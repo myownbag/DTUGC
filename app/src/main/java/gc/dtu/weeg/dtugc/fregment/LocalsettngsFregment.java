@@ -14,6 +14,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
@@ -190,7 +191,7 @@ public class LocalsettngsFregment extends Fragment {
             }
             if(mIndexcmd<adsinf0.length)
             {
-                String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd++]);
+                String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
                 verycutstatus(readOutMsg);
             }
 
@@ -221,13 +222,16 @@ public class LocalsettngsFregment extends Fragment {
             String registername;
             String registerconnet;
             String registersetting;
+            String registerlen;
             registername=((TextView)view.findViewById(R.id.register_item)).getText().toString();
             registersetting=((TextView)view.findViewById(R.id.registerinfo_item)).getText().toString();
-            registerconnet= ((TextView)view.findViewById(R.id.registerset_item)).getText().toString();
+            registerconnet= ((TextView)view.findViewById(R.id.registerset_item)).getText().toString();   //registerlen_item
+            registerlen=((TextView)view.findViewById(R.id.registerlen_item)).getText().toString();
             Intent serverIntent = new Intent(MainActivity.getInstance(), ItemSetingActivity.class);
             serverIntent.putExtra("addrs",registername);
             serverIntent.putExtra("name",registersetting);
             serverIntent.putExtra("settings",registerconnet);
+            serverIntent.putExtra("datalen",registerlen);
             startActivityForResult(serverIntent, Constants.LocalsetingFlag);
            // Log.d("zl","position:"+position+"id:"+id);
 
@@ -236,8 +240,16 @@ public class LocalsettngsFregment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("zl","requestCode:"+requestCode+" "+"resultCode:"+resultCode);
         MainActivity.getInstance().setOndataparse(new DataParse());
+        Log.d("zl","requestCode:"+requestCode+" "+"resultCode:"+resultCode);
+        if(resultCode==1)
+        {
+            Toast.makeText(MainActivity.getInstance(),"参数设置成功",Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            return;
+        }
         if(data!=null)
         {
             String temp=data.getStringExtra("name");
@@ -253,12 +265,21 @@ public class LocalsettngsFregment extends Fragment {
     {
 
         @Override
-        public void datacometoparse(String readOutMsg1, byte[] readOutBuf1) {
+        public void datacometoparse(String readOutMsg1, byte[] readOutBuf1)
+        {
             String temp;
+            int tempint;
+            int tempint2;
             int  i=0;
+            int transtrit=-1;
             if(readOutBuf1.length<5)
             {
                 ToastUtils.showToast(getActivity(), "数据长度短");
+//                if(mIndexcmd<senddatabuf.length)
+//                {
+//                    String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
+//                    verycutstatus(readOutMsg);
+//                }
                 return;
             }
             else
@@ -266,14 +287,191 @@ public class LocalsettngsFregment extends Fragment {
                 if(readOutBuf1[3]!=(readOutBuf1.length-5))
                 {
                     ToastUtils.showToast(getActivity(), "数据长度异常");
+//                    if(mIndexcmd<senddatabuf.length)
+//                    {
+//                        String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
+//                        verycutstatus(readOutMsg);
+//                    }
                     return;
                 }
             }
-//            switch()
-//            {
-//                case :
-//                    break;
-//            }
+            byte addr= (byte) (Integer.valueOf(baseinfo[mIndexcmd][0])%0x100);
+            if(Integer.valueOf(baseinfo[mIndexcmd][2])==1)
+            {
+                for(i=0;i<registerinfosel.length;i++)
+                {
+
+                    if(addr==readOutBuf1[14])
+                    {
+                         tempint=(0x000000ff&readOutBuf1[15])*0x100+(0x000000ff&readOutBuf1[16]);
+                        if(tempint==Integer.valueOf(registerinfosel[i][2]))
+                        {
+                            settingscontent[mIndexcmd]=registerinfosel[i][1];
+                         //   myadpater.notifyDataSetChanged();
+                            if(Integer.valueOf(baseinfo[mIndexcmd][0])==208)
+                            {
+                                transtrit=tempint;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            else if(Integer.valueOf(baseinfo[mIndexcmd][2])==10)
+            {
+                tempint=0x000000ff&readOutBuf1[15];
+                int gatetype=0;
+                if(tempint==1)
+                {
+                     tempint2=0x000000ff&readOutBuf1[16];
+                     if(tempint2==2)
+                     {
+                         gatetype=1;
+                     }
+                     else if(tempint2==0)
+                     {
+                         tempint2=(0x000000ff&readOutBuf1[17])*0x100+(0x000000ff&readOutBuf1[18]);
+                         if(tempint2==Constants.GCOPENTIME)
+                         {
+                             gatetype=2;
+                         }
+                         if(tempint2==Constants.G6OPENTIME)
+                         {
+                             gatetype=3;
+                         }
+                     }
+                }
+                else if(tempint==0)
+                {
+                    gatetype=0;
+                }
+                else if(tempint==2)
+                {
+                    gatetype=4;
+                }
+                else
+                {
+                    gatetype=-1;
+                }
+                for(i=0;i<registerinfosel.length;i++)
+                {
+
+                    if(0x6E==readOutBuf1[14]) //0x64=110
+                    {
+                        if(gatetype==Integer.valueOf(registerinfosel[i][2]))
+                        {
+                            settingscontent[mIndexcmd]=registerinfosel[i][1];
+                           // myadpater.notifyDataSetChanged();
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                tempint2=0x000000ff&readOutBuf1[14];
+                if(tempint2==202||tempint2==202) //解析IP
+                {
+                    temp=String.format("%d.%d.%d.%d,",0x000000ff&readOutBuf1[16],0x000000ff&readOutBuf1[17]
+                                                    ,0x000000ff&readOutBuf1[18],0x000000ff&readOutBuf1[19]);
+                    tempint=0x000000ff&readOutBuf1[20]+(0x000000ff&readOutBuf1[21])*0x100;
+                    temp=temp+tempint;
+                    settingscontent[mIndexcmd]=temp;
+                    //myadpater.notifyDataSetChanged();
+                }
+               else if(tempint2==209)
+                {
+                    tempint=0x000000ff&readOutBuf1[16]+(0x000000ff&readOutBuf1[17])*0x100;
+                    temp=""+tempint;
+                    settingscontent[mIndexcmd]=temp;
+                }
+                else if(tempint2==210)
+                {
+                    String daytime="";
+                    String lockdaytime1=ArrayFormatCString(0x000000ff&readOutBuf1[16],0x000000ff&readOutBuf1[17]
+                            ,0x000000ff&readOutBuf1[18],transtrit);
+                    if(lockdaytime1.equals("")==false)
+                    {
+                        daytime+=lockdaytime1+";";
+                    }
+                    String lockdaytime2=ArrayFormatCString(0x000000ff&readOutBuf1[19],0x000000ff&readOutBuf1[20],
+                                                            0x000000ff&readOutBuf1[21],transtrit);
+                    if (lockdaytime2.equals("")==false)
+                    {
+                        daytime+=lockdaytime2+";";
+                    }
+                    String lockdaytime3=ArrayFormatCString(0x000000ff&readOutBuf1[22],0x000000ff&readOutBuf1[23],
+                            0x000000ff&readOutBuf1[24],transtrit);
+                    if (lockdaytime3.equals("")==false)
+                    {
+                        daytime+=lockdaytime3+";";
+                    }
+                    String lockdaytime4=ArrayFormatCString(0x000000ff&readOutBuf1[25],0x000000ff&readOutBuf1[26],
+                            0x000000ff&readOutBuf1[27],transtrit);
+                    if (lockdaytime4.equals("")==false)
+                    {
+                        daytime+=lockdaytime4+";";
+                    }
+                    settingscontent[mIndexcmd]=daytime;
+                }
+                else
+                {
+                    temp="";
+                    for(i=0;i<readOutBuf1.length-18;i++)
+                    {
+                        temp+=(char)readOutBuf1[16];
+                        settingscontent[mIndexcmd]=temp;
+                    }
+                }
+            }
+
+            myadpater.notifyDataSetChanged();
+            mIndexcmd++;
+            if(mIndexcmd<senddatabuf.length)
+            {
+                String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
+                verycutstatus(readOutMsg);
+            }
         }
+    }
+
+    private String ArrayFormatCString(int week, int hour, int minute, int transtrit1) {
+
+        String temp="";
+        if(hour==0xff||minute==0xff)
+            return "";
+        String strweek = "";
+        String strhourminute;
+        switch (week)
+        {
+            case 1:
+                strweek="星期一";
+                break;
+            case 2:
+                strweek="星期二";
+                break;
+            case 3:
+                strweek="星期三";
+                break;
+            case 4:
+                strweek="星期四";
+                break;
+            case 5:
+                strweek="星期五";
+                break;
+            case 6:
+                strweek="星期六";
+                break;
+            case 7:
+                strweek="星期日";
+                break;
+        }
+        //strhourminute.Format("%.2d:%.2d",hour,minute);
+        strhourminute=String.format("%02d:%02d",hour,minute);
+        if (transtrit1==0x01)
+            strweek=strweek+","+strhourminute;
+        else
+            strweek=strhourminute;
+        return strweek;
     }
 }

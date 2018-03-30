@@ -10,6 +10,11 @@ public class Constants {
 
     public static final int  LocalsetingFlag = 800;
 
+    public static final int  GCOPENTIME = 8000;
+    public static final int  GCCLOSETIME = 6000;
+    public static final int  G6OPENTIME = 15000;
+    public static final int  G6CLOSETIME = 9000;
+
     //----------------------------------------------------
     //本地设置详情
 }

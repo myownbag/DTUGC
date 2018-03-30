@@ -186,13 +186,13 @@ public class BasicinfoFregment extends Fragment {
                     switch (readOutBuf1[16])
                     {
                         case 0x01:
-                            indicatorSeekBar.setProgress(20);
+                            indicatorSeekBar.setProgress(25);
                             break;
                         case 0x02:
-                            indicatorSeekBar.setProgress(40);
+                            indicatorSeekBar.setProgress(50);
                             break;
                         case 0x04:
-                            indicatorSeekBar.setProgress(80);
+                            indicatorSeekBar.setProgress(75);
                             break;
                         case (byte) 0x08:
                             indicatorSeekBar.setProgress(100);
