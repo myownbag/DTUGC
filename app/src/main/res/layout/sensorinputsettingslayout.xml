@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="5"
+    android:orientation="vertical">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:id="@+id/sensor_press1set"
+    android:layout_weight="1"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#fff" >
+        <TextView
+            android:id="@+id/tv_sensor_type1_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="第一路压力:"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_sensor_type1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/tv_sensor_type1_label"
+            android:layout_toRightOf="@+id/tv_sensor_type1_label"
+            android:textColor="#444"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:weightSum="4"
+        android:background="#fff" >
+
+        <TextView
+            android:id="@+id/tv_sensor_pressvalue1h_label"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="高报警:"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_sensor_pressvalue1h"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:textColor="#444"
+            android:textSize="14sp"
+            android:inputType="numberDecimal"/>
+
+
+
+        <TextView
+            android:id="@+id/tv_sensor_pressvalue1l_label"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="低报警:"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_sensor_pressvalue1l"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:inputType="numberDecimal"
+            android:textColor="#444"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:id="@+id/sensor_press2set"
+    android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#fff" >
+        <TextView
+            android:id="@+id/tv_sensor_type2_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="第二路压力:"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_sensor_type2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/tv_sensor_type2_label"
+            android:layout_toRightOf="@+id/tv_sensor_type2_label"
+            android:textColor="#444"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:weightSum="4"
+        android:background="#fff" >
+
+        <TextView
+            android:id="@+id/tv_sensor_pressvalue2h_label"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="高报警:"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_sensor_pressvalue2h"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:textColor="#444"
+            android:textSize="14sp"
+            android:inputType="numberDecimal"/>
+
+
+
+        <TextView
+            android:id="@+id/tv_sensor_pressvalue2l_label"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="低报警:"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_sensor_pressvalue2l"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:inputType="numberDecimal"
+            android:textColor="#444"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+
+</LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:id="@+id/sensor_temperatureset"
+    android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#fff" >
+        <TextView
+            android:id="@+id/tv_sensor_type3_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="温度:"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_sensor_type3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/tv_sensor_type3_label"
+            android:layout_toRightOf="@+id/tv_sensor_type3_label"
+            android:textColor="#444"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:weightSum="4"
+        android:background="#fff" >
+
+        <TextView
+            android:id="@+id/tv_sensor_temperatureh_label"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="高报警:"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_sensor_temperatureh"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:inputType="numberDecimal"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+
+
+        <TextView
+            android:id="@+id/tv_sensor_temperaturel_label"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="低报警:"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_sensor_temperaturel"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:inputType="numberDecimal"
+            android:textColor="#444"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+
+</LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/sensor_timeset"
+            android:orientation="vertical">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="#fff" >
+                <TextView
+                    android:id="@+id/tv_sensor_type4_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:text="时间:"
+                    android:textColor="#444"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_sensor_type4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@+id/tv_sensor_type4_label"
+                    android:layout_toRightOf="@+id/tv_sensor_type4_label"
+                    android:textColor="#444"
+                    android:textSize="14sp" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:weightSum="4"
+                android:background="#fff" >
+
+                <TextView
+                    android:id="@+id/tv_sensor_time1_label"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:text="扫描时间:"
+                    android:textColor="#444"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_sensor_time1"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:inputType="numberDecimal"
+                    android:textColor="#444"
+                    android:textSize="14sp" />
+
+
+
+                <TextView
+                    android:id="@+id/tv_sensor_time2_label"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:text="记录时间:"
+                    android:textColor="#444"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_sensor_time2"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:inputType="numberDecimal"
+                    android:textColor="#444"
+                    android:textSize="14sp" />
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="#CFCFCF" />
+        </LinearLayout>
+
+        <!--123-->
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center_vertical"
+            android:layout_weight="1"
+           >
+
+            <Button
+                android:id="@+id/tv_sensor_btn_write"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginStart="20dp"
+                android:textSize="16sp"
+                android:background="@drawable/round_button"
+                android:text="命令执行"
+                android:textColor="#fff" />
+
+        </LinearLayout>
+
+
+
+</LinearLayout>

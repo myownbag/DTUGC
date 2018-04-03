@@ -15,6 +15,8 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -39,6 +41,7 @@ public class ItemSetingActivity extends Activity {
     TextView mtextaddr;
     TextView mtextaddrname;
     Spinner spinner;
+    ImageView backbut;
     MainActivity mainActivity;
     private List<String> data_list;
     private int [] currsetvaluesettings;
@@ -79,7 +82,13 @@ public class ItemSetingActivity extends Activity {
         spinner=findViewById(R.id.currentset_item_addrspiner);
         spinerconter=findViewById(R.id.selectitemspiner);
         mainActivity=MainActivity.getInstance();
-
+        backbut=findViewById(R.id.imgBackItemset);
+        backbut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ItemSetingActivity.this.finish();
+            }
+        });
         initview();
     }
 

@@ -9,7 +9,7 @@
         android:background="#1D8FFE" >
 
         <ImageView
-            android:id="@+id/imgBackItemset"
+            android:id="@+id/Sensor_imgBackItemset"
             android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -18,140 +18,19 @@
             android:src="@drawable/icon_back" />
 
         <TextView
-            android:id="@+id/txt_titles"
+            android:id="@+id/Sensor_item_txt_titles"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:textColor="#FFF"
             android:textSize="20sp" />
-
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="#fff" >
-
-
-
         <TextView
-            android:id="@+id/currentset_item_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-
-            android:text="寄存器地址:"
-            android:textColor="#444"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/currentset_item_addr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/currentset_item_label"
-            android:layout_toRightOf="@+id/currentset_item_label"
-            android:textColor="#444"
-            android:textSize="14sp" />
-
-
-    </RelativeLayout>
-    <!-- 分割线 -->
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#CFCFCF" />
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="#fff" >
-
-
-
-        <TextView
-            android:id="@+id/currentset_item_addrname_lable"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-
-            android:text="寄存器名称:"
-            android:textColor="#444"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/currentset_item_addrname"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/currentset_item_addrname_lable"
-            android:layout_toRightOf="@+id/currentset_item_addrname_lable"
-            android:textColor="#444"
-            android:textSize="14sp" />
-
-
-    </RelativeLayout>
-    <!-- 分割线 -->
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#CFCFCF" />
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="#fff" >
-
-
-
-        <TextView
-            android:id="@+id/currentset_item_addrsettings_lable"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-
-            android:text="设置内容:"
-            android:textColor="#444"
-            android:textSize="14sp" />
-
-        <EditText
-            android:id="@+id/currentset_item_addrsettings"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/currentset_item_addrsettings_lable"
-            android:layout_toRightOf="@+id/currentset_item_addrsettings_lable"
-            android:textColor="#444"
-            android:textSize="14sp" />
-    </RelativeLayout>
-    <!-- 分割线 -->
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#CFCFCF" />
-
-    <RelativeLayout
-        android:id="@+id/selectitemspiner"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="#fff" >
-
-
-
-        <TextView
-            android:id="@+id/currentset_item_addrspiner_lable"
+            android:id="@+id/sensor_set_item_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -163,16 +42,18 @@
             android:textSize="14sp" />
 
         <Spinner
-            android:id="@+id/currentset_item_addrspiner"
+            android:id="@+id/sensor_set_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/currentset_item_addrspiner_lable"
-            android:layout_toRightOf="@+id/currentset_item_addrspiner_lable"
+            android:layout_toEndOf="@+id/sensor_set_item_label"
+            android:layout_toRightOf="@+id/sensor_set_item_label"
             android:textColor="#444"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
+
+
     </RelativeLayout>
     <!-- 分割线 -->
 
@@ -181,25 +62,108 @@
         android:layout_height="0.5dp"
         android:background="#CFCFCF" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp">
+        android:layout_height="50dp"
+        android:background="#fff" >
+        <TextView
+            android:id="@+id/sensor_set_item_manual_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
 
-        <Button
-            android:id="@+id/tv_itemsettings_btn_write"
+            android:text="请输入:(单位:Kpa)"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/sensor_set_item_manual"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginEnd="20dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginStart="20dp"
-            android:textSize="16sp"
-            android:background="@drawable/round_button"
-            android:text="写入数据"
-            android:textColor="#fff" />
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/sensor_set_item_manual_label"
+            android:layout_toRightOf="@+id/sensor_set_item_manual_label"
+            android:textColor="#444"
+            android:textSize="14sp" />
+    </RelativeLayout>
+    <!-- 分割线 -->
 
-    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+    <!--1213-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#fff" >
+        <TextView
+            android:id="@+id/sensor_set_item_hight_lable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+
+            android:text="高报警:"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/sensor_set_item_hight_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/sensor_set_item_hight_lable"
+            android:layout_toRightOf="@+id/sensor_set_item_hight_lable"
+            android:textColor="#444"
+            android:textSize="14sp" />
+    </RelativeLayout>
+    <!-- 分割线 -->
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+    <!--234-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#fff" >
+        <TextView
+            android:id="@+id/sensor_set_item_low_lable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+
+            android:text="低报警:"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/sensor_set_item_low_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/sensor_set_item_low_lable"
+            android:layout_toRightOf="@+id/sensor_set_item_low_lable"
+            android:textColor="#444"
+            android:textSize="14sp" />
+    </RelativeLayout>
+    <!-- 分割线 -->
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
 </LinearLayout>
