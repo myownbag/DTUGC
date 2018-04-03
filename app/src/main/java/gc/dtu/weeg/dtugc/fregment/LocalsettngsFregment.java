@@ -57,35 +57,43 @@ public class LocalsettngsFregment extends Fragment {
     };
     public String[][] registerinfosel=
             {
+//                    {"100","","-1"},
                     {"100","热量表采集","1"},
                     {"100","修正仪表采集","2"},
                     {"100","可燃气体报警器","4"},
                     {"100","压力报警器","8"},
                     {"100","燃气仪表采集","16"},
 
+//                    {"101","","-1"},
                     {"101","外供电","0"},
                     {"101","锂电池","1"},
                     {"101","外供电+备电","16"},
                     {"101","干电池+备电","17"},
                     //阀门解析和打包需要特别注意
+//                    {"110","","-1"},
                     {"110","未挂接","0"},
                     {"110","EMV DJF","1"},
                     {"110","EMV CV GC","2"},
                     {"110","EMV CV G6+","3"},
                     {"110","EMV BV","4"},
                     //无线模块
+//                    {"198","","-1"},
                     {"198","模块关闭","0"},
                     {"198","模块自适应","1"},
                     {"198","M72","2"},
                     {"198","MC323","3"},
 
+//                    {"206","","-1"},
                     {"206","TCP","0"},
                     {"206","UDP","1"},
+                    {"206","CoAp","2"},
 
+//                    {"207","","-1"},
                     {"207","主动上传","0"},
                     {"207","远程抄读","1"},
                     {"207","透明传输","2"},
 
+//                    {"208","","-1"},
                     {"208","频率","0"},
                     {"208","每天固定时间","2"},
             };
@@ -295,13 +303,18 @@ public class LocalsettngsFregment extends Fragment {
                     return;
                 }
             }
-            byte addr= (byte) (Integer.valueOf(baseinfo[mIndexcmd][0])%0x100);
+            byte addr= readOutBuf1[14];//(byte) (Integer.valueOf(baseinfo[mIndexcmd][0])%0x100);
+            if(mIndexcmd>=baseinfo.length)
+            {
+                Log.d("zl","接收任务完成" );
+                return;
+            }
             if(Integer.valueOf(baseinfo[mIndexcmd][2])==1)
             {
                 for(i=0;i<registerinfosel.length;i++)
                 {
-
-                    if(addr==readOutBuf1[14])
+                    byte bytetemp= (byte) (Integer.valueOf(registerinfosel[i][0])%0x100);
+                    if(addr==bytetemp)
                     {
                          tempint=(0x000000ff&readOutBuf1[15])*0x100+(0x000000ff&readOutBuf1[16]);
                         if(tempint==Integer.valueOf(registerinfosel[i][2]))
@@ -319,18 +332,18 @@ public class LocalsettngsFregment extends Fragment {
             }
             else if(Integer.valueOf(baseinfo[mIndexcmd][2])==10)
             {
-                tempint=0x000000ff&readOutBuf1[15];
+                tempint=0x000000ff&readOutBuf1[16];
                 int gatetype=0;
                 if(tempint==1)
                 {
-                     tempint2=0x000000ff&readOutBuf1[16];
+                     tempint2=0x000000ff&readOutBuf1[17];
                      if(tempint2==2)
                      {
                          gatetype=1;
                      }
                      else if(tempint2==0)
                      {
-                         tempint2=(0x000000ff&readOutBuf1[17])*0x100+(0x000000ff&readOutBuf1[18]);
+                         tempint2=(0x000000ff&readOutBuf1[19])*0x100+(0x000000ff&readOutBuf1[18]);
                          if(tempint2==Constants.GCOPENTIME)
                          {
                              gatetype=2;
@@ -356,7 +369,7 @@ public class LocalsettngsFregment extends Fragment {
                 for(i=0;i<registerinfosel.length;i++)
                 {
 
-                    if(0x6E==readOutBuf1[14]) //0x64=110
+                    if(0x6E==Integer.valueOf(registerinfosel[i][0])%0x100) //0x64=110
                     {
                         if(gatetype==Integer.valueOf(registerinfosel[i][2]))
                         {
@@ -370,18 +383,18 @@ public class LocalsettngsFregment extends Fragment {
             else
             {
                 tempint2=0x000000ff&readOutBuf1[14];
-                if(tempint2==202||tempint2==202) //解析IP
+                if(tempint2==202||tempint2==205) //解析IP
                 {
                     temp=String.format("%d.%d.%d.%d,",0x000000ff&readOutBuf1[16],0x000000ff&readOutBuf1[17]
                                                     ,0x000000ff&readOutBuf1[18],0x000000ff&readOutBuf1[19]);
-                    tempint=0x000000ff&readOutBuf1[20]+(0x000000ff&readOutBuf1[21])*0x100;
+                    tempint=(0x000000ff&readOutBuf1[20])+(0x000000ff&readOutBuf1[21])*0x100;
                     temp=temp+tempint;
                     settingscontent[mIndexcmd]=temp;
                     //myadpater.notifyDataSetChanged();
                 }
                else if(tempint2==209)
                 {
-                    tempint=0x000000ff&readOutBuf1[16]+(0x000000ff&readOutBuf1[17])*0x100;
+                    tempint=(0x000000ff&readOutBuf1[16])+(0x000000ff&readOutBuf1[17])*0x100;
                     temp=""+tempint;
                     settingscontent[mIndexcmd]=temp;
                 }
@@ -419,7 +432,7 @@ public class LocalsettngsFregment extends Fragment {
                     temp="";
                     for(i=0;i<readOutBuf1.length-18;i++)
                     {
-                        temp+=(char)readOutBuf1[16];
+                        temp+=(char)readOutBuf1[16+i];
                         settingscontent[mIndexcmd]=temp;
                     }
                 }
