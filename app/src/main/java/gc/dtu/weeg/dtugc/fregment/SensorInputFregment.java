@@ -22,6 +22,7 @@ import java.util.Map;
 
 import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
+import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.ItemSetingActivity;
 import gc.dtu.weeg.dtugc.utils.SensoritemsettingActivity;
@@ -49,6 +50,10 @@ public class SensorInputFregment extends Fragment {
     TextView mtime1;
     TextView mtime2;
     ArrayList<Map<String,String>> mdataitem;
+    byte sendbufread[]={(byte) 0xFD, 0x00 ,0x00 ,0x0D ,        0x00 ,0x19 ,0x00 ,        0x00 ,0x00 ,0x00
+                              ,0x00 ,0x00 ,0x00 ,0x00 , (byte) 0xD9 ,0x00 ,0x0C , (byte) 0xA0};
+    byte [] sendbufwrite;
+    int m_position;
     private SharedPreferences sp ;
 
     //基础数据
@@ -98,6 +103,7 @@ public class SensorInputFregment extends Fragment {
         mlayouttemperature.setOnClickListener(new OnclicklistenerImp());
         mlayouttime.setOnClickListener(new OnclicklistenerImp());
         MainActivity.getInstance().SetonPageSelectedinviewpager(new Oncurrentpageselect());
+        MainActivity.getInstance().setOndataparse(new ondataParseimp());
 
     }
     private class OnclicklistenerImp implements View.OnClickListener
@@ -115,6 +121,7 @@ public class SensorInputFregment extends Fragment {
                    serverIntent.putExtra("item1",mpressmode1.getText().toString());
                    serverIntent.putExtra("item2",mPress1H.getText().toString());
                    serverIntent.putExtra("item3",mPress1L.getText().toString());
+                   m_position=0;
 //                   Log.d("zl","R.id.sensor_press1set:");
                    break;
                case R.id.sensor_press2set:
@@ -123,6 +130,7 @@ public class SensorInputFregment extends Fragment {
                    serverIntent.putExtra("item1",mpressmode2.getText().toString());
                    serverIntent.putExtra("item2",mPress2H.getText().toString());
                    serverIntent.putExtra("item3",mPress2L.getText().toString());
+                   m_position=1;
 //                   Log.d("zl","R.id.sensor_press2set:");
                    break;
                case R.id.sensor_temperatureset:
@@ -131,6 +139,7 @@ public class SensorInputFregment extends Fragment {
                    serverIntent.putExtra("item1",mtempmode.getText().toString());
                    serverIntent.putExtra("item2",mtempIn1.getText().toString());
                    serverIntent.putExtra("item3",mtempIn2.getText().toString());
+                   m_position=2;
 //                   Log.d("zl","R.id.sensor_temperatureset:");
                    break;
                case R.id.sensor_timeset:
@@ -139,6 +148,7 @@ public class SensorInputFregment extends Fragment {
                    serverIntent.putExtra("item1","");
                    serverIntent.putExtra("item2",mtime1.getText().toString());
                    serverIntent.putExtra("item3",mtime2.getText().toString());
+                   m_position=3;
 //                   Log.d("zl","R.id.sensor_timeset:");
                    break;
                    default:
@@ -188,7 +198,56 @@ public class SensorInputFregment extends Fragment {
         //super.onActivityResult(requestCode, resultCode, data);
         if(resultCode==1)
         {
+            if(mdataitem!=null)
+            {
+//                Log.d("zl","text 0:"+mdataitem.get(0).get("text"));
+//                Log.d("zl","settings 0:"+mdataitem.get(0).get("settings"));
+//
+//                Log.d("zl","text 1:"+mdataitem.get(1).get("text"));
+//                Log.d("zl","settings 1:"+mdataitem.get(1).get("settings"));
+                switch (m_position)
+                {
+                    case 0:
+                        mpressmode1.setText(mdataitem.get(0).get("text"));
+                        mPress1H.setText(mdataitem.get(1).get("text"));
+                        mPress1L.setText(mdataitem.get(2).get("text"));
+                        break;
+                    case 1:
+                        mpressmode2.setText(mdataitem.get(0).get("text"));
+                        mPress2H.setText(mdataitem.get(1).get("text"));
+                        mPress2L.setText(mdataitem.get(2).get("text"));
+                        break;
+                    case 2:
+                        mtempmode.setText(mdataitem.get(0).get("text"));
+                        mtempIn1.setText(mdataitem.get(1).get("text"));
+                        mtempIn2.setText(mdataitem.get(2).get("text"));
+                        break;
+                    case 3:
+                        mtime1.setText(mdataitem.get(0).get("text"));
+                        mtime2.setText(mdataitem.get(1).get("text"));
+                        break;
+                        default:
+                            break;
+                }
+            }
 
+        }
+    }
+    private class ondataParseimp implements MainActivity.Ondataparse
+    {
+
+        @Override
+        public void datacometoparse(String readOutMsg1, byte[] readOutBuf1) {
+            if(readOutBuf1.length>20)
+            {
+                sendbufwrite=readOutBuf1;
+                sendbufwrite[5]=0x1A;
+                CodeFormat.crcencode(sendbufwrite);
+            }
+            else
+            {
+                Toast.makeText(MainActivity.getInstance(),"数据设置成功",Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

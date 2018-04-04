@@ -12,11 +12,13 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,18 +31,22 @@ import gc.dtu.weeg.dtugc.R;
 
 public class SensoritemsettingActivity extends Activity {
     Intent intent;
-    MainActivity mainActivity;
+    public MainActivity mainActivity;
     RelativeLayout  selectlayout;
     RelativeLayout  anologinputlayout;
     TextView  mtitle;
     TextView  text1;
     TextView  text2;
     Spinner msettings;
+    EditText m_range;
+    EditText editText1;
+    EditText editText2;
+
     ImageView Imageback;
     Button   butcommit;
     ArrayList<String> listcontent;
     ArrayList<String> listvalue;
-    int m_currentselect=-1;
+    int m_currentselect=0;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +61,9 @@ public class SensoritemsettingActivity extends Activity {
         Imageback=findViewById(R.id.Sensor_imgBackItemset);
         butcommit=findViewById(R.id.buttsensorcommite);
         mainActivity=MainActivity.getInstance();
+        m_range=findViewById(R.id.sensor_set_item_manual);
+        editText1=findViewById(R.id.sensor_set_item_hight_input);
+        editText2=findViewById(R.id.sensor_set_item_low_input);
 
 
         initview();
@@ -65,10 +74,11 @@ public class SensoritemsettingActivity extends Activity {
 
             int position=intent.getIntExtra("position",-1);
             String temptitle=intent.getStringExtra("name");
+            boolean isfind=false;
             mtitle.setText(temptitle);
             listcontent=new ArrayList<String>();
             listvalue=new ArrayList<String>();
-            String tempcontent=intent.getStringExtra("item1");;
+            String tempcontent=intent.getStringExtra("item1");
             if(position==1||position==2)
             {
                 for(int i=0;i<mainActivity.fregment5.sensorinfo.length;i++)
@@ -77,12 +87,22 @@ public class SensoritemsettingActivity extends Activity {
                     {
                         listcontent.add(mainActivity.fregment5.sensorinfo[i][1]);
                         listvalue.add(mainActivity.fregment5.sensorinfo[i][2]);
-                        if(tempcontent==mainActivity.fregment5.sensorinfo[i][1])
+
+                        if(tempcontent.equals(mainActivity.fregment5.sensorinfo[i][1]))
                         {
-                            m_currentselect=i;
+                            m_currentselect=listvalue.size()-1;
+                            isfind=true;
                         }
                     }
                 }
+                if(isfind==false)
+                {
+                    if(tempcontent.length()!=0)
+                    {
+                        m_currentselect=listvalue.size()-1;
+                    }
+                }
+
             }
             else if(position==3)
             {
@@ -92,9 +112,9 @@ public class SensoritemsettingActivity extends Activity {
                     {
                         listcontent.add(mainActivity.fregment5.sensorinfo[i][1]);
                         listvalue.add(mainActivity.fregment5.sensorinfo[i][2]);
-                        if(tempcontent==mainActivity.fregment5.sensorinfo[i][1])
+                        if(tempcontent.equals(mainActivity.fregment5.sensorinfo[i][1]))
                         {
-                            m_currentselect=i;
+                            m_currentselect=listvalue.size()-1;
                         }
                     }
                 }
@@ -108,6 +128,7 @@ public class SensoritemsettingActivity extends Activity {
                     anologinputlayout.setVisibility(View.VISIBLE);
                     text1.setText("高报警");
                     text2.setText("低报警");
+                    m_range.setText(tempcontent);
                     break;
                 case 4:
                     selectlayout.setVisibility(View.GONE);
@@ -117,7 +138,8 @@ public class SensoritemsettingActivity extends Activity {
                     break;
 
             }
-
+            editText1.setText(intent.getStringExtra("item2"));
+            editText2.setText(intent.getStringExtra("item3"));
         //适配器
         ArrayAdapter<String> arr_adapter;
         arr_adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, listcontent);
@@ -132,13 +154,21 @@ public class SensoritemsettingActivity extends Activity {
 //        serverIntent.putExtra("item3",mPress2L.getText().toString());
         msettings.setSelection(m_currentselect,true);
         msettings.setOnItemSelectedListener(new SpinerOnitemselectimp());
-        if(tempcontent=="模拟量量程")
+        int sizemax=listvalue.size()-1;
+        if(position==1||position==2)
         {
-            anologinputlayout.setVisibility(View.VISIBLE);
+            if(m_currentselect==sizemax)
+                anologinputlayout.setVisibility(View.VISIBLE);
+            else
+                anologinputlayout.setVisibility(View.GONE);
+        }
+        else if(position==3)
+        {
+            anologinputlayout.setVisibility(View.GONE);
         }
         else
         {
-            anologinputlayout.setVisibility(View.GONE);
+            selectlayout.setVisibility(View.GONE);
         }
         Imageback.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,6 +177,10 @@ public class SensoritemsettingActivity extends Activity {
             }
         });
         butcommit.setOnClickListener(new ButtonOnclicklistenerimp());
+    }
+    public void test()
+    {
+
     }
     private class SpinerOnitemselectimp implements AdapterView.OnItemSelectedListener
     {
@@ -162,6 +196,7 @@ public class SensoritemsettingActivity extends Activity {
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.showSoftInput(anologinputlayout,0);
                     imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+                    m_range.setText("");
                 }
                 else
                 {
@@ -181,11 +216,52 @@ public class SensoritemsettingActivity extends Activity {
         public void onClick(View v) {
             ArrayList<Map<String,String>> itemdata=new ArrayList<Map<String,String>>();
             int m_currentselect=  msettings.getSelectedItemPosition();
-            Map<String,String> temp =new HashMap<String,String>();
-            temp.put("text",listcontent.get(m_currentselect));
-            temp.put("settings",listvalue.get(m_currentselect));
+            Map<String,String> temp;
+            if(listvalue.size()!=0)
+            {
+                temp=new HashMap<String,String>();
+
+                if(listvalue.get(m_currentselect).equals("65535")==false)
+                {
+                    temp.put("text",listcontent.get(m_currentselect));
+                    temp.put("settings",listvalue.get(m_currentselect));
+                    itemdata.add(temp);
+                }
+                else
+                {
+                    if(m_range.length()==0)
+                    {
+                        Toast.makeText(SensoritemsettingActivity.this,"请完善信息",Toast.LENGTH_SHORT).show();
+                        SensoritemsettingActivity.this.setResult(-1,intent);
+                        return;
+                    }
+                    else
+                    {
+                        temp.put("text",m_range.getText().toString());
+                        temp.put("settings",m_range.getText().toString());
+                        itemdata.add(temp);
+                    }
+                }
+            }
+            temp=new HashMap<String,String>();
+            if(editText1.length()==0||editText2.length()==0)
+            {
+                Toast.makeText(SensoritemsettingActivity.this,"请完善信息",Toast.LENGTH_SHORT).show();
+                SensoritemsettingActivity.this.setResult(-1,intent);
+                return;
+            }
+            temp.put("text",editText1.getText().toString());
+            temp.put("settings",editText1.getText().toString());
             itemdata.add(temp);
 
+            temp=new HashMap<String,String>();
+            temp.put("text",editText2.getText().toString());
+            temp.put("settings",editText2.getText().toString());
+            itemdata.add(temp);
+
+            mainActivity.fregment5.updateallsettingitems(itemdata);
+            SensoritemsettingActivity.this.setResult(1,intent);
+            SensoritemsettingActivity.this.finish();
         }
     }
 }
