@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
+import gc.dtu.weeg.dtugc.myview.MyDlg;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.ItemSetingActivity;
@@ -49,6 +51,7 @@ public class SensorInputFregment extends Fragment {
     TextView mtimemode;
     TextView mtime1;
     TextView mtime2;
+    Button mButcommand;
     ArrayList<Map<String,String>> mdataitem;
     byte sendbufread[]={(byte) 0xFD, 0x00 ,0x00 ,0x0D ,        0x00 ,0x19 ,0x00 ,        0x00 ,0x00 ,0x00
                               ,0x00 ,0x00 ,0x00 ,0x00 , (byte) 0xD9 ,0x00 ,0x0C , (byte) 0xA0};
@@ -92,6 +95,7 @@ public class SensorInputFregment extends Fragment {
         mtempIn2=mView.findViewById(R.id.tv_sensor_temperaturel);
         mtime1=mView.findViewById(R.id.tv_sensor_time1);
         mtime2=mView.findViewById(R.id.tv_sensor_time2);
+        mButcommand=mView.findViewById(R.id.tv_sensor_btn_write);
         initview();
 
         return mView;
@@ -104,7 +108,30 @@ public class SensorInputFregment extends Fragment {
         mlayouttime.setOnClickListener(new OnclicklistenerImp());
         MainActivity.getInstance().SetonPageSelectedinviewpager(new Oncurrentpageselect());
         MainActivity.getInstance().setOndataparse(new ondataParseimp());
+        mButcommand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MyDlg dlg=new MyDlg(MainActivity.getInstance());
+                dlg.SetOnbutclickListernerdlg(new MyDlg.Onbutclicked() {
+                    @Override
+                    public void Onbutclicked(int select) {
+                        if(select==1)
+                        {
+                            Toast.makeText(MainActivity.getInstance(),"read",Toast.LENGTH_SHORT).show();
+                        }
+                        else if(select==0)
+                        {
+                            Toast.makeText(MainActivity.getInstance(),"write",Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
 
+                        }
+                    }
+                });
+                dlg.show();
+            }
+        });
     }
     private class OnclicklistenerImp implements View.OnClickListener
     {
@@ -250,4 +277,5 @@ public class SensorInputFregment extends Fragment {
             }
         }
     }
+
 }

@@ -5,35 +5,47 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
     <ImageView
-        android:layout_width="150dp"
+        android:layout_width="match_parent"
         android:layout_height="150dp"
         android:src="@drawable/confused"
+        android:background="#fff"
         />
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#CFCFCF"/>
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="请选择需要的操作"
-        />
+        android:layout_height="50dp"
+        android:background="#fff" >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="请选择需要的操作"
+            />
+    </RelativeLayout>>
+
     <RadioGroup
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:checkedButton="@id/selectread"
+        android:orientation="vertical"
         android:id="@+id/dlgselect"
         >
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="读数据"
-            android:id="@+id/selectread"/>
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="写数据"
-            android:id="@+id/selectwrite"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:text="读数据"
+                android:id="@+id/selectread"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:text="写数据"
+                android:id="@+id/selectwrite"/>
+
+
     </RadioGroup>
     <View
         android:layout_width="match_parent"
@@ -47,7 +59,7 @@
         android:layout_alignParentBottom="true">
 
         <Button
-            android:id="@+id/btn_realtime_data"
+            android:id="@+id/dlgokbut"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_alignParentLeft="true"
@@ -58,7 +70,7 @@
             android:layout_marginStart="20dp"
             android:textSize="16sp"
             android:background="@drawable/round_button"
-            android:text="读取数据"
+            android:text="确定"
             android:textColor="#fff" />
 
     </LinearLayout>
