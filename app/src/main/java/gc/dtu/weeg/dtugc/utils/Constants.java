@@ -9,6 +9,7 @@ public class Constants {
     public static final int  TimeOutSecond = 60000;
 
     public static final int  LocalsetingFlag = 800;
+    public static final int  SensorlsetingFlag = 801;
 
     public static final int  GCOPENTIME = 8000;
     public static final int  GCCLOSETIME = 6000;

@@ -26,6 +26,7 @@
             android:textSize="20sp" />
     </RelativeLayout>
     <RelativeLayout
+        android:id="@+id/sensor_select_layout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="#fff" >
@@ -63,6 +64,7 @@
         android:background="#CFCFCF" />
 
     <RelativeLayout
+        android:id="@+id/sensor_anolog_layout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="#fff" >
@@ -82,6 +84,7 @@
             android:id="@+id/sensor_set_item_manual"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="number"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
@@ -118,10 +121,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:inputType="numberDecimal"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/sensor_set_item_hight_lable"
-            android:layout_toRightOf="@+id/sensor_set_item_hight_lable"
+            android:layout_toEndOf="@id/sensor_set_item_hight_lable"
+            android:layout_toRightOf="@id/sensor_set_item_hight_lable"
             android:textColor="#444"
             android:textSize="14sp" />
     </RelativeLayout>
@@ -155,6 +159,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
+            android:inputType="numberDecimal"
             android:layout_toEndOf="@+id/sensor_set_item_low_lable"
             android:layout_toRightOf="@+id/sensor_set_item_low_lable"
             android:textColor="#444"
@@ -166,4 +171,27 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:background="#CFCFCF" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/buttsensorcommite"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:textSize="16sp"
+            android:background="@drawable/round_button"
+            android:text="确定"
+            android:textColor="#fff" />
+
+    </LinearLayout>
 </LinearLayout>

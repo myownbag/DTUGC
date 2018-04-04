@@ -17,6 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
 import gc.dtu.weeg.dtugc.utils.Constants;
@@ -45,7 +48,21 @@ public class SensorInputFregment extends Fragment {
     TextView mtimemode;
     TextView mtime1;
     TextView mtime2;
+    ArrayList<Map<String,String>> mdataitem;
     private SharedPreferences sp ;
+
+    //基础数据
+    public  String sensorinfo[][]=
+            {
+                    {"1","无","65534"},
+                    {"1","I2C","65533"},
+                    {"1","RS485","65532"},
+                    {"1","转换模块","65531"},
+                    {"1","模拟量量程","65535"},
+
+                    {"2","无","0"},
+                    {"2","PT100","1"},
+            };
 
     @Nullable
     @Override
@@ -98,7 +115,7 @@ public class SensorInputFregment extends Fragment {
                    serverIntent.putExtra("item1",mpressmode1.getText().toString());
                    serverIntent.putExtra("item2",mPress1H.getText().toString());
                    serverIntent.putExtra("item3",mPress1L.getText().toString());
-                   Log.d("zl","R.id.sensor_press1set:");
+//                   Log.d("zl","R.id.sensor_press1set:");
                    break;
                case R.id.sensor_press2set:
                    serverIntent.putExtra("name","第二路压力");
@@ -106,7 +123,7 @@ public class SensorInputFregment extends Fragment {
                    serverIntent.putExtra("item1",mpressmode2.getText().toString());
                    serverIntent.putExtra("item2",mPress2H.getText().toString());
                    serverIntent.putExtra("item3",mPress2L.getText().toString());
-                   Log.d("zl","R.id.sensor_press2set:");
+//                   Log.d("zl","R.id.sensor_press2set:");
                    break;
                case R.id.sensor_temperatureset:
                    serverIntent.putExtra("name","温度");
@@ -114,7 +131,7 @@ public class SensorInputFregment extends Fragment {
                    serverIntent.putExtra("item1",mtempmode.getText().toString());
                    serverIntent.putExtra("item2",mtempIn1.getText().toString());
                    serverIntent.putExtra("item3",mtempIn2.getText().toString());
-                   Log.d("zl","R.id.sensor_temperatureset:");
+//                   Log.d("zl","R.id.sensor_temperatureset:");
                    break;
                case R.id.sensor_timeset:
                    serverIntent.putExtra("name","时间");
@@ -122,12 +139,12 @@ public class SensorInputFregment extends Fragment {
                    serverIntent.putExtra("item1","");
                    serverIntent.putExtra("item2",mtime1.getText().toString());
                    serverIntent.putExtra("item3",mtime2.getText().toString());
-                   Log.d("zl","R.id.sensor_timeset:");
+//                   Log.d("zl","R.id.sensor_timeset:");
                    break;
                    default:
                        break;
            }
-            startActivityForResult(serverIntent, Constants.LocalsetingFlag);
+            startActivityForResult(serverIntent, Constants.SensorlsetingFlag);
         }
     }
     private  class Oncurrentpageselect implements MainActivity.OnPageSelectedinviewpager
@@ -159,6 +176,19 @@ public class SensorInputFregment extends Fragment {
 //                 Toast.makeText(MainActivity.getInstance(),"单击各个条目进行设置",Toast.LENGTH_SHORT).show();
 
             }
+        }
+    }
+    public void updateallsettingitems(ArrayList<Map<String,String>> arrayList)
+    {
+            this.mdataitem=arrayList;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==1)
+        {
+
         }
     }
 }
