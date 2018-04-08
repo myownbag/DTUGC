@@ -83,8 +83,12 @@ public class SensorInputFregment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d("zl", "onCreateView: in Sensor");
+        if(mView!=null)
+        {
+            return mView;
+        }
         mView= inflater.inflate(R.layout.sensorinputsettingslayout,null);
-
         mlayoutpress1=mView.findViewById(R.id.sensor_press1set);
         mlayoutpress2=mView.findViewById(R.id.sensor_press2set);
         mlayouttemperature=mView.findViewById(R.id.sensor_temperatureset);
@@ -394,11 +398,13 @@ public class SensorInputFregment extends BaseFragment {
                         mpressmode1.setText(mdataitem.get(0).get("text"));
                         mPress1H.setText(mdataitem.get(1).get("text"));
                         mPress1L.setText(mdataitem.get(2).get("text"));
+                        mPress1unit.setText(mdataitem.get(0).get("unit"));
                         break;
                     case 1:
                         mpressmode2.setText(mdataitem.get(0).get("text"));
                         mPress2H.setText(mdataitem.get(1).get("text"));
                         mPress2L.setText(mdataitem.get(2).get("text"));
+                        mPress2unit.setText(mdataitem.get(0).get("unit"));
                         break;
                     case 2:
                         mtempmode.setText(mdataitem.get(0).get("text"));

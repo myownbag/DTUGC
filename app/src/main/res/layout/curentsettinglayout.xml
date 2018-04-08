@@ -172,7 +172,8 @@
             android:layout_toEndOf="@+id/currentset_item_addrspiner_lable"
             android:layout_toRightOf="@+id/currentset_item_addrspiner_lable"
             android:textColor="#444"
-            android:textSize="14sp"/>
+            android:textSize="14sp"
+            android:autofillHints="请选择"/>
     </RelativeLayout>
     <!-- 分割线 -->
 

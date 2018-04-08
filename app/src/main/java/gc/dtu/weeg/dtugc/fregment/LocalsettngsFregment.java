@@ -105,6 +105,7 @@ public class LocalsettngsFregment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //return super.onCreateView(inflater, container, savedInstanceState);
+       Log.d("zl","onCreateView : Local");
         if (mView != null) {
             // 防止多次new出片段对象，造成图片错乱问题
             return mView;
