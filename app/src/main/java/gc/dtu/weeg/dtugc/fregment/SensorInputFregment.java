@@ -18,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -26,6 +28,7 @@ import gc.dtu.weeg.dtugc.R;
 import gc.dtu.weeg.dtugc.myview.MyDlg;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
+import gc.dtu.weeg.dtugc.utils.DigitalTrans;
 import gc.dtu.weeg.dtugc.utils.ItemSetingActivity;
 import gc.dtu.weeg.dtugc.utils.SensoritemsettingActivity;
 import gc.dtu.weeg.dtugc.utils.ToastUtils;
@@ -52,6 +55,10 @@ public class SensorInputFregment extends BaseFragment {
     TextView mtimemode;
     TextView mtime1;
     TextView mtime2;
+
+    TextView mPress1unit;
+    TextView mPress2unit;
+
     Button mButcommand;
     ArrayList<Map<String,String>> mdataitem;
     byte sendbufread[]={(byte) 0xFD, 0x00 ,0x00 ,0x0D ,        0x00 ,0x19 ,0x00 ,        0x00 ,0x00 ,0x00
@@ -97,6 +104,9 @@ public class SensorInputFregment extends BaseFragment {
         mtime1=mView.findViewById(R.id.tv_sensor_time1);
         mtime2=mView.findViewById(R.id.tv_sensor_time2);
         mButcommand=mView.findViewById(R.id.tv_sensor_btn_write);
+        mPress1unit=mView.findViewById(R.id.tv_sensor_type1_unit);
+        mPress2unit=mView.findViewById(R.id.tv_sensor_type2_unit);
+
         initview();
 
         return mView;
@@ -116,12 +126,14 @@ public class SensorInputFregment extends BaseFragment {
                 dlg.SetOnbutclickListernerdlg(new MyDlg.Onbutclicked() {
                     @Override
                     public void Onbutclicked(int select) {
-                        if(select==1)
+                        if(select==1) //读数据
                         {
                             Toast.makeText(MainActivity.getInstance(),"read",Toast.LENGTH_SHORT).show();
-                            verycutstatus("0102010201020102");
+                            CodeFormat.crcencode(sendbufread);
+                            String readOutMsg = DigitalTrans.byte2hex(sendbufread);
+                            verycutstatus(readOutMsg);
                         }
-                        else if(select==0)
+                        else if(select==0)//写数据
                         {
                             Toast.makeText(MainActivity.getInstance(),"write",Toast.LENGTH_SHORT).show();
                         }
@@ -160,11 +172,115 @@ public class SensorInputFregment extends BaseFragment {
             sendbufwrite=readOutBuf1;
             sendbufwrite[5]=0x1A;
             CodeFormat.crcencode(sendbufwrite);
+
+//            ByteBuffer buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+//            buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+//            buf.put(b);
+//            buf.rewind();
+//            float f2=buf.getFloat();
+//            alldatafloat.add(new String(""+f2));
+            int temp;
+            String textshow;
+            String tem;
+
+            temp=(sendbufwrite[17]&0x000000FF)*0x100+(sendbufwrite[16]&0x000000FF);
+            textshow=""+temp;
+            tem=findwhichvalueString("1",textshow);
+            if(tem.equals(textshow))
+            {
+                mPress1unit.setText("Kp");
+            }
+            else
+            {
+                mPress1unit.setText("");
+            }
+            mpressmode1.setText(tem);
+
+            ByteBuffer buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+            buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+            buf.put(sendbufwrite,18,4);
+            buf.rewind();
+            float f2=buf.getFloat();
+            mPress1H.setText(""+f2);
+
+
+
+            buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+            buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+            buf.put(sendbufwrite,22,4);
+            buf.rewind();
+            f2=buf.getFloat();
+            mPress1L.setText(""+f2);
+
+            temp=(sendbufwrite[27]&0x000000FF)*0x100+(sendbufwrite[26]&0x000000FF);
+            textshow=""+temp;
+            tem=findwhichvalueString("1",textshow);
+            if(tem.equals(textshow))
+            {
+                mPress2unit.setText("Kp");
+            }
+            else
+            {
+                mPress2unit.setText("");
+            }
+            mpressmode2.setText(tem);
+
+            buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+            buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+            buf.put(sendbufwrite,28,4);
+            buf.rewind();
+            f2=buf.getFloat();
+            mPress2H.setText(""+f2);
+
+            buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+            buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+            buf.put(sendbufwrite,32,4);
+            buf.rewind();
+            f2=buf.getFloat();
+            mPress2L.setText(""+f2);
+
+            temp=(sendbufwrite[36]&0x000000FF);
+            textshow=""+temp;
+            tem=findwhichvalueString("2",textshow);
+            mtempmode.setText(tem);
+
+            buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+            buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+            buf.put(sendbufwrite,37,4);
+            buf.rewind();
+            f2=buf.getFloat();
+            mtempIn1.setText(""+f2);
+
+            buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+            buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+            buf.put(sendbufwrite,41,4);
+            buf.rewind();
+            f2=buf.getFloat();
+            mtempIn2.setText(""+f2);
+
+            temp=(sendbufwrite[46]&0x000000FF)*0x100+(sendbufwrite[45]&0x000000FF);
+            mtime1.setText(""+temp);
+
+            temp=(sendbufwrite[48]&0x000000FF)*0x100+(sendbufwrite[47]&0x000000FF);
+            mtime2.setText(""+temp);
         }
         else
         {
             Toast.makeText(MainActivity.getInstance(),"数据设置成功",Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private String findwhichvalueString(String type, String value) {
+        String show=value;
+        for(int i=0;i<sensorinfo.length;i++)
+        {
+            if(type.equals(sensorinfo[i][0])&&value.equals(sensorinfo[i][2]))
+            {
+                show=sensorinfo[i][1];
+                break;
+            }
+        }
+        return show;
     }
 
     private class OnclicklistenerImp implements View.OnClickListener

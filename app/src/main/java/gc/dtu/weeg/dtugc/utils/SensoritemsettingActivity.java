@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -129,12 +130,16 @@ public class SensoritemsettingActivity extends Activity {
                     text1.setText("高报警");
                     text2.setText("低报警");
                     m_range.setText(tempcontent);
+                    editText1.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_CLASS_NUMBER);
+                    editText2.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_CLASS_NUMBER);
                     break;
                 case 4:
                     selectlayout.setVisibility(View.GONE);
                     anologinputlayout.setVisibility(View.GONE);
                     text1.setText("扫描时间");
                     text2.setText("记录时间");
+                    editText1.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    editText2.setInputType(InputType.TYPE_CLASS_NUMBER);
                     break;
 
             }
@@ -225,6 +230,7 @@ public class SensoritemsettingActivity extends Activity {
                 {
                     temp.put("text",listcontent.get(m_currentselect));
                     temp.put("settings",listvalue.get(m_currentselect));
+                    temp.put("unit","");
                     itemdata.add(temp);
                 }
                 else
@@ -239,17 +245,28 @@ public class SensoritemsettingActivity extends Activity {
                     {
                         temp.put("text",m_range.getText().toString());
                         temp.put("settings",m_range.getText().toString());
+                        temp.put("unit","Kp");
                         itemdata.add(temp);
                     }
                 }
             }
             temp=new HashMap<String,String>();
-            if(editText1.length()==0||editText2.length()==0)
-            {
-                Toast.makeText(SensoritemsettingActivity.this,"请完善信息",Toast.LENGTH_SHORT).show();
-                SensoritemsettingActivity.this.setResult(-1,intent);
-                return;
-            }
+            Log.d("zl","m_currentselect:"+m_currentselect+"\n"+listvalue.get(m_currentselect));
+             if(m_currentselect!=0)
+             {
+                 if(editText1.length()==0||editText2.length()==0)
+                 {
+                     Toast.makeText(SensoritemsettingActivity.this,"请完善信息",Toast.LENGTH_SHORT).show();
+                     SensoritemsettingActivity.this.setResult(-1,intent);
+                     return;
+                 }
+                 if(Float.valueOf(editText1.getText().toString())<Float.valueOf(editText2.getText().toString()))
+                 {
+                     Toast.makeText(SensoritemsettingActivity.this,"高报警必须大于低报警",Toast.LENGTH_SHORT).show();
+                     SensoritemsettingActivity.this.setResult(-1,intent);
+                     return;
+                 }
+             }
             temp.put("text",editText1.getText().toString());
             temp.put("settings",editText1.getText().toString());
             itemdata.add(temp);

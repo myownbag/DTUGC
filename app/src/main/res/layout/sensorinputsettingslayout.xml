@@ -28,11 +28,22 @@
 
         <TextView
             android:id="@+id/tv_sensor_type1"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@+id/tv_sensor_type1_label"
             android:layout_toRightOf="@+id/tv_sensor_type1_label"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:textColor="#444"
+            android:textSize="14sp" />
+        <TextView
+            android:id="@+id/tv_sensor_type1_unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/tv_sensor_type1"
+            android:layout_toRightOf="@+id/tv_sensor_type1"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
             android:textColor="#444"
@@ -124,12 +135,23 @@
 
         <TextView
             android:id="@+id/tv_sensor_type2"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@+id/tv_sensor_type2_label"
             android:layout_toRightOf="@+id/tv_sensor_type2_label"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_sensor_type2_unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/tv_sensor_type2"
+            android:layout_toRightOf="@+id/tv_sensor_type2"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
             android:textColor="#444"
