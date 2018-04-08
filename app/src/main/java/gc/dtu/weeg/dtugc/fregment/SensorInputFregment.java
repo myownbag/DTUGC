@@ -28,12 +28,13 @@ import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.ItemSetingActivity;
 import gc.dtu.weeg.dtugc.utils.SensoritemsettingActivity;
+import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
 /**
  * Created by Administrator on 2018-03-22.
  */
 
-public class SensorInputFregment extends Fragment {
+public class SensorInputFregment extends BaseFragment {
     View mView;
     LinearLayout mlayoutpress1;
     LinearLayout mlayoutpress2;
@@ -106,8 +107,8 @@ public class SensorInputFregment extends Fragment {
         mlayoutpress2.setOnClickListener(new OnclicklistenerImp());
         mlayouttemperature.setOnClickListener(new OnclicklistenerImp());
         mlayouttime.setOnClickListener(new OnclicklistenerImp());
-        MainActivity.getInstance().SetonPageSelectedinviewpager(new Oncurrentpageselect());
-        MainActivity.getInstance().setOndataparse(new ondataParseimp());
+//        MainActivity.getInstance().SetonPageSelectedinviewpager(new Oncurrentpageselect());
+//        MainActivity.getInstance().setOndataparse(new ondataParseimp());
         mButcommand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,6 +119,7 @@ public class SensorInputFregment extends Fragment {
                         if(select==1)
                         {
                             Toast.makeText(MainActivity.getInstance(),"read",Toast.LENGTH_SHORT).show();
+                            verycutstatus("0102010201020102");
                         }
                         else if(select==0)
                         {
@@ -133,6 +135,38 @@ public class SensorInputFregment extends Fragment {
             }
         });
     }
+
+    private void verycutstatus(String readOutMsg) {
+        MainActivity parentActivity1 = (MainActivity) getActivity();
+        String strState1 = parentActivity1.GetStateConnect();
+        if(!strState1.equalsIgnoreCase("无连接"))
+        {
+            parentActivity1.mDialog.show();
+            parentActivity1.mDialog.setDlgMsg("读取中...");
+            //String input1 = Constants.Cmd_Read_Alarm_Pressure;
+            parentActivity1.sendData(readOutMsg, "FFFF");
+        }
+        else
+        {
+            ToastUtils.showToast(getActivity(), "请先建立蓝牙连接!");
+        }
+    }
+
+    @Override
+    public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
+        Log.d("zl","in SensorInputFregment") ;
+        if(readOutBuf1.length>20)
+        {
+            sendbufwrite=readOutBuf1;
+            sendbufwrite[5]=0x1A;
+            CodeFormat.crcencode(sendbufwrite);
+        }
+        else
+        {
+            Toast.makeText(MainActivity.getInstance(),"数据设置成功",Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private class OnclicklistenerImp implements View.OnClickListener
     {
 
@@ -184,37 +218,43 @@ public class SensorInputFregment extends Fragment {
             startActivityForResult(serverIntent, Constants.SensorlsetingFlag);
         }
     }
-    private  class Oncurrentpageselect implements MainActivity.OnPageSelectedinviewpager
-    {
 
-        @Override
-        public void currentviewpager(int position) {
-            if(position==4)
+    @Override
+    public void Oncurrentpageselect(int index) {
+        if(index==4)
+        {
+            sp = MainActivity.getInstance().getSharedPreferences("User", Context.MODE_PRIVATE);
+            int inftshow=sp.getInt("info",-1);
+            if(inftshow!=1)
             {
-                sp = MainActivity.getInstance().getSharedPreferences("User", Context.MODE_PRIVATE);
-                int inftshow=sp.getInt("info",-1);
-                if(inftshow!=1)
-                {
-                    Dialog dialog = new AlertDialog.Builder(MainActivity.getInstance()) // 实例化对象
-                            .setIcon(R.drawable.i_ve_got_it) 						// 设置显示图片
-                            .setTitle("操作提示") 							// 设置显示标题
-                            .setMessage("单击条目可以进行设置") 				// 设置显示内容
-                            .setPositiveButton("确定", 						// 增加一个确定按钮
-                                    new DialogInterface.OnClickListener() {	// 设置操作监听
-                                        public void onClick(DialogInterface dialog,
-                                                            int whichButton) { 			// 单击事件
-                                            SharedPreferences.Editor edit = sp.edit();
-                                            edit.putInt("info",1);
-                                            edit.commit();
-                                        }
-                                    }).create(); 							// 创建Dialog
-                    dialog.show();
-                }
+                Dialog dialog = new AlertDialog.Builder(MainActivity.getInstance()) // 实例化对象
+                        .setIcon(R.drawable.i_ve_got_it) 						// 设置显示图片
+                        .setTitle("操作提示") 							// 设置显示标题
+                        .setMessage("单击条目可以进行设置") 				// 设置显示内容
+                        .setPositiveButton("确定", 						// 增加一个确定按钮
+                                new DialogInterface.OnClickListener() {	// 设置操作监听
+                                    public void onClick(DialogInterface dialog,
+                                                        int whichButton) { 			// 单击事件
+                                        SharedPreferences.Editor edit = sp.edit();
+                                        edit.putInt("info",1);
+                                        edit.commit();
+                                    }
+                                }).create(); 							// 创建Dialog
+                dialog.show();
+            }
 //                 Toast.makeText(MainActivity.getInstance(),"单击各个条目进行设置",Toast.LENGTH_SHORT).show();
 
-            }
         }
     }
+
+//    private  class Oncurrentpageselect implements MainActivity.OnPageSelectedinviewpager
+//    {
+//
+//        @Override
+//        public void currentviewpager(int position) {
+//
+//        }
+//    }
     public void updateallsettingitems(ArrayList<Map<String,String>> arrayList)
     {
             this.mdataitem=arrayList;
@@ -260,22 +300,13 @@ public class SensorInputFregment extends Fragment {
 
         }
     }
-    private class ondataParseimp implements MainActivity.Ondataparse
-    {
-
-        @Override
-        public void datacometoparse(String readOutMsg1, byte[] readOutBuf1) {
-            if(readOutBuf1.length>20)
-            {
-                sendbufwrite=readOutBuf1;
-                sendbufwrite[5]=0x1A;
-                CodeFormat.crcencode(sendbufwrite);
-            }
-            else
-            {
-                Toast.makeText(MainActivity.getInstance(),"数据设置成功",Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
+//    private class ondataParseimp implements MainActivity.Ondataparse
+//    {
+//
+//        @Override
+//        public void datacometoparse(String readOutMsg1, byte[] readOutBuf1) {
+//
+//        }
+//    }
 
 }

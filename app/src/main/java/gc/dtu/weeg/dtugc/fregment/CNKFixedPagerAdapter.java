@@ -20,7 +20,7 @@ public class CNKFixedPagerAdapter extends FragmentStatePagerAdapter {
     public void setTitles(String[] titles) {
         this.titles = titles;
     }
-    private List<Fragment> fragments;
+    private List<BaseFragment> fragments;
     public CNKFixedPagerAdapter(FragmentManager fm) {
         super(fm);
     }
@@ -34,11 +34,11 @@ public class CNKFixedPagerAdapter extends FragmentStatePagerAdapter {
         return this.fragments.size();
     }
 
-    public List<Fragment> getFragments() {
+    public List<BaseFragment> getFragments() {
         return fragments;
     }
 
-    public void setFragments(List<Fragment> fragments) {
+    public void setFragments(List<BaseFragment> fragments) {
         this.fragments = fragments;
     }
 

@@ -29,6 +29,7 @@ import java.util.List;
 import gc.dtu.weeg.dtugc.bluetooth.BluetoothService;
 import gc.dtu.weeg.dtugc.bluetooth.BluetoothState;
 import gc.dtu.weeg.dtugc.bluetooth.DeviceListActivity;
+import gc.dtu.weeg.dtugc.fregment.BaseFragment;
 import gc.dtu.weeg.dtugc.fregment.BasicinfoFregment;
 import gc.dtu.weeg.dtugc.fregment.CNKFixedPagerAdapter;
 import gc.dtu.weeg.dtugc.fregment.FrozendataFregment;
@@ -50,6 +51,7 @@ public class MainActivity extends FragmentActivity {
     private TextView mTxtStatus;
 
     LayoutInflater mLayoutInflater;
+    BaseFragment mCurrentpage;
     ViewPager info_viewpager;
     private CNKFixedPagerAdapter mPagerAdater;
     /**
@@ -75,7 +77,7 @@ public class MainActivity extends FragmentActivity {
      */
     private ViewGroup mClassContainer;
     int mScrollX = 0;
-    private List<Fragment> fragments;
+    private List<BaseFragment> fragments;
     private String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置", "传感器设置", "仪表接入"};
 
     // Name of the connected device
@@ -100,7 +102,7 @@ public class MainActivity extends FragmentActivity {
     public InstrumentInputFregment fregment6;
     //接口
     Ondataparse mydataparse=null;
-    OnPageSelectedinviewpager myOnPageSelectedinviewpager=null;
+//    OnPageSelectedinviewpager myOnPageSelectedinviewpager=null;
     public static MainActivity getInstance() {
         return instanceMainActivity;
     }
@@ -223,8 +225,12 @@ public class MainActivity extends FragmentActivity {
                     if(mydataparse!=null)
                     {
                         mydataparse.datacometoparse(readOutMsg,readOutBuf);
-                        mDialog.dismiss();
                     }
+                    else
+                    {
+                        mCurrentpage.OndataCometoParse(readOutMsg,readOutBuf);
+                    }
+                    mDialog.dismiss();
                     break;
                 case BluetoothState.MESSAGE_DEVICE_NAME:
                     // save the connected device's name
@@ -252,7 +258,7 @@ public class MainActivity extends FragmentActivity {
             }
         });
 
-        fragments=new ArrayList<Fragment>();
+        fragments=new ArrayList<BaseFragment>();
 
         fregment1 = new BasicinfoFregment();
         Bundle bundle1 = new Bundle();
@@ -491,10 +497,12 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         public void onPageSelected(int position) {
-            if(myOnPageSelectedinviewpager!=null)
-            {
-                myOnPageSelectedinviewpager.currentviewpager(position);
-            }
+            mCurrentpage=fragments.get(position);
+            mCurrentpage.Oncurrentpageselect(position);
+//            if(myOnPageSelectedinviewpager!=null)
+//            {
+//                myOnPageSelectedinviewpager.currentviewpager(position);
+//            }
             View preView=mClassContainer.getChildAt(mCurClassIndex);
             ((TextView)(preView.findViewById(R.id.horizontal_tv_type))).setTextColor(ContextCompat.getColor(MainActivity.this, R.color.color_unselected));
             ((ImageView)(preView.findViewById(R.id.horizontal_img_type))).setImageResource(R.drawable.bottom_line_gray);
@@ -529,14 +537,14 @@ public class MainActivity extends FragmentActivity {
         void datacometoparse(String readOutMsg1,byte[] readOutBuf1);
     }
 
-    public interface OnPageSelectedinviewpager
-    {
-        void currentviewpager(int position);
-    }
-    public void SetonPageSelectedinviewpager(OnPageSelectedinviewpager onPageSelectedinviewpager )
-    {
-        myOnPageSelectedinviewpager=onPageSelectedinviewpager;
-    }
+//    public interface OnPageSelectedinviewpager
+//    {
+//        void currentviewpager(int position);
+//    }
+//    public void SetonPageSelectedinviewpager(OnPageSelectedinviewpager onPageSelectedinviewpager )
+//    {
+//        myOnPageSelectedinviewpager=onPageSelectedinviewpager;
+//    }
     public void setOndataparse(Ondataparse ondataparse)
     {
         mydataparse=ondataparse;

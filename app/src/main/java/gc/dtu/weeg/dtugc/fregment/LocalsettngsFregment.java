@@ -31,7 +31,7 @@ import gc.dtu.weeg.dtugc.utils.ToastUtils;
  * Created by Administrator on 2018-03-22.
  */
 
-public class LocalsettngsFregment extends Fragment {
+public class LocalsettngsFregment extends BaseFragment {
     View mView;
     LayoutInflater thisinflater;
     ViewGroup thiscontainer;
@@ -113,7 +113,7 @@ public class LocalsettngsFregment extends Fragment {
         thiscontainer=container;
         mView = inflater.inflate(R.layout.localsetlayout, container, false);
         initView();
-        initdata();
+//        initdata();
         return  mView;
     }
 
@@ -127,9 +127,185 @@ public class LocalsettngsFregment extends Fragment {
         mybut.setOnClickListener(new butonclicklistener());
         mylist.setOnItemClickListener(new Onlistviewitemclicked());
     }
-    private void initdata() {
-        MainActivity.getInstance().setOndataparse(new DataParse());
+//    private void initdata() {
+//        MainActivity.getInstance().setOndataparse(new DataParse());
+//    }
+
+    @Override
+    public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
+//        Log.d("zl","in LocalsettngsFregment");
+        String temp;
+        int tempint;
+        int tempint2;
+        int  i=0;
+        int transtrit=-1;
+        if(readOutBuf1.length<5)
+        {
+            ToastUtils.showToast(getActivity(), "数据长度短");
+//                if(mIndexcmd<senddatabuf.length)
+//                {
+//                    String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
+//                    verycutstatus(readOutMsg);
+//                }
+            return;
+        }
+        else
+        {
+            if(readOutBuf1[3]!=(readOutBuf1.length-5))
+            {
+                ToastUtils.showToast(getActivity(), "数据长度异常");
+//                    if(mIndexcmd<senddatabuf.length)
+//                    {
+//                        String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
+//                        verycutstatus(readOutMsg);
+//                    }
+                return;
+            }
+        }
+        byte addr= readOutBuf1[14];//(byte) (Integer.valueOf(baseinfo[mIndexcmd][0])%0x100);
+        if(mIndexcmd>=baseinfo.length)
+        {
+            Log.d("zl","接收任务完成" );
+            return;
+        }
+        if(Integer.valueOf(baseinfo[mIndexcmd][2])==1)
+        {
+            for(i=0;i<registerinfosel.length;i++)
+            {
+                byte bytetemp= (byte) (Integer.valueOf(registerinfosel[i][0])%0x100);
+                if(addr==bytetemp)
+                {
+                    tempint=(0x000000ff&readOutBuf1[15])*0x100+(0x000000ff&readOutBuf1[16]);
+                    if(tempint==Integer.valueOf(registerinfosel[i][2]))
+                    {
+                        settingscontent[mIndexcmd]=registerinfosel[i][1];
+                        //   myadpater.notifyDataSetChanged();
+                        if(Integer.valueOf(baseinfo[mIndexcmd][0])==208)
+                        {
+                            transtrit=tempint;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        else if(Integer.valueOf(baseinfo[mIndexcmd][2])==10)
+        {
+            tempint=0x000000ff&readOutBuf1[16];
+            int gatetype=0;
+            if(tempint==1)
+            {
+                tempint2=0x000000ff&readOutBuf1[17];
+                if(tempint2==2)
+                {
+                    gatetype=1;
+                }
+                else if(tempint2==0)
+                {
+                    tempint2=(0x000000ff&readOutBuf1[19])*0x100+(0x000000ff&readOutBuf1[18]);
+                    if(tempint2==Constants.GCOPENTIME)
+                    {
+                        gatetype=2;
+                    }
+                    if(tempint2==Constants.G6OPENTIME)
+                    {
+                        gatetype=3;
+                    }
+                }
+            }
+            else if(tempint==0)
+            {
+                gatetype=0;
+            }
+            else if(tempint==2)
+            {
+                gatetype=4;
+            }
+            else
+            {
+                gatetype=-1;
+            }
+            for(i=0;i<registerinfosel.length;i++)
+            {
+
+                if(0x6E==Integer.valueOf(registerinfosel[i][0])%0x100) //0x64=110
+                {
+                    if(gatetype==Integer.valueOf(registerinfosel[i][2]))
+                    {
+                        settingscontent[mIndexcmd]=registerinfosel[i][1];
+                        // myadpater.notifyDataSetChanged();
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            tempint2=0x000000ff&readOutBuf1[14];
+            if(tempint2==202||tempint2==205) //解析IP
+            {
+                temp=String.format("%d.%d.%d.%d,",0x000000ff&readOutBuf1[16],0x000000ff&readOutBuf1[17]
+                        ,0x000000ff&readOutBuf1[18],0x000000ff&readOutBuf1[19]);
+                tempint=(0x000000ff&readOutBuf1[20])+(0x000000ff&readOutBuf1[21])*0x100;
+                temp=temp+tempint;
+                settingscontent[mIndexcmd]=temp;
+                //myadpater.notifyDataSetChanged();
+            }
+            else if(tempint2==209)
+            {
+                tempint=(0x000000ff&readOutBuf1[16])+(0x000000ff&readOutBuf1[17])*0x100;
+                temp=""+tempint;
+                settingscontent[mIndexcmd]=temp;
+            }
+            else if(tempint2==210)
+            {
+                String daytime="";
+                String lockdaytime1=ArrayFormatCString(0x000000ff&readOutBuf1[16],0x000000ff&readOutBuf1[17]
+                        ,0x000000ff&readOutBuf1[18],transtrit);
+                if(lockdaytime1.equals("")==false)
+                {
+                    daytime+=lockdaytime1+";";
+                }
+                String lockdaytime2=ArrayFormatCString(0x000000ff&readOutBuf1[19],0x000000ff&readOutBuf1[20],
+                        0x000000ff&readOutBuf1[21],transtrit);
+                if (lockdaytime2.equals("")==false)
+                {
+                    daytime+=lockdaytime2+";";
+                }
+                String lockdaytime3=ArrayFormatCString(0x000000ff&readOutBuf1[22],0x000000ff&readOutBuf1[23],
+                        0x000000ff&readOutBuf1[24],transtrit);
+                if (lockdaytime3.equals("")==false)
+                {
+                    daytime+=lockdaytime3+";";
+                }
+                String lockdaytime4=ArrayFormatCString(0x000000ff&readOutBuf1[25],0x000000ff&readOutBuf1[26],
+                        0x000000ff&readOutBuf1[27],transtrit);
+                if (lockdaytime4.equals("")==false)
+                {
+                    daytime+=lockdaytime4+";";
+                }
+                settingscontent[mIndexcmd]=daytime;
+            }
+            else
+            {
+                temp="";
+                for(i=0;i<readOutBuf1.length-18;i++)
+                {
+                    temp+=(char)readOutBuf1[16+i];
+                    settingscontent[mIndexcmd]=temp;
+                }
+            }
+        }
+
+        myadpater.notifyDataSetChanged();
+        mIndexcmd++;
+        if(mIndexcmd<senddatabuf.length)
+        {
+            String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
+            verycutstatus(readOutMsg);
+        }
     }
+
     public class thislistviewadpater extends BaseAdapter
     {
 
@@ -250,7 +426,7 @@ public class LocalsettngsFregment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        MainActivity.getInstance().setOndataparse(new DataParse());
+//        MainActivity.getInstance().setOndataparse(new DataParse());
         Log.d("zl","requestCode:"+requestCode+" "+"resultCode:"+resultCode);
         if(resultCode==1)
         {
@@ -271,184 +447,15 @@ public class LocalsettngsFregment extends Fragment {
             myadpater.notifyDataSetChanged();
         }
     }
-    private class DataParse implements MainActivity.Ondataparse
-    {
-
-        @Override
-        public void datacometoparse(String readOutMsg1, byte[] readOutBuf1)
-        {
-            String temp;
-            int tempint;
-            int tempint2;
-            int  i=0;
-            int transtrit=-1;
-            if(readOutBuf1.length<5)
-            {
-                ToastUtils.showToast(getActivity(), "数据长度短");
-//                if(mIndexcmd<senddatabuf.length)
-//                {
-//                    String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
-//                    verycutstatus(readOutMsg);
-//                }
-                return;
-            }
-            else
-            {
-                if(readOutBuf1[3]!=(readOutBuf1.length-5))
-                {
-                    ToastUtils.showToast(getActivity(), "数据长度异常");
-//                    if(mIndexcmd<senddatabuf.length)
-//                    {
-//                        String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
-//                        verycutstatus(readOutMsg);
-//                    }
-                    return;
-                }
-            }
-            byte addr= readOutBuf1[14];//(byte) (Integer.valueOf(baseinfo[mIndexcmd][0])%0x100);
-            if(mIndexcmd>=baseinfo.length)
-            {
-                Log.d("zl","接收任务完成" );
-                return;
-            }
-            if(Integer.valueOf(baseinfo[mIndexcmd][2])==1)
-            {
-                for(i=0;i<registerinfosel.length;i++)
-                {
-                    byte bytetemp= (byte) (Integer.valueOf(registerinfosel[i][0])%0x100);
-                    if(addr==bytetemp)
-                    {
-                         tempint=(0x000000ff&readOutBuf1[15])*0x100+(0x000000ff&readOutBuf1[16]);
-                        if(tempint==Integer.valueOf(registerinfosel[i][2]))
-                        {
-                            settingscontent[mIndexcmd]=registerinfosel[i][1];
-                         //   myadpater.notifyDataSetChanged();
-                            if(Integer.valueOf(baseinfo[mIndexcmd][0])==208)
-                            {
-                                transtrit=tempint;
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-            else if(Integer.valueOf(baseinfo[mIndexcmd][2])==10)
-            {
-                tempint=0x000000ff&readOutBuf1[16];
-                int gatetype=0;
-                if(tempint==1)
-                {
-                     tempint2=0x000000ff&readOutBuf1[17];
-                     if(tempint2==2)
-                     {
-                         gatetype=1;
-                     }
-                     else if(tempint2==0)
-                     {
-                         tempint2=(0x000000ff&readOutBuf1[19])*0x100+(0x000000ff&readOutBuf1[18]);
-                         if(tempint2==Constants.GCOPENTIME)
-                         {
-                             gatetype=2;
-                         }
-                         if(tempint2==Constants.G6OPENTIME)
-                         {
-                             gatetype=3;
-                         }
-                     }
-                }
-                else if(tempint==0)
-                {
-                    gatetype=0;
-                }
-                else if(tempint==2)
-                {
-                    gatetype=4;
-                }
-                else
-                {
-                    gatetype=-1;
-                }
-                for(i=0;i<registerinfosel.length;i++)
-                {
-
-                    if(0x6E==Integer.valueOf(registerinfosel[i][0])%0x100) //0x64=110
-                    {
-                        if(gatetype==Integer.valueOf(registerinfosel[i][2]))
-                        {
-                            settingscontent[mIndexcmd]=registerinfosel[i][1];
-                           // myadpater.notifyDataSetChanged();
-                            break;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                tempint2=0x000000ff&readOutBuf1[14];
-                if(tempint2==202||tempint2==205) //解析IP
-                {
-                    temp=String.format("%d.%d.%d.%d,",0x000000ff&readOutBuf1[16],0x000000ff&readOutBuf1[17]
-                                                    ,0x000000ff&readOutBuf1[18],0x000000ff&readOutBuf1[19]);
-                    tempint=(0x000000ff&readOutBuf1[20])+(0x000000ff&readOutBuf1[21])*0x100;
-                    temp=temp+tempint;
-                    settingscontent[mIndexcmd]=temp;
-                    //myadpater.notifyDataSetChanged();
-                }
-               else if(tempint2==209)
-                {
-                    tempint=(0x000000ff&readOutBuf1[16])+(0x000000ff&readOutBuf1[17])*0x100;
-                    temp=""+tempint;
-                    settingscontent[mIndexcmd]=temp;
-                }
-                else if(tempint2==210)
-                {
-                    String daytime="";
-                    String lockdaytime1=ArrayFormatCString(0x000000ff&readOutBuf1[16],0x000000ff&readOutBuf1[17]
-                            ,0x000000ff&readOutBuf1[18],transtrit);
-                    if(lockdaytime1.equals("")==false)
-                    {
-                        daytime+=lockdaytime1+";";
-                    }
-                    String lockdaytime2=ArrayFormatCString(0x000000ff&readOutBuf1[19],0x000000ff&readOutBuf1[20],
-                                                            0x000000ff&readOutBuf1[21],transtrit);
-                    if (lockdaytime2.equals("")==false)
-                    {
-                        daytime+=lockdaytime2+";";
-                    }
-                    String lockdaytime3=ArrayFormatCString(0x000000ff&readOutBuf1[22],0x000000ff&readOutBuf1[23],
-                            0x000000ff&readOutBuf1[24],transtrit);
-                    if (lockdaytime3.equals("")==false)
-                    {
-                        daytime+=lockdaytime3+";";
-                    }
-                    String lockdaytime4=ArrayFormatCString(0x000000ff&readOutBuf1[25],0x000000ff&readOutBuf1[26],
-                            0x000000ff&readOutBuf1[27],transtrit);
-                    if (lockdaytime4.equals("")==false)
-                    {
-                        daytime+=lockdaytime4+";";
-                    }
-                    settingscontent[mIndexcmd]=daytime;
-                }
-                else
-                {
-                    temp="";
-                    for(i=0;i<readOutBuf1.length-18;i++)
-                    {
-                        temp+=(char)readOutBuf1[16+i];
-                        settingscontent[mIndexcmd]=temp;
-                    }
-                }
-            }
-
-            myadpater.notifyDataSetChanged();
-            mIndexcmd++;
-            if(mIndexcmd<senddatabuf.length)
-            {
-                String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
-                verycutstatus(readOutMsg);
-            }
-        }
-    }
+//    private class DataParse implements MainActivity.Ondataparse
+//    {
+//
+//        @Override
+//        public void datacometoparse(String readOutMsg1, byte[] readOutBuf1)
+//        {
+//
+//        }
+//    }
 
     private String ArrayFormatCString(int week, int hour, int minute, int transtrit1) {
 

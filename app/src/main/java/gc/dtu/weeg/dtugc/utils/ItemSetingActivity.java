@@ -104,6 +104,7 @@ public class ItemSetingActivity extends Activity {
             }
         });
         String temp=mtextaddr.getText().toString();
+//        Log.d("zl","mainActivity.setOndataparse(new datacometoparse()) has been executed");
         mainActivity.setOndataparse(new datacometoparse());
         for( i=0;i<mainActivity.fregment4.baseinfo.length;i++)
         {
@@ -511,4 +512,10 @@ public class ItemSetingActivity extends Activity {
        }
    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+//        Log.d("zl","onStop");
+        mainActivity.setOndataparse(null);
+    }
 }

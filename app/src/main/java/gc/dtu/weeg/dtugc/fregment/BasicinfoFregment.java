@@ -25,7 +25,7 @@ import gc.dtu.weeg.dtugc.utils.ToastUtils;
  * Created by Administrator on 2018-03-22.
  */
 
-public class BasicinfoFregment extends Fragment {
+public class BasicinfoFregment extends BaseFragment {
     private View mView;
     LayoutInflater thisinflater;
     ViewGroup thiscontainer;
@@ -86,8 +86,8 @@ public class BasicinfoFregment extends Fragment {
     }
 
     private void initdata() {
-        MainActivity.getInstance().setOndataparse(new DataParse());
-        MainActivity.getInstance().SetonPageSelectedinviewpager(new onviewpagerchangedimp());
+//        MainActivity.getInstance().setOndataparse(new DataParse());
+//        MainActivity.getInstance().SetonPageSelectedinviewpager(new onviewpagerchangedimp());
         butsend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,108 +137,122 @@ public class BasicinfoFregment extends Fragment {
         }
     }
 
-    private class DataParse implements MainActivity.Ondataparse
-    {
-
-        @Override
-        public void datacometoparse(String readOutMsg1, byte[] readOutBuf1) {
-            String temp;
-            int  i=0;
-            if(readOutBuf1.length<5)
+    @Override
+    public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
+        String temp;
+        int  i=0;
+        if(readOutBuf1.length<5)
+        {
+            ToastUtils.showToast(getActivity(), "数据长度短");
+            return;
+        }
+        else
+        {
+            if(readOutBuf1[3]!=(readOutBuf1.length-5))
             {
-                ToastUtils.showToast(getActivity(), "数据长度短");
+                ToastUtils.showToast(getActivity(), "数据长度异常");
                 return;
             }
-            else
-            {
-                if(readOutBuf1[3]!=(readOutBuf1.length-5))
-                {
-                    ToastUtils.showToast(getActivity(), "数据长度异常");
-                    return;
-                }
-            }
-            switch (readOutBuf1[14])
-            {
-                case 1:
-                    temp="";
-                    for( i=16;i<24;i++)
-                    {
-                        temp+=(char)readOutBuf1[i];
-                    }
-                    DeviceID.setText(temp);
-                    break;
-                case 3:
-                    temp="";
-                    for( i=16;i<20;i++)
-                    {
-                        temp+=(char)readOutBuf1[i];
-                    }
-                    Softversion.setText(temp);
-                    break;
-                case 105:
-                    StringBuilder temp1=new StringBuilder();;
-                    temp1.append(String.format("%x-%x-%x %x %x:%x:%x ", readOutBuf1[16],readOutBuf1[17],readOutBuf1[18],readOutBuf1[19]
-                                                                        ,readOutBuf1[20],readOutBuf1[21],readOutBuf1[22]));
-
-                    Timeinfo.setText(temp1.toString());
-                    break;
-                case (byte) 0xC7:
-                    switch (readOutBuf1[16])
-                    {
-                        case 0x01:
-                            indicatorSeekBar.setProgress(25);
-                            break;
-                        case 0x02:
-                            indicatorSeekBar.setProgress(50);
-                            break;
-                        case 0x04:
-                            indicatorSeekBar.setProgress(75);
-                            break;
-                        case (byte) 0x08:
-                            indicatorSeekBar.setProgress(100);
-                            mytimer.cancel();
-                            timerstop=true;
-                            break;
-                        default:
-                            indicatorSeekBar.setProgress(0);
-                                break;
-                    }
-                    temp=""+readOutBuf1[17];
-                    Log.d("zl","temp");
-                    Signalinfo.setText(temp);
-                    break;
-                default:
-                    break;
-            }
-            if(mIndexcmd<3)
-            {
-                String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd++]);
-                verycutstatus(readOutMsg);
-            }
-            else
-            {
-                if(timerstop==true)
-                {
-                    timerstop=false;
-                    mytimer.cancel();
-                }
-                else
-                {
-                    mytimer.start();
-                }
-
-            }
         }
-    }
-    public class onviewpagerchangedimp implements MainActivity.OnPageSelectedinviewpager
-    {
+        switch (readOutBuf1[14])
+        {
+            case 1:
+                temp="";
+                for( i=16;i<24;i++)
+                {
+                    temp+=(char)readOutBuf1[i];
+                }
+                DeviceID.setText(temp);
+                break;
+            case 3:
+                temp="";
+                for( i=16;i<20;i++)
+                {
+                    temp+=(char)readOutBuf1[i];
+                }
+                Softversion.setText(temp);
+                break;
+            case 105:
+                StringBuilder temp1=new StringBuilder();;
+                temp1.append(String.format("%x-%x-%x %x %x:%x:%x ", readOutBuf1[16],readOutBuf1[17],readOutBuf1[18],readOutBuf1[19]
+                        ,readOutBuf1[20],readOutBuf1[21],readOutBuf1[22]));
 
-        @Override
-        public void currentviewpager(int position) {
-            if(position!=0)
+                Timeinfo.setText(temp1.toString());
+                break;
+            case (byte) 0xC7:
+                switch (readOutBuf1[16])
+                {
+                    case 0x01:
+                        indicatorSeekBar.setProgress(25);
+                        break;
+                    case 0x02:
+                        indicatorSeekBar.setProgress(50);
+                        break;
+                    case 0x04:
+                        indicatorSeekBar.setProgress(75);
+                        break;
+                    case (byte) 0x08:
+                        indicatorSeekBar.setProgress(100);
+                        mytimer.cancel();
+                        timerstop=true;
+                        break;
+                    default:
+                        indicatorSeekBar.setProgress(0);
+                        break;
+                }
+                temp=""+readOutBuf1[17];
+                Log.d("zl","temp");
+                Signalinfo.setText(temp);
+                break;
+            default:
+                break;
+        }
+        if(mIndexcmd<3)
+        {
+            String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd++]);
+            verycutstatus(readOutMsg);
+        }
+        else
+        {
+            if(timerstop==true)
             {
+                timerstop=false;
                 mytimer.cancel();
             }
+            else
+            {
+                mytimer.start();
+            }
+
+        }
+
+    }
+
+//    private class DataParse implements MainActivity.Ondataparse
+//    {
+//
+//        @Override
+//        public void datacometoparse(String readOutMsg1, byte[] readOutBuf1) {
+//
+//        }
+//    }
+//    public class onviewpagerchangedimp implements MainActivity.OnPageSelectedinviewpager
+//    {
+//
+//        @Override
+//        public void currentviewpager(int position) {
+//            if(position!=0)
+//            {
+//                mytimer.cancel();
+//            }
+//        }
+//    }
+
+    @Override
+    public void Oncurrentpageselect(int index) {
+        if(index!=0)
+        {
+            mytimer.cancel();
         }
     }
 
