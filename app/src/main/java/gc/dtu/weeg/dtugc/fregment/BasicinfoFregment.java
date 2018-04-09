@@ -73,7 +73,6 @@ public class BasicinfoFregment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d("zl", "onCreateView: in basic");
         if (mView != null) {
             // 防止多次new出片段对象，造成图片错乱问题
             return mView;

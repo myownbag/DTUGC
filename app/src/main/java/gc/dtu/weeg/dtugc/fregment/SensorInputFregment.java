@@ -63,17 +63,19 @@ public class SensorInputFregment extends BaseFragment {
     ArrayList<Map<String,String>> mdataitem;
     byte sendbufread[]={(byte) 0xFD, 0x00 ,0x00 ,0x0D ,        0x00 ,0x19 ,0x00 ,        0x00 ,0x00 ,0x00
                               ,0x00 ,0x00 ,0x00 ,0x00 , (byte) 0xD9 ,0x00 ,0x0C , (byte) 0xA0};
-    byte [] sendbufwrite;
+
+    byte [] sendbufwrite=new byte[51];
+
     int m_position;
     private SharedPreferences sp ;
 
     //基础数据
     public  String sensorinfo[][]=
             {
-                    {"1","无","65534"},
-                    {"1","I2C","65533"},
-                    {"1","RS485","65532"},
-                    {"1","转换模块","65531"},
+                    {"1","无","0"},
+                    {"1","I2C","65534"},
+                    {"1","RS485","65533"},
+                    {"1","转换模块","65532"},
                     {"1","模拟量量程","65535"},
 
                     {"2","无","0"},
@@ -83,7 +85,6 @@ public class SensorInputFregment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d("zl", "onCreateView: in Sensor");
         if(mView!=null)
         {
             return mView;
@@ -112,8 +113,17 @@ public class SensorInputFregment extends BaseFragment {
         mPress2unit=mView.findViewById(R.id.tv_sensor_type2_unit);
 
         initview();
-
+        initdata();
         return mView;
+    }
+
+    private void initdata() {
+       for(int i=0;i<(sendbufread.length-2);i++)
+       {
+           sendbufwrite[i]=sendbufread[i];
+       }
+        sendbufwrite[3]=0x2e;
+        sendbufwrite[5]=0x15;
     }
 
     private void initview() {
@@ -132,22 +142,56 @@ public class SensorInputFregment extends BaseFragment {
                     public void Onbutclicked(int select) {
                         if(select==1) //读数据
                         {
-                            Toast.makeText(MainActivity.getInstance(),"read",Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(MainActivity.getInstance(),"read",Toast.LENGTH_SHORT).show();
                             CodeFormat.crcencode(sendbufread);
                             String readOutMsg = DigitalTrans.byte2hex(sendbufread);
                             verycutstatus(readOutMsg);
                         }
                         else if(select==0)//写数据
                         {
-                            Toast.makeText(MainActivity.getInstance(),"write",Toast.LENGTH_SHORT).show();
-                        }
-                        else
-                        {
-
+//                            Toast.makeText(MainActivity.getInstance(),"write",Toast.LENGTH_SHORT).show();
+                            if(checkinput())
+                            {
+                                CodeFormat.crcencode(sendbufwrite);
+                                String readOutMsg = DigitalTrans.byte2hex(sendbufread);
+                                verycutstatus(readOutMsg);
+                            }
+                            else
+                            {
+                                Toast.makeText(MainActivity.getInstance(),"数据未填充完整",Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
                 });
                 dlg.show();
+            }
+
+            private Boolean checkinput() {
+                Boolean temp=false;
+                    if(mpressmode1.getText().length()==0)
+                    {
+                        return false;
+                    }
+                    else if(mpressmode2.getText().length()==0)
+                    {
+                       return false;
+                    }
+                    else if(mtempmode.getText().length()==0)
+                    {
+                        return false;
+                    }
+                    else if(mtime1.getText().length()==0)
+                    {
+                        return false;
+                    }
+                    else if (mtime2.getText().length()==0)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
             }
         });
     }
@@ -170,11 +214,10 @@ public class SensorInputFregment extends BaseFragment {
 
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
-        Log.d("zl","in SensorInputFregment") ;
         if(readOutBuf1.length>20)
         {
             sendbufwrite=readOutBuf1;
-            sendbufwrite[5]=0x1A;
+            sendbufwrite[5]=0x15;
             CodeFormat.crcencode(sendbufwrite);
 
 //            ByteBuffer buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
@@ -382,6 +425,8 @@ public class SensorInputFregment extends BaseFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        ByteBuffer buf;
+        String tem;
         //super.onActivityResult(requestCode, resultCode, data);
         if(resultCode==1)
         {
@@ -399,21 +444,101 @@ public class SensorInputFregment extends BaseFragment {
                         mPress1H.setText(mdataitem.get(1).get("text"));
                         mPress1L.setText(mdataitem.get(2).get("text"));
                         mPress1unit.setText(mdataitem.get(0).get("unit"));
+
+                        tem=mdataitem.get(0).get("settings");
+                        buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+                        buf.putInt(Integer.valueOf(tem));
+                        buf.rewind();
+                        buf.get(sendbufwrite,16,2);
+
+                        tem=mdataitem.get(1).get("settings");
+                        buf=ByteBuffer.allocateDirect(4);
+                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);
+                        buf.putFloat(Float.valueOf(tem).floatValue());
+                        buf.rewind();
+                        buf.get(sendbufwrite,18,4);
+
+                        tem=mdataitem.get(2).get("settings");
+                        buf=ByteBuffer.allocateDirect(4);
+                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);
+                        buf.putFloat(Float.valueOf(tem).floatValue());
+                        buf.rewind();
+                        buf.get(sendbufwrite,22,4);
+
+                        String readOutMsg =  CodeFormat.byteToHex (sendbufwrite,sendbufwrite.length);
+                        Log.d("zl", "the value "+tem+"is \n"+readOutMsg);
                         break;
                     case 1:
                         mpressmode2.setText(mdataitem.get(0).get("text"));
                         mPress2H.setText(mdataitem.get(1).get("text"));
                         mPress2L.setText(mdataitem.get(2).get("text"));
                         mPress2unit.setText(mdataitem.get(0).get("unit"));
+
+                        tem=mdataitem.get(0).get("settings");
+                        buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+                        buf.putInt(Integer.valueOf(tem).intValue());
+                        buf.rewind();
+                        buf.get(sendbufwrite,26,2);
+
+                        tem=mdataitem.get(1).get("settings");
+                        buf=ByteBuffer.allocateDirect(4);
+                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);
+                        buf.putFloat(Float.valueOf(tem).floatValue());
+                        buf.rewind();
+                        buf.get(sendbufwrite,28,4);
+
+                        tem=mdataitem.get(2).get("settings");
+                        buf=ByteBuffer.allocateDirect(4);
+                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);
+                        buf.putFloat(Float.valueOf(tem).floatValue());
+                        buf.rewind();
+                        buf.get(sendbufwrite,32,4);
                         break;
                     case 2:
                         mtempmode.setText(mdataitem.get(0).get("text"));
                         mtempIn1.setText(mdataitem.get(1).get("text"));
                         mtempIn2.setText(mdataitem.get(2).get("text"));
+
+                        tem=mdataitem.get(0).get("settings");
+                        buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+                        buf.putInt(Integer.valueOf(tem));
+                        buf.rewind();
+                        buf.get(sendbufwrite,36,1);
+
+                        tem=mdataitem.get(1).get("settings");
+                        buf=ByteBuffer.allocateDirect(4);
+                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);
+                        buf.putFloat(Float.valueOf(tem).floatValue());
+                        buf.rewind();
+                        buf.get(sendbufwrite,37,4);
+
+                        tem=mdataitem.get(2).get("settings");
+                        buf=ByteBuffer.allocateDirect(4);
+                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);
+                        buf.putFloat(Float.valueOf(tem).floatValue());
+                        buf.rewind();
+                        buf.get(sendbufwrite,41,4);
                         break;
                     case 3:
                         mtime1.setText(mdataitem.get(0).get("text"));
                         mtime2.setText(mdataitem.get(1).get("text"));
+
+                        tem=mdataitem.get(0).get("settings");
+                        buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+                        buf.putInt(Integer.valueOf(tem).intValue());
+                        buf.rewind();
+                        buf.get(sendbufwrite,45,2);
+
+                        tem=mdataitem.get(1).get("settings");
+                        buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+                        buf.putInt(Integer.valueOf(tem).intValue());
+                        buf.rewind();
+                        buf.get(sendbufwrite,47,2);
                         break;
                         default:
                             break;

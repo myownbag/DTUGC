@@ -250,9 +250,8 @@ public class SensoritemsettingActivity extends Activity {
                     }
                 }
             }
-            temp=new HashMap<String,String>();
-            Log.d("zl","m_currentselect:"+m_currentselect+"\n"+listvalue.get(m_currentselect));
-             if(m_currentselect!=0)
+
+             if(m_currentselect!=0&&m_currentselect!=-1)
              {
                  if(editText1.length()==0||editText2.length()==0)
                  {
@@ -267,16 +266,34 @@ public class SensoritemsettingActivity extends Activity {
                      return;
                  }
              }
-            temp.put("text",editText1.getText().toString());
-            temp.put("settings",editText1.getText().toString());
+            temp=new HashMap<String,String>();
+            if(editText1.getText().length()==0)
+            {
+                temp.put("text","0");
+                temp.put("settings","0");
+            }
+            else
+            {
+                temp.put("text",editText1.getText().toString());
+                temp.put("settings",editText1.getText().toString());
+            }
             itemdata.add(temp);
 
             temp=new HashMap<String,String>();
-            temp.put("text",editText2.getText().toString());
-            temp.put("settings",editText2.getText().toString());
+            if(editText2.getText().toString().length()==0)
+            {
+                temp.put("text","0");
+                temp.put("settings","0");
+            }
+            else
+            {
+                temp.put("text",editText2.getText().toString());
+                temp.put("settings",editText2.getText().toString());
+            }
             itemdata.add(temp);
 
             mainActivity.fregment5.updateallsettingitems(itemdata);
+            Log.d("zl","itemdata"+itemdata.size());
             SensoritemsettingActivity.this.setResult(1,intent);
             SensoritemsettingActivity.this.finish();
         }
