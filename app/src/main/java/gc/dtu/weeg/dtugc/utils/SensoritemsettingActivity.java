@@ -293,7 +293,6 @@ public class SensoritemsettingActivity extends Activity {
             itemdata.add(temp);
 
             mainActivity.fregment5.updateallsettingitems(itemdata);
-            Log.d("zl","itemdata"+itemdata.size());
             SensoritemsettingActivity.this.setResult(1,intent);
             SensoritemsettingActivity.this.finish();
         }

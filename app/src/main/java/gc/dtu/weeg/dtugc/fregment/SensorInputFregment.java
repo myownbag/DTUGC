@@ -142,18 +142,20 @@ public class SensorInputFregment extends BaseFragment {
                     public void Onbutclicked(int select) {
                         if(select==1) //读数据
                         {
-//                            Toast.makeText(MainActivity.getInstance(),"read",Toast.LENGTH_SHORT).show();
+                           Toast.makeText(MainActivity.getInstance(),"read",Toast.LENGTH_SHORT).show();
                             CodeFormat.crcencode(sendbufread);
                             String readOutMsg = DigitalTrans.byte2hex(sendbufread);
+                            Log.d("zl",readOutMsg);
                             verycutstatus(readOutMsg);
                         }
                         else if(select==0)//写数据
                         {
-//                            Toast.makeText(MainActivity.getInstance(),"write",Toast.LENGTH_SHORT).show();
+                           Toast.makeText(MainActivity.getInstance(),"write",Toast.LENGTH_SHORT).show();
+                            CodeFormat.crcencode(sendbufwrite);
+                            String readOutMsg = DigitalTrans.byte2hex(sendbufwrite);
+                            Log.d("zl","写:"+ CodeFormat.byteToHex(sendbufwrite,sendbufwrite.length));
                             if(checkinput())
                             {
-                                CodeFormat.crcencode(sendbufwrite);
-                                String readOutMsg = DigitalTrans.byte2hex(sendbufread);
                                 verycutstatus(readOutMsg);
                             }
                             else
@@ -495,6 +497,8 @@ public class SensorInputFregment extends BaseFragment {
                         buf.putFloat(Float.valueOf(tem).floatValue());
                         buf.rewind();
                         buf.get(sendbufwrite,32,4);
+                        readOutMsg =  CodeFormat.byteToHex (sendbufwrite,sendbufwrite.length);
+                        Log.d("zl", "the value "+tem+"is \n"+readOutMsg);
                         break;
                     case 2:
                         mtempmode.setText(mdataitem.get(0).get("text"));
@@ -521,6 +525,8 @@ public class SensorInputFregment extends BaseFragment {
                         buf.putFloat(Float.valueOf(tem).floatValue());
                         buf.rewind();
                         buf.get(sendbufwrite,41,4);
+                        readOutMsg =  CodeFormat.byteToHex (sendbufwrite,sendbufwrite.length);
+                        Log.d("zl", "the value "+tem+"is \n"+readOutMsg);
                         break;
                     case 3:
                         mtime1.setText(mdataitem.get(0).get("text"));
@@ -539,6 +545,8 @@ public class SensorInputFregment extends BaseFragment {
                         buf.putInt(Integer.valueOf(tem).intValue());
                         buf.rewind();
                         buf.get(sendbufwrite,47,2);
+                        readOutMsg =  CodeFormat.byteToHex (sendbufwrite,sendbufwrite.length);
+                        Log.d("zl", "the value "+tem+"is \n"+readOutMsg);
                         break;
                         default:
                             break;

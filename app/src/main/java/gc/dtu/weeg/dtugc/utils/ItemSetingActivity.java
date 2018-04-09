@@ -511,11 +511,9 @@ public class ItemSetingActivity extends Activity {
            ItemSetingActivity.this.finish();
        }
    }
-
     @Override
-    protected void onStop() {
-        super.onStop();
-//        Log.d("zl","onStop");
+    protected void onDestroy() {
+        super.onDestroy();
         mainActivity.setOndataparse(null);
     }
 }
