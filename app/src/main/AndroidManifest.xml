@@ -27,5 +27,6 @@
             android:theme="@android:style/Theme.Holo.Dialog" />
         <activity android:name=".utils.ItemSetingActivity"/>
         <activity android:name=".utils.SensoritemsettingActivity"/>
+        <activity android:name=".utils.InstrumemtItemseetingActivity"/>
     </application>
 </manifest>

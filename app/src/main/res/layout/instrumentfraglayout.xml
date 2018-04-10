@@ -57,7 +57,6 @@
                         android:layout_toRightOf="@+id/tv_ins_baud_lable"
                         android:layout_centerVertical="true"
                         android:gravity="center_horizontal"
-                        android:text="9600"
                         />
                 </LinearLayout>
                 <LinearLayout
@@ -65,15 +64,14 @@
                     android:layout_weight="2"
                     android:layout_height="wrap_content">
                     <TextView
-                        android:id="@+id/tv_ins_valifybit_lable"
+                        android:id="@+id/tv_ins_paritybit_lable"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="校验位:" />
                     <TextView
-                        android:id="@+id/tv_ins_valifybit_value"
+                        android:id="@+id/tv_ins_paritybit_value"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="无" />
+                        android:layout_height="wrap_content" />
 
                 </LinearLayout>
 
@@ -89,8 +87,7 @@
                     <TextView
                         android:id="@+id/tv_ins_databit_value"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="8" />
+                        android:layout_height="wrap_content" />
 
                 </LinearLayout>
                 <LinearLayout
@@ -105,8 +102,7 @@
                     <TextView
                         android:id="@+id/tv_ins_stopbit_value"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="1" />
+                        android:layout_height="wrap_content" />
 
                 </LinearLayout>
             </LinearLayout>
@@ -135,7 +131,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
-                android:text="寄存器1999"/>
+                android:text="寄存器 1999"/>
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -158,8 +154,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/tv_ins_recodegap_lable"
-                android:text="60"/>
+                android:layout_toRightOf="@+id/tv_ins_recodegap_lable" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -177,6 +172,7 @@
         android:id="@+id/but_layout_2000"
         android:layout_width="match_parent"
         android:layout_height="260dp"
+        android:focusableInTouchMode="true"
         >
         <RelativeLayout
             android:layout_width="match_parent"
@@ -187,7 +183,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
-                android:text="寄存器2000"/>
+                android:text="寄存器 2000"/>
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -201,6 +197,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_below="@id/tv_ins_2000_lable"
+            android:listSelector="@android:color/transparent"
             android:divider="@null"></ListView>
     </RelativeLayout>
     <View
