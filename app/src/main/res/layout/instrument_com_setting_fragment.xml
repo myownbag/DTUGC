@@ -21,4 +21,94 @@
         android:layout_height="wrap_content"
         />
 </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ins_fragment_parity_select_lable"
+            android:layout_centerVertical="true"
+            android:text="校验位："/>
+        <Spinner
+            android:id="@+id/ins_fragment_parity_select"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/ins_fragment_parity_select_lable"
+            android:layout_toEndOf="@id/ins_fragment_parity_select_lable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+    </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ins_fragment_databit_select_lable"
+            android:layout_centerVertical="true"
+            android:text="数据位："/>
+        <Spinner
+            android:id="@+id/ins_fragment_databit_select"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/ins_fragment_databit_select_lable"
+            android:layout_toEndOf="@id/ins_fragment_databit_select_lable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+    </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ins_fragment_stopbit_select_lable"
+            android:layout_centerVertical="true"
+            android:text="停止位："/>
+        <Spinner
+            android:id="@+id/ins_fragment_stopbit_select"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/ins_fragment_stopbit_select_lable"
+            android:layout_toEndOf="@id/ins_fragment_stopbit_select_lable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+    </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="50dp"
+        >
+        <Button
+            android:id="@+id/ins_fragment_com_but"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:textSize="16sp"
+            android:background="@drawable/round_button"
+            android:text="写入数据"
+            android:textColor="#fff" />
+    </RelativeLayout>
 </LinearLayout>
