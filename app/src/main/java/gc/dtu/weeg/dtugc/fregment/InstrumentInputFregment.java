@@ -94,7 +94,7 @@ public class InstrumentInputFregment extends BaseFragment {
     }
     private void putdata2000(Intent srcint)
     {
-        String [] listdata;
+        String [] listdata=null;
         if(reg2000list!=null)
         {
             listdata=new String[reg2000list.size()];
@@ -103,7 +103,8 @@ public class InstrumentInputFregment extends BaseFragment {
                 listdata[i]=reg2000list.get(i).get("value");
             }
         }
-        srcint.putExtra("listdata",srcint);
+        srcint.putExtra("listdata",listdata);
+        srcint.putExtra("regaddr",2000);
     }
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {

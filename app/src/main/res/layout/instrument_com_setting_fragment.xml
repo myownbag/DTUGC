@@ -92,23 +92,5 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:background="#CFCFCF" />
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="50dp"
-        >
-        <Button
-            android:id="@+id/ins_fragment_com_but"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="20dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginStart="20dp"
-            android:textSize="16sp"
-            android:background="@drawable/round_button"
-            android:text="写入数据"
-            android:textColor="#fff" />
-    </RelativeLayout>
+
 </LinearLayout>
