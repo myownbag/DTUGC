@@ -11,19 +11,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
+import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
+import gc.dtu.weeg.dtugc.utils.DigitalTrans;
 import gc.dtu.weeg.dtugc.utils.InstrumemtItemseetingActivity;
+import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
 /**
  * Created by Administrator on 2018-03-22.
@@ -43,10 +49,12 @@ public class InstrumentInputFregment extends BaseFragment {
     private TextView mStopTx;
     private TextView mRecodeTmTx;
     private Intent intent;
-
-
+    private Button mbutread;
+    private byte [][] bufofreadcmd=new byte[3][18];
     String[] listitem={"仪表状态:","仪表类型:","仪表地址:","供电时长(步长:10ms):","Elster press 地址:"};
     ArrayList<Map<String,String>> reg2000list;
+    private int sendcmeindex=0;
+
 
 
     @SuppressLint("InflateParams")
@@ -64,9 +72,11 @@ public class InstrumentInputFregment extends BaseFragment {
         mReg2000clickrecv=mView.findViewById(R.id.but_layout_2000);
         mBuardTx=mView.findViewById(R.id.tv_ins_baud_value);
         mParityTx=mView.findViewById(R.id.tv_ins_paritybit_value);
-        mDataTx=mView.findViewById(R.id.tv_ins_stopbit_value);
+        mDataTx=mView.findViewById(R.id.tv_ins_databit_value);
         mStopTx=mView.findViewById(R.id.tv_ins_stopbit_value);
         mRecodeTmTx=mView.findViewById(R.id.tv_ins_recodegap_value);
+        mbutread=mView.findViewById(R.id.tv_ins_btn_read);
+
 
         initview();
         initdata();
@@ -77,6 +87,7 @@ public class InstrumentInputFregment extends BaseFragment {
         mReg1998clickrecv.setOnClickListener(new OnMyclicklisternerImp());
         mReg1999clickrecv.setOnClickListener(new OnMyclicklisternerImp());
         mReg2000clickrecv.setOnClickListener(new OnMyclicklisternerImp());
+        mbutread.setOnClickListener(new Onbutclicklisterner());
     }
 
     private void initdata() {
@@ -91,7 +102,31 @@ public class InstrumentInputFregment extends BaseFragment {
         list2000adpater = new listadpater();
         mReg2000.setAdapter(list2000adpater);
         mReg2000.setOnItemClickListener(new OnmyOnItemClickListenerlistenerImp());
+        initsendbuf();
     }
+
+    private void initsendbuf() {
+        byte[] temp={(byte)0xFD,0x00 ,0x00 ,0x0D ,0x00 ,0x19 ,0x00 ,0x00 ,0x00 ,0x00
+                ,0x00 ,0x00 ,0x00 ,0x00 ,(byte)0xCE ,0x07 ,0x42 ,(byte)0x92};
+        for(int i=0;i<3;i++)
+        {
+            ByteBuffer buf1;
+            buf1=ByteBuffer.allocateDirect(18);
+            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+            buf1.put(temp);
+            buf1.rewind();
+            buf1.get(bufofreadcmd[i]);
+
+            ByteBuffer buf;
+            buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+            buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+            buf.putInt(1998+i);
+            buf.rewind();
+            buf.get(bufofreadcmd[i],14,2);
+            CodeFormat.crcencode(bufofreadcmd[i]);
+        }
+    }
+
     private void putdata2000(Intent srcint)
     {
         String [] listdata=null;
@@ -108,7 +143,117 @@ public class InstrumentInputFregment extends BaseFragment {
     }
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
+           String info[][]=InstrumemtItemseetingActivity.baseinfo;
+            switch(sendcmeindex)
+            {
+                case 0:
+                    int buad=0x000000ff&readOutBuf1[19];
+                    int parity=0x000000ff&(readOutBuf1[20]&0x03);
+                    int databit=0x000000ff&(readOutBuf1[20]&0x0C);
+                    int stopbit=0x000000ff&(readOutBuf1[20]&0x30);
+                    for(int i=0;i<info.length;i++)
+                    {
+                        if(info[i][0].equals("1998")&&info[i][1].equals("1"))
+                        {
+                            if(Integer.valueOf(info[i][2]).intValue()== buad)
+                            {
+                                mBuardTx.setText(info[i][3]);
+                            }
+                        }
+                        if(info[i][0].equals("1998")&&info[i][1].equals("2"))
+                        {
+                            if(Integer.valueOf(info[i][2]).intValue()== parity)
+                            {
+                                mParityTx.setText(info[i][3]);
+                            }
+                        }
+                        if(info[i][0].equals("1998")&&info[i][1].equals("3"))
+                        {
+                            if(Integer.valueOf(info[i][2]).intValue()== databit)
+                            {
+                                mDataTx.setText(info[i][3]);
+                            }
+                        }
+                        if(info[i][0].equals("1998")&&info[i][1].equals("4"))
+                        {
+                            if(Integer.valueOf(info[i][2]).intValue()== stopbit)
+                            {
+                                mStopTx.setText(info[i][3]);
+                            }
+                        }
+                    }
+                    break;
+                case 1:
+                    byte[] tempbyte={0,0,0,0};
+                    tempbyte[0]=readOutBuf1[16];
+                    tempbyte[1]=readOutBuf1[17];
+                    ByteBuffer buf1;
+                    buf1=ByteBuffer.allocateDirect(4);
+                    buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+                    buf1.put(tempbyte);
+                    buf1.rewind();
+                    int gap=buf1.getInt();
+                    mRecodeTmTx.setText(""+gap);
+                    break;
+                case 2:
+                    int devicestatus=0x000000ff&readOutBuf1[16];
+                    int devicetype;
+                    //ByteBuffer buf1;
+                    tempbyte=new byte[4];
+                    tempbyte[0]=readOutBuf1[17];
+                    tempbyte[1]=readOutBuf1[18];
+                    buf1=ByteBuffer.allocateDirect(4);
+                    buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+                    buf1.put(tempbyte);
+                    buf1.rewind();
+                    devicetype=buf1.getInt();
+                    for(int i=0;i<info.length;i++)
+                    {
+                        if(info[i][0].equals("2000")&&info[i][1].equals("1"))
+                        {
+                            if(Integer.valueOf(info[i][3]).intValue()== devicestatus)
+                            {
 
+                                reg2000list.get(0).put("value",info[i][2]);
+                            }
+                        }
+                        if(info[i][0].equals("2000")&&info[i][1].equals("2"))
+                        {
+                            if(Integer.valueOf(info[i][3]).intValue()== devicetype)
+                            {
+                                reg2000list.get(1).put("value",info[i][2]);
+                            }
+                        }
+                    }
+
+                    int addr=0x000000ff&(readOutBuf1[19]);
+                    reg2000list.get(2).put("value",""+addr);
+
+                    buf1=ByteBuffer.allocateDirect(4);
+                    buf1=buf1.order(ByteOrder.BIG_ENDIAN);
+                    buf1.put(readOutBuf1,24,4);
+                    buf1.rewind();
+                    int timegap=buf1.getInt();
+                    reg2000list.get(3).put("value",""+timegap);
+
+
+                    buf1=ByteBuffer.allocateDirect(8);
+                    buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+                    buf1.put(readOutBuf1,28,8);
+                    buf1.rewind();
+                    byte[] by1=new byte[8];
+                    buf1.get(by1);
+                    reg2000list.get(4).put("value",DigitalTrans.byte2hex(by1));
+
+                    list2000adpater.notifyDataSetChanged();
+                    break;
+            }
+            sendcmeindex++;
+            if(sendcmeindex<3)
+            {
+                String readOutMsg = DigitalTrans.byte2hex(bufofreadcmd[sendcmeindex]);
+                verycutstatus(readOutMsg);
+            }
     }
     private class listadpater extends BaseAdapter
     {
@@ -133,7 +278,7 @@ public class InstrumentInputFregment extends BaseFragment {
             {
                 convertView=View.inflate(mainActivity,R.layout.ins2000itemlayout,null);
             }
-            Log.d("zl",""+convertView);
+//            Log.d("zl",""+convertView);
             TextView viewlable=convertView.findViewById(R.id.ins_item_lable);
             TextView viewvlaue=convertView.findViewById(R.id.ins_item_value);
             viewlable.setText(reg2000list.get(position).get("lable"));
@@ -179,6 +324,31 @@ public class InstrumentInputFregment extends BaseFragment {
             intent.putExtra("title","Reg 2000");
             putdata2000(intent);
             startActivityForResult(intent, Constants.InstrumemtsetingFlag);
+        }
+    }
+    private class Onbutclicklisterner implements View.OnClickListener
+    {
+        @Override
+        public void onClick(View v) {
+            sendcmeindex=0;
+            String readOutMsg = DigitalTrans.byte2hex(bufofreadcmd[sendcmeindex]);
+            verycutstatus(readOutMsg);
+        }
+    }
+
+    private void verycutstatus(String readOutMsg) {
+        MainActivity parentActivity1 = (MainActivity) getActivity();
+        String strState1 = parentActivity1.GetStateConnect();
+        if(!strState1.equalsIgnoreCase("无连接"))
+        {
+            parentActivity1.mDialog.show();
+            parentActivity1.mDialog.setDlgMsg("读取中...");
+            //String input1 = Constants.Cmd_Read_Alarm_Pressure;
+            parentActivity1.sendData(readOutMsg, "FFFF");
+        }
+        else
+        {
+            ToastUtils.showToast(getActivity(), "请先建立蓝牙连接!");
         }
     }
 }

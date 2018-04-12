@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ import gc.dtu.weeg.dtugc.R;
 
 public class instrumenttimegapFragment extends instrumentbaseFragment {
     View mView;
+    String mSetting;
+    EditText mTimegap;
 
     @Nullable
     @Override
@@ -33,9 +36,19 @@ public class instrumenttimegapFragment extends instrumentbaseFragment {
     }
 
     private void initview() {
+        mTimegap=mView.findViewById(R.id.instrument_item_timegap_value);
+        mTimegap.setText(mSetting);
     }
     private void initdata() {
     }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle temp=getArguments();
+        mSetting= temp.getString("settings");
+    }
+
     @Override
    public ArrayList<Map<String, String>> OnbutOKPress( byte[] sendbuf) {
         return null;

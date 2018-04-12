@@ -25,6 +25,7 @@ public class instrumentWorkModeSetFragment extends instrumentbaseFragment {
     ArrayAdapter<String> mdevicestatusad;
     ArrayAdapter<String> mdevicetypead;
 
+    String[] mSettings;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -100,5 +101,12 @@ public class instrumentWorkModeSetFragment extends instrumentbaseFragment {
     @Override
    public ArrayList<Map<String, String>> OnbutOKPress( byte[] sendbuf) {
         return null;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle temp=getArguments();
+        mSettings=temp.getStringArray("listdata");
     }
 }

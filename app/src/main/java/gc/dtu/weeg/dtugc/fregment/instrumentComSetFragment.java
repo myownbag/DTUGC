@@ -134,6 +134,41 @@ public class instrumentComSetFragment extends instrumentbaseFragment {
         mParityadpater=setSpinneradpater(mParity,mParitylist);
         mDatabitadpater=setSpinneradpater(mDatabit,mDatabitlist);
         mStopbitadpater=setSpinneradpater(mStopbit,mStopbitlist);
+        for(int i=0;i<mBuadlist.size();i++)
+        {
+            if(mSettings[0].equals(mBuadlist.get(i).get("items")))
+            {
+                mBuad.setSelection(i,true);
+                break;
+            }
+
+        }
+        for(int i=0;i<mParitylist.size();i++)
+        {
+            if(mSettings[1].equals(mParitylist.get(i).get("items")))
+            {
+                mParity.setSelection(i,true);
+                break;
+            }
+
+        }
+        for(int i=0;i<mDatabitlist.size();i++)
+        {
+            if(mSettings[2].equals(mDatabitlist.get(i).get("items")))
+            {
+                mDatabit.setSelection(i,true);
+                break;
+            }
+
+        }
+        for(int i=0;i<mStopbitlist.size();i++)
+        {
+            if(mSettings[3].equals(mStopbitlist.get(i).get("items")))
+            {
+                mStopbit.setSelection(i,true);
+                break;
+            }
+        }
 
         mBuad.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -152,6 +187,9 @@ public class instrumentComSetFragment extends instrumentbaseFragment {
 
             }
         });
+
+
+
     }
 
     @Override
