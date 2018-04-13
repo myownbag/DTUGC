@@ -225,10 +225,10 @@ public class InstrumentInputFregment extends BaseFragment {
                             }
                         }
                     }
-
+                    //仪表地址
                     int addr=0x000000ff&(readOutBuf1[19]);
                     reg2000list.get(2).put("value",""+addr);
-
+                    //供电时长
                     buf1=ByteBuffer.allocateDirect(4);
                     buf1=buf1.order(ByteOrder.BIG_ENDIAN);
                     buf1.put(readOutBuf1,24,4);
@@ -349,6 +349,42 @@ public class InstrumentInputFregment extends BaseFragment {
         else
         {
             ToastUtils.showToast(getActivity(), "请先建立蓝牙连接!");
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==1)
+        {
+            int reg=data.getIntExtra("regaddr",-1);
+            String[] Set=data.getStringArrayExtra("returnsettings");
+            switch(reg)
+            {
+                case 1998:
+                    if(Set!=null)
+                    {
+                        mBuardTx.setText(Set[0]);
+                        mParityTx.setText(Set[1]);
+                        mDataTx.setText(Set[2]);
+                        mStopTx.setText(Set[3]);
+                    }
+                    break;
+                case 1999:
+                    if(Set!=null)
+                        mRecodeTmTx.setText(Set[0]);
+                    break;
+                case 2000:
+                    if(Set!=null)
+                    {
+                        for(int i=0;i<reg2000list.size();i++)
+                        {
+                            reg2000list.get(i).put("value",Set[i]);
+                        }
+                    }
+                    list2000adpater.notifyDataSetChanged();
+                    break;
+            }
         }
     }
 }

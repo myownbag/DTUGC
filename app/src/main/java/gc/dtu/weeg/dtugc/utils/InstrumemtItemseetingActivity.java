@@ -9,12 +9,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Map;
 
 import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
@@ -23,18 +26,21 @@ import gc.dtu.weeg.dtugc.fregment.instrumentComSetFragment;
 import gc.dtu.weeg.dtugc.fregment.instrumentWorkModeSetFragment;
 import gc.dtu.weeg.dtugc.fregment.instrumentbaseFragment;
 import gc.dtu.weeg.dtugc.fregment.instrumenttimegapFragment;
+import gc.dtu.weeg.dtugc.myview.CustomDialog;
 
-public class InstrumemtItemseetingActivity extends FragmentActivity {
+public class InstrumemtItemseetingActivity extends FragmentActivity implements View.OnClickListener {
 
     private TextView mtltie;
     private ImageView mbutback;
     private MainActivity mainActivity;
-    //private instrumentComSetFragment fragmentcom;  //instrumentbaseFragment
     private ArrayList<instrumentbaseFragment> fragments;
     private instrumentComSetFragment fragment1;
     private instrumenttimegapFragment fragment2;
     private instrumentWorkModeSetFragment fragment3;
+    private Button mButwrite;
     private static Activity activity;
+    public ArrayList<Map<String,String>> settings;
+    public CustomDialog mDialog;
     public static String baseinfo[][]={
             {"1998","1","1","300"}, // reg,item,seletc,value
             {"1998","1","2","600"},
@@ -96,7 +102,7 @@ public class InstrumemtItemseetingActivity extends FragmentActivity {
             {"2000","2","Trancy cpuCard","1021"},
     };
 
-
+    int reg;
     Intent intent;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -105,6 +111,7 @@ public class InstrumemtItemseetingActivity extends FragmentActivity {
         activity=this;
         mtltie=findViewById(R.id.txt_titles_insitem);
         mbutback=findViewById(R.id.imgBack_insitem);
+        mButwrite=findViewById(R.id.ins_fragment_but);
         intent=getIntent();
         mainActivity=MainActivity.getInstance();
         initview();
@@ -113,6 +120,13 @@ public class InstrumemtItemseetingActivity extends FragmentActivity {
     }
 
     private void initview() {
+        mDialog = CustomDialog.createProgressDialog(this, Constants.TimeOutSecond, new CustomDialog.OnTimeOutListener() {
+            @Override
+            public void onTimeOut(CustomDialog dialog) {
+                dialog.dismiss();
+                ToastUtils.showToast(getBaseContext(), "超时啦!");
+            }
+        });
         mbutback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,7 +134,7 @@ public class InstrumemtItemseetingActivity extends FragmentActivity {
             }
         });
         fragments=new ArrayList<instrumentbaseFragment>();
-        int reg=intent.getIntExtra("regaddr",-1);
+        reg=intent.getIntExtra("regaddr",-1);
         initfragment();
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
@@ -128,15 +142,6 @@ public class InstrumemtItemseetingActivity extends FragmentActivity {
         switch (reg)
         {
             case 1998:
-//                Bundle bundle_3 = new Bundle();
-//                bundle_3.putString("some_data", parmData);
-//                upParamConfig_F.setArguments(bundle_3);
-//
-//                transaction.replace(R.id.content, upParamConfig_F);  content_insitem
-//                intent.putExtra("buad",mBuardTx.getText().toString());
-//                intent.putExtra("parity",mParityTx.getText().toString());
-//                intent.putExtra("databit",mDataTx.getText().toString());
-//                intent.putExtra("stopbit",mStopTx.getText().toString());
                 Bundle bundle_1 = new Bundle();
                 String[] settings=new String[4];
                 settings[0]=intent.getStringExtra("buad");
@@ -165,6 +170,7 @@ public class InstrumemtItemseetingActivity extends FragmentActivity {
         }
         transaction.commit();
         mainActivity.setOndataparse(new Onbluetoothdataparse());
+        mButwrite.setOnClickListener(this);
     }
 
     private void initfragment() {
@@ -174,7 +180,6 @@ public class InstrumemtItemseetingActivity extends FragmentActivity {
         fragments.add(fragment2);
         fragment3=new instrumentWorkModeSetFragment();
         fragments.add(fragment3);
-       // fragments.add(fragment1);
     }
 
     private void initdata()
@@ -182,12 +187,6 @@ public class InstrumemtItemseetingActivity extends FragmentActivity {
         intent=getIntent();
         String titlehere=intent.getStringExtra("title");
         mtltie.setText(titlehere);
-
-//        for(int i=0;i<3;i++)
-//        {
-//            String temp1=CodeFormat.byteToHex(bufofreadcmd[i],bufofreadcmd[i].length);
-//            Log.d("zl",temp1);
-//        }
     }
 
     @Override
@@ -200,11 +199,84 @@ public class InstrumemtItemseetingActivity extends FragmentActivity {
     {
        return activity;
     }
+
+    @Override
+    public void onClick(View v) {
+        byte [] sendbuf = new byte[0];
+        byte [] headbuf={(byte)0xFD ,0x00 ,0x00 ,0x0F ,0x00 ,0x15 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00
+                ,0x00 ,0x00 ,0x00 ,(byte)0xCF ,0x07 };
+        ByteBuffer buf1;
+        buf1=ByteBuffer.allocateDirect(headbuf.length);
+        buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+        switch (reg)
+        {
+            case 1998:
+                headbuf[3]=0x12;
+                headbuf[14]= (byte) 0xCE;
+                sendbuf=new byte[23];
+                break;
+            case 1999:
+                headbuf[3]=0x0F;
+                headbuf[14]= (byte) 0xCF;
+                sendbuf=new byte[20];
+                break;
+            case 2000:
+                headbuf[3]=0x27;
+                headbuf[14]= (byte) 0xD0;
+                sendbuf=new byte[44];
+                break;
+        }
+        buf1.put(headbuf);
+        buf1.rewind();
+        buf1.get(sendbuf,0,headbuf.length);
+
+        settings=fragments.get(reg-1998).OnbutOKPress(sendbuf);
+        if(settings==null)
+        {
+            return;
+        }
+        CodeFormat.crcencode(sendbuf);
+        String readOutMsg = DigitalTrans.byte2hex(sendbuf);
+        verycutstatus(readOutMsg);
+//        if(settings==null)
+//        {
+//            Toast.makeText(this,"请完善写入参数",Toast.LENGTH_SHORT).show();
+//        }
+    }
+
+    private void verycutstatus(String readOutMsg) {
+        MainActivity parentActivity1 = InstrumemtItemseetingActivity.this.mainActivity;
+        String strState1 = parentActivity1.GetStateConnect();
+        if(!strState1.equalsIgnoreCase("无连接"))
+        {
+            InstrumemtItemseetingActivity.this.mDialog.show();
+            InstrumemtItemseetingActivity.this.mDialog.setDlgMsg("读取中...");
+            //String input1 = Constants.Cmd_Read_Alarm_Pressure;
+            parentActivity1.sendData(readOutMsg, "FFFF");
+        }
+        else
+        {
+            ToastUtils.showToast(InstrumemtItemseetingActivity.this, "请先建立蓝牙连接!");
+        }
+    }
+
     private  class Onbluetoothdataparse implements MainActivity.Ondataparse
     {
         @Override
         public void datacometoparse(String readOutMsg1, byte[] readOutBuf1) {
-
+            if(settings!=null)
+            {
+                String temp[]=new String[settings.size()];
+                for(int i=0;i<settings.size();i++)
+                {
+                    temp[i]=settings.get(i).get("items");
+                }
+                intent.putExtra("returnsettings",temp);
+                intent.putExtra("regaddr",reg);
+                InstrumemtItemseetingActivity.this.setResult(1,intent);
+                InstrumemtItemseetingActivity.this.mDialog.dismiss();
+                InstrumemtItemseetingActivity.this.finish();
+            }
         }
     }
 }

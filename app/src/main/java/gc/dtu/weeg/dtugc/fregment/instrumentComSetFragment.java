@@ -3,6 +3,7 @@ package gc.dtu.weeg.dtugc.fregment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,9 +40,45 @@ public class instrumentComSetFragment extends instrumentbaseFragment {
     ArrayList<Map<String,String>> mDatabitlist;
     ArrayList<Map<String,String>> mStopbitlist;
     String[] mSettings;
+    int [] mSelect={0,0,0,0};
+
     @Override
    public ArrayList<Map<String, String>> OnbutOKPress(byte[] sendbuf) {
-        return null;
+        sendbuf[16]=0x01;
+        sendbuf[18]=0x01;
+        ArrayList<Map<String, String>> setlist=new ArrayList<>();
+        for(int i=0;i<mSelect.length;i++)
+        {
+           if(mSelect[i]==0)
+                return  null;
+        }
+        int baud=Integer.valueOf(mBuadlist.get(mSelect[0]).get("value")).intValue();
+        ByteBuffer buf;
+        buf=ByteBuffer.allocateDirect(4);
+        buf.order(ByteOrder.LITTLE_ENDIAN);
+        buf.putInt(baud);
+        buf.rewind();
+        buf.get(sendbuf,19,1);
+        setlist.add(mBuadlist.get(mSelect[0]));
+
+
+
+        int parity=Integer.valueOf(mParitylist.get(mSelect[1]).get("value")).intValue();
+        setlist.add(mParitylist.get(mSelect[1]));
+        int databit=Integer.valueOf(mDatabitlist.get(mSelect[2]).get("value")).intValue();
+        setlist.add(mDatabitlist.get(mSelect[2]));
+        int stopbit=Integer.valueOf(mStopbitlist.get(mSelect[3]).get("value")).intValue();
+        setlist.add(mStopbitlist.get(mSelect[3]));
+        parity=parity|databit;
+        parity=parity|stopbit;
+
+        buf=ByteBuffer.allocateDirect(4);
+        buf.order(ByteOrder.LITTLE_ENDIAN);
+        buf.putInt(parity);
+        buf.rewind();
+        buf.get(sendbuf,20,1);
+
+        return setlist;
     }
 
     @Nullable
@@ -139,6 +178,7 @@ public class instrumentComSetFragment extends instrumentbaseFragment {
             if(mSettings[0].equals(mBuadlist.get(i).get("items")))
             {
                 mBuad.setSelection(i,true);
+                mSelect[0]=i;
                 break;
             }
 
@@ -148,6 +188,7 @@ public class instrumentComSetFragment extends instrumentbaseFragment {
             if(mSettings[1].equals(mParitylist.get(i).get("items")))
             {
                 mParity.setSelection(i,true);
+                mSelect[1]=i;
                 break;
             }
 
@@ -157,6 +198,7 @@ public class instrumentComSetFragment extends instrumentbaseFragment {
             if(mSettings[2].equals(mDatabitlist.get(i).get("items")))
             {
                 mDatabit.setSelection(i,true);
+                mSelect[2]=i;
                 break;
             }
 
@@ -166,30 +208,15 @@ public class instrumentComSetFragment extends instrumentbaseFragment {
             if(mSettings[3].equals(mStopbitlist.get(i).get("items")))
             {
                 mStopbit.setSelection(i,true);
+                mSelect[3]=i;
                 break;
             }
         }
 
-        mBuad.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                if(mBuadlist.get(0).get("items").equals("请选择"))
-//                {
-//                    mBuadlist.remove(0);
-//                    mBuadadpater=setSpinneradpater(mBuad,mBuadlist);
-//                    mBuadadpater.notifyDataSetChanged();
-//                    mBuad.setSelection(position-1,true);
-//                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-
-
+        mBuad.setOnItemSelectedListener(new OnComSpinnerItemSelect());
+        mParity.setOnItemSelectedListener(new OnComSpinnerItemSelect());
+        mDatabit.setOnItemSelectedListener(new OnComSpinnerItemSelect());
+        mStopbit.setOnItemSelectedListener(new OnComSpinnerItemSelect());
     }
 
     @Override
@@ -207,6 +234,35 @@ public class instrumentComSetFragment extends instrumentbaseFragment {
             {
                 mSettings[i]="";
             }
+        }
+    }
+    public class OnComSpinnerItemSelect implements AdapterView.OnItemSelectedListener
+    {
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+            int thisid=parent.getId();
+            switch (thisid)
+            {
+                case R.id.ins_fragment_buad_select:
+                    mSelect[0]=position;
+                    break;
+                case R.id.ins_fragment_parity_select:
+                    mSelect[1]=position;
+                    break;
+                case R.id.ins_fragment_databit_select:
+                    mSelect[2]=position;
+                    break;
+                case R.id.ins_fragment_stopbit_select:
+                    mSelect[3]=position;
+                    break;
+            }
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
         }
     }
 }
