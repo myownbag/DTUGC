@@ -2,6 +2,7 @@ package gc.dtu.weeg.dtugc.fregment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -122,7 +123,9 @@ public class LocalsettngsFregment extends BaseFragment {
         myadpater=new thislistviewadpater();
         mylist.setAdapter(myadpater);
         View view=View.inflate(MainActivity.getInstance(),R.layout.lcalseitemthead,null);
-        mylist.addHeaderView(view);
+        Log.d("zl","Version"+Build.VERSION.SDK_INT);
+        if(Build.VERSION.SDK_INT>21)
+            mylist.addHeaderView(view);
         mybut= mView.findViewById(R.id.btn_realtime_data);
         mybut.setOnClickListener(new butonclicklistener());
         mylist.setOnItemClickListener(new Onlistviewitemclicked());
