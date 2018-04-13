@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+                  android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,8 +26,11 @@
             android:label="@string/select_device"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Dialog" />
-        <activity android:name=".utils.ItemSetingActivity"/>
-        <activity android:name=".utils.SensoritemsettingActivity"/>
-        <activity android:name=".utils.InstrumemtItemseetingActivity"/>
+        <activity android:name=".utils.ItemSetingActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".utils.SensoritemsettingActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".utils.InstrumemtItemseetingActivity"
+            android:screenOrientation="portrait"/>
     </application>
 </manifest>
