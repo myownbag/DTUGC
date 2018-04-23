@@ -20,15 +20,6 @@ public abstract class instrumentbaseFragment extends Fragment {
         mActivity=(InstrumemtItemseetingActivity) context;
     }
     public Map<String,String> findcursetting(int position,ArrayList<Map<String,String>> list,String keyname,String keyvalue){
-        Map<String,String> map=new HashMap<>();
-        if(list==null)
-        {
-            return null;
-        }
-        for(int i=0;i<list.size();i++)
-        {
-
-        }
-        return map;
+       return null;
     }
 }

@@ -307,6 +307,8 @@ public class MainActivity extends FragmentActivity {
         mPagerAdater.setFragments(fragments);
         info_viewpager.setAdapter(mPagerAdater);
         info_viewpager.addOnPageChangeListener(new OnpagechangedListernerImp());
+
+        mCurrentpage=fregment1;
     }
 
     private void addScrollView(String[] titles) {
@@ -345,6 +347,7 @@ public class MainActivity extends FragmentActivity {
                     type_name.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.color_selected));
                     //跳转到指定的ViewPager
                     info_viewpager.setCurrentItem(mCurClassIndex);
+                    mCurrentpage=fragments.get(mCurClassIndex);
                 }
             });
 
@@ -497,6 +500,7 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         public void onPageSelected(int position) {
+            Log.d("zl","in onPageSelected");
             mCurrentpage=fragments.get(position);
             mCurrentpage.Oncurrentpageselect(position);
 //            if(myOnPageSelectedinviewpager!=null)

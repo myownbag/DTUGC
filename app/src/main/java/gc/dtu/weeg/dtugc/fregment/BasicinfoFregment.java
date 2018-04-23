@@ -35,6 +35,7 @@ public class BasicinfoFregment extends BaseFragment {
     TextView Signalinfo;
     IndicatorSeekBar indicatorSeekBar;
     Button butsend;
+    public int currentposition=0;
     //停止标记
     Boolean timerstop=false;
     int mIndexcmd=0;
@@ -140,6 +141,11 @@ public class BasicinfoFregment extends BaseFragment {
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
         String temp;
+        Log.d("zl",CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
+        if(currentposition!=0)
+        {
+            return;
+        }
         int  i=0;
         if(readOutBuf1.length<5)
         {
@@ -150,7 +156,7 @@ public class BasicinfoFregment extends BaseFragment {
         {
             if(readOutBuf1[3]!=(readOutBuf1.length-5))
             {
-                ToastUtils.showToast(getActivity(), "数据长度异常");
+                ToastUtils.showToast(getActivity(), "数据长度异常"+"当前解析："+mIndexcmd);
                 return;
             }
         }
@@ -180,28 +186,49 @@ public class BasicinfoFregment extends BaseFragment {
                 Timeinfo.setText(temp1.toString());
                 break;
             case (byte) 0xC7:
-                switch (readOutBuf1[16])
+//                switch (readOutBuf1[16])
+//                {
+//                    case 0x01:
+//                        indicatorSeekBar.setProgress(25);
+//                        break;
+//                    case 0x02:
+//                        indicatorSeekBar.setProgress(50);
+//                        break;
+//                    case 0x04:
+//                        indicatorSeekBar.setProgress(75);
+//                        break;
+//                    case (byte) 0x08:
+//                        indicatorSeekBar.setProgress(100);
+//                        mytimer.cancel();
+//                        timerstop=true;
+//                        break;
+//                    default:
+//                        indicatorSeekBar.setProgress(0);
+//                        break;
+//                }
+                int status=0x000000FF&readOutBuf1[16];
+                if(status<2)
                 {
-                    case 0x01:
-                        indicatorSeekBar.setProgress(25);
-                        break;
-                    case 0x02:
-                        indicatorSeekBar.setProgress(50);
-                        break;
-                    case 0x04:
-                        indicatorSeekBar.setProgress(75);
-                        break;
-                    case (byte) 0x08:
-                        indicatorSeekBar.setProgress(100);
-                        mytimer.cancel();
-                        timerstop=true;
-                        break;
-                    default:
-                        indicatorSeekBar.setProgress(0);
-                        break;
+                    indicatorSeekBar.setProgress(0);
+                }
+                if(status<=2)
+                {
+                    indicatorSeekBar.setProgress(25);
+                }
+                else if(status<=3)
+                {
+                    indicatorSeekBar.setProgress(50);
+                }
+                else if(status<=7)
+                {
+                    indicatorSeekBar.setProgress(75);
+                }
+                else if(status<=15)
+                {
+                    indicatorSeekBar.setProgress(100);
                 }
                 temp=""+readOutBuf1[17];
-                Log.d("zl","temp");
+               // Log.d("zl","temp");
                 Signalinfo.setText(temp);
                 break;
             default:
@@ -250,6 +277,7 @@ public class BasicinfoFregment extends BaseFragment {
 
     @Override
     public void Oncurrentpageselect(int index) {
+        currentposition=index;
         if(index!=0)
         {
             mytimer.cancel();
