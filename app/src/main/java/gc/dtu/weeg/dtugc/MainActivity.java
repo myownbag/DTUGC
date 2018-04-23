@@ -52,6 +52,7 @@ public class MainActivity extends FragmentActivity {
 
     LayoutInflater mLayoutInflater;
     BaseFragment mCurrentpage;
+    BaseFragment mPrepage;
     ViewPager info_viewpager;
     private CNKFixedPagerAdapter mPagerAdater;
     /**
@@ -309,6 +310,7 @@ public class MainActivity extends FragmentActivity {
         info_viewpager.addOnPageChangeListener(new OnpagechangedListernerImp());
 
         mCurrentpage=fregment1;
+        mPrepage=fregment1;
     }
 
     private void addScrollView(String[] titles) {
@@ -348,6 +350,13 @@ public class MainActivity extends FragmentActivity {
                     //跳转到指定的ViewPager
                     info_viewpager.setCurrentItem(mCurClassIndex);
                     mCurrentpage=fragments.get(mCurClassIndex);
+                    mCurrentpage=fragments.get(mCurClassIndex);
+                    mCurrentpage.Oncurrentpageselect(mCurClassIndex);
+                    if(mPrepage!=null)
+                    {
+                        mPrepage.Oncurrentpageselect(mCurClassIndex);
+                    }
+                    mPrepage=mCurrentpage;
                 }
             });
 
@@ -503,6 +512,11 @@ public class MainActivity extends FragmentActivity {
             Log.d("zl","in onPageSelected");
             mCurrentpage=fragments.get(position);
             mCurrentpage.Oncurrentpageselect(position);
+            if(mPrepage!=null)
+            {
+                mPrepage.Oncurrentpageselect(position);
+            }
+            mPrepage=mCurrentpage;
 //            if(myOnPageSelectedinviewpager!=null)
 //            {
 //                myOnPageSelectedinviewpager.currentviewpager(position);

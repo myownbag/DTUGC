@@ -85,6 +85,7 @@ public class SensorInputFregment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mIsatart=false;
         if(mView!=null)
         {
             return mView;
@@ -136,6 +137,7 @@ public class SensorInputFregment extends BaseFragment {
         mButcommand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mIsatart=true;
                 MyDlg dlg=new MyDlg(MainActivity.getInstance());
                 dlg.SetOnbutclickListernerdlg(new MyDlg.Onbutclicked() {
                     @Override
@@ -216,6 +218,33 @@ public class SensorInputFregment extends BaseFragment {
 
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
+        if(mIsatart==false)
+        {
+            return;
+        }
+        if(readOutBuf1.length<5)
+        {
+            ToastUtils.showToast(getActivity(), "数据长度短");
+//                if(mIndexcmd<senddatabuf.length)
+//                {
+//                    String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
+//                    verycutstatus(readOutMsg);
+//                }
+            return;
+        }
+        else
+        {
+            if(readOutBuf1[3]!=(readOutBuf1.length-5))
+            {
+                ToastUtils.showToast(getActivity(), "数据长度异常");
+//                    if(mIndexcmd<senddatabuf.length)
+//                    {
+//                        String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
+//                        verycutstatus(readOutMsg);
+//                    }
+                return;
+            }
+        }
         if(readOutBuf1.length>20)
         {
             sendbufwrite=readOutBuf1;
@@ -386,6 +415,10 @@ public class SensorInputFregment extends BaseFragment {
 
     @Override
     public void Oncurrentpageselect(int index) {
+        if(index!=4)
+        {
+            mIsatart=false;
+        }
         if(index==4)
         {
             sp = MainActivity.getInstance().getSharedPreferences("User", Context.MODE_PRIVATE);
@@ -563,5 +596,4 @@ public class SensorInputFregment extends BaseFragment {
 //
 //        }
 //    }
-
 }

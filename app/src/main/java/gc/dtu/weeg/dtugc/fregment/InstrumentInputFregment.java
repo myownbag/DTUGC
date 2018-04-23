@@ -61,6 +61,7 @@ public class InstrumentInputFregment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mIsatart=false;
         if(mView!=null)
         {
             return mView;
@@ -143,6 +144,33 @@ public class InstrumentInputFregment extends BaseFragment {
     }
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
+        if(mIsatart==false)
+        {
+            return;
+        }
+        if(readOutBuf1.length<5)
+        {
+            ToastUtils.showToast(getActivity(), "数据长度短");
+//                if(mIndexcmd<senddatabuf.length)
+//                {
+//                    String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
+//                    verycutstatus(readOutMsg);
+//                }
+            return;
+        }
+        else
+        {
+            if(readOutBuf1[3]!=(readOutBuf1.length-5))
+            {
+                ToastUtils.showToast(getActivity(), "数据长度异常");
+//                    if(mIndexcmd<senddatabuf.length)
+//                    {
+//                        String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
+//                        verycutstatus(readOutMsg);
+//                    }
+                return;
+            }
+        }
            String info[][]=InstrumemtItemseetingActivity.baseinfo;
             switch(sendcmeindex)
             {
@@ -330,6 +358,7 @@ public class InstrumentInputFregment extends BaseFragment {
     {
         @Override
         public void onClick(View v) {
+            mIsatart=true;
             sendcmeindex=0;
             String readOutMsg = DigitalTrans.byte2hex(bufofreadcmd[sendcmeindex]);
             verycutstatus(readOutMsg);
@@ -385,6 +414,14 @@ public class InstrumentInputFregment extends BaseFragment {
                     list2000adpater.notifyDataSetChanged();
                     break;
             }
+        }
+    }
+
+    @Override
+    public void Oncurrentpageselect(int index) {
+        if(index!=5)
+        {
+            mIsatart=false;
         }
     }
 }

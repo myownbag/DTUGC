@@ -106,6 +106,7 @@ public class LocalsettngsFregment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //return super.onCreateView(inflater, container, savedInstanceState);
+        mIsatart=false;
         if (mView != null) {
             // 防止多次new出片段对象，造成图片错乱问题
             return mView;
@@ -135,8 +136,20 @@ public class LocalsettngsFregment extends BaseFragment {
 //    }
 
     @Override
+    public void Oncurrentpageselect(int index) {
+        if(index!=3)
+        {
+            mIsatart=false;
+        }
+    }
+
+    @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
 //        Log.d("zl","in LocalsettngsFregment");
+        if(mIsatart==false)
+        {
+            return;
+        }
         String temp;
         int tempint;
         int tempint2;
@@ -354,6 +367,7 @@ public class LocalsettngsFregment extends BaseFragment {
             int i;
             int tempint;
             byte[] adsinf0;//={1,3,105, (byte) 0xC7};
+            mIsatart=true;
             adsinf0=new byte[baseinfo.length];
             for(i=0;i<adsinf0.length;i++)
             {

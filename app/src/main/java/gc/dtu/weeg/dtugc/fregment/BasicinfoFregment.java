@@ -60,6 +60,10 @@ public class BasicinfoFregment extends BaseFragment {
 
     private void verycutstatus1(String readOutMsg) {
         MainActivity parentActivity1 = (MainActivity) getActivity();
+        if(parentActivity1==null)
+        {
+            return;
+        }
         String strState1 = parentActivity1.GetStateConnect();
         if(!strState1.equalsIgnoreCase("无连接"))
         {
@@ -74,6 +78,7 @@ public class BasicinfoFregment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mIsatart=false;
         if (mView != null) {
             // 防止多次new出片段对象，造成图片错乱问题
             return mView;
@@ -92,6 +97,7 @@ public class BasicinfoFregment extends BaseFragment {
         butsend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mIsatart=true;
                 int index=0;
                 byte[] adsinf0={1,3,105, (byte) 0xC7};
                 mIndexcmd=0;
@@ -142,6 +148,10 @@ public class BasicinfoFregment extends BaseFragment {
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
         String temp;
         Log.d("zl",CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
+        if(mIsatart==false)
+        {
+            return;
+        }
         if(currentposition!=0)
         {
             return;
@@ -281,6 +291,7 @@ public class BasicinfoFregment extends BaseFragment {
         if(index!=0)
         {
             mytimer.cancel();
+            mIsatart=false;
         }
     }
 
