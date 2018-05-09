@@ -231,7 +231,7 @@ public class MainActivity extends FragmentActivity {
                     {
                         mCurrentpage.OndataCometoParse(readOutMsg,readOutBuf);
                     }
-                    mDialog.dismiss();
+                    //mDialog.dismiss();
                     break;
                 case BluetoothState.MESSAGE_DEVICE_NAME:
                     // save the connected device's name

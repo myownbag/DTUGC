@@ -1,5 +1,7 @@
 package gc.dtu.weeg.dtugc.fregment;
 
+import android.annotation.SuppressLint;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
@@ -52,9 +54,12 @@ public class BasicinfoFregment extends BaseFragment {
             }
         }
 
+        @SuppressLint("NewApi")
         @Override
         public void onFinish() {
             ToastUtils.showToast(getActivity(), "已经测试了30秒，如需再测，请读取数据");
+            butsend.setEnabled(true);
+            butsend.setBackground(getActivity().getResources().getDrawable(R.drawable.round_button));
         }
     };
 
@@ -166,7 +171,8 @@ public class BasicinfoFregment extends BaseFragment {
         {
             if(readOutBuf1[3]!=(readOutBuf1.length-5))
             {
-                ToastUtils.showToast(getActivity(), "数据长度异常"+"当前解析："+mIndexcmd);
+                //ToastUtils.showToast(getActivity(), "数据长度异常"+"当前解析："+mIndexcmd);
+
                 return;
             }
         }
@@ -259,8 +265,11 @@ public class BasicinfoFregment extends BaseFragment {
             else
             {
                 mytimer.start();
+                butsend.setEnabled(false);
+                butsend.setBackgroundColor(this.getResources().getColor(R.color.color_unselected));
             }
-
+            MainActivity activity= (MainActivity) getActivity();
+            activity.mDialog.dismiss();
         }
 
     }
