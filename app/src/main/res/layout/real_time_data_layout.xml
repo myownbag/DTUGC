@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <TextView
+            android:id="@+id/real_time_tem_addr_labale"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="40dp"
+            android:text="温度:"/>
+        <TextView
+            android:id="@+id/real_time_tem_addr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/real_time_tem_addr_labale"
+            android:layout_toEndOf="@id/real_time_tem_addr_labale"
+            />
+    </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <TextView
+            android:id="@+id/real_time_press1_labale"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="40dp"
+            android:text="压力1:"/>
+        <TextView
+            android:id="@+id/real_time_press1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/real_time_press1_labale"
+            android:layout_toEndOf="@id/real_time_press1_labale"
+            />
+    </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <TextView
+            android:id="@+id/real_time_press2_labale"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="40dp"
+            android:text="压力2:"/>
+        <TextView
+            android:id="@+id/real_time_press2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/real_time_press2_labale"
+            android:layout_toEndOf="@id/real_time_press2_labale"
+            />
+    </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+
+    <LinearLayout
+        android:id="@+id/realtime_buttoncanter"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="bottom"
+        android:layout_marginBottom="30dp">
+
+        <Button
+            android:id="@+id/realtime_but"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/round_button"
+            android:text="读取数据"
+            android:textColor="#fff"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+</LinearLayout>

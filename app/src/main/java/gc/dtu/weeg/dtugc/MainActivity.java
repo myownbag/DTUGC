@@ -3,6 +3,7 @@ package gc.dtu.weeg.dtugc;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
@@ -373,7 +374,16 @@ public class MainActivity extends FragmentActivity {
                 ToastUtils.showToast(getBaseContext(), "超时啦!");
             }
         });
-
+        mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                Log.d("zl","dialog has been cancelde");
+                if(mCurrentpage!=null)
+                {
+                    mCurrentpage.Ondlgcancled();
+                }
+            }
+        });
         //蓝牙扫描
         rllBtScan = (RelativeLayout)findViewById(R.id.rll_bt_scan);
         rllBtScan.setOnClickListener(new OnclickListererImp());

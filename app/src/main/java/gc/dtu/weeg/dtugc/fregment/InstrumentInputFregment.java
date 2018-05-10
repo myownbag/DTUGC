@@ -277,6 +277,10 @@ public class InstrumentInputFregment extends BaseFragment {
                     break;
             }
             sendcmeindex++;
+            if(sendcmeindex==bufofreadcmd.length)
+            {
+                MainActivity.getInstance().mDialog.dismiss();
+            }
             if(sendcmeindex<3)
             {
                 String readOutMsg = DigitalTrans.byte2hex(bufofreadcmd[sendcmeindex]);

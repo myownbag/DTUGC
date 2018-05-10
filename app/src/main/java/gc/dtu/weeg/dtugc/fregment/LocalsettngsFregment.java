@@ -312,9 +312,13 @@ public class LocalsettngsFregment extends BaseFragment {
                 }
             }
         }
-
-        myadpater.notifyDataSetChanged();
         mIndexcmd++;
+        if(mIndexcmd==senddatabuf.length)
+        {
+            myadpater.notifyDataSetChanged();
+            MainActivity.getInstance().mDialog.dismiss();
+        }
+
         if(mIndexcmd<senddatabuf.length)
         {
             String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);

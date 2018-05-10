@@ -35,22 +35,27 @@ public class BasicinfoFregment extends BaseFragment {
     TextView Softversion;
     TextView Timeinfo;
     TextView Signalinfo;
+    Boolean  m_isTMStart;
     IndicatorSeekBar indicatorSeekBar;
-    Button butsend;
+    public Button butsend;
     public int currentposition=0;
+    //public int timersec=30;
     //停止标记
     Boolean timerstop=false;
     int mIndexcmd=0;
     byte [][] senddatabuf=new byte[4][18];
     //倒计时
     CountDownTimer mytimer= new CountDownTimer(30000, 1000) {
+        @SuppressLint("NewApi")
         @Override
         public void onTick(long millisUntilFinished) {
             if(MainActivity.getInstance()!=null)
             {
                 String readOutMsg = DigitalTrans.byte2hex(senddatabuf[3]);
                 //verycutstatus(readOutMsg);
+                BasicinfoFregment.this.butsend.setText("剩余:"+millisUntilFinished/1000);
                 verycutstatus1(readOutMsg);
+                //BasicinfoFregment.this.timersec--;
             }
         }
 
@@ -60,6 +65,9 @@ public class BasicinfoFregment extends BaseFragment {
             ToastUtils.showToast(getActivity(), "已经测试了30秒，如需再测，请读取数据");
             butsend.setEnabled(true);
             butsend.setBackground(getActivity().getResources().getDrawable(R.drawable.round_button));
+            BasicinfoFregment.this.butsend.setText("读取数据");
+            m_isTMStart=false;
+           // BasicinfoFregment.this.timersec=30;
         }
     };
 
@@ -84,6 +92,7 @@ public class BasicinfoFregment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mIsatart=false;
+        m_isTMStart=false;
         if (mView != null) {
             // 防止多次new出片段对象，造成图片错乱问题
             return mView;
@@ -134,6 +143,7 @@ public class BasicinfoFregment extends BaseFragment {
     }
 
     private void verycutstatus(String readOutMsg) {
+        Log.d("zl",readOutMsg);
         MainActivity parentActivity1 = (MainActivity) getActivity();
         String strState1 = parentActivity1.GetStateConnect();
         if(!strState1.equalsIgnoreCase("无连接"))
@@ -171,7 +181,7 @@ public class BasicinfoFregment extends BaseFragment {
         {
             if(readOutBuf1[3]!=(readOutBuf1.length-5))
             {
-                //ToastUtils.showToast(getActivity(), "数据长度异常"+"当前解析："+mIndexcmd);
+                ToastUtils.showToast(getActivity(), "数据长度异常"+"当前解析："+mIndexcmd);
 
                 return;
             }
@@ -264,7 +274,11 @@ public class BasicinfoFregment extends BaseFragment {
             }
             else
             {
-                mytimer.start();
+                if(m_isTMStart==false)
+                {
+                    m_isTMStart=true;
+                    mytimer.start();
+                }
                 butsend.setEnabled(false);
                 butsend.setBackgroundColor(this.getResources().getColor(R.color.color_unselected));
             }
@@ -294,6 +308,7 @@ public class BasicinfoFregment extends BaseFragment {
 //        }
 //    }
 
+    @SuppressLint("NewApi")
     @Override
     public void Oncurrentpageselect(int index) {
         currentposition=index;
@@ -301,6 +316,16 @@ public class BasicinfoFregment extends BaseFragment {
         {
             mytimer.cancel();
             mIsatart=false;
+        }
+        else
+        {
+            if(butsend.getText().equals("读取数据")==false)
+            {
+                butsend.setEnabled(true);
+                butsend.setBackground(getActivity().getResources().getDrawable(R.drawable.round_button));
+                BasicinfoFregment.this.butsend.setText("读取数据");
+                m_isTMStart=false;
+            }
         }
     }
 

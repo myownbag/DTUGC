@@ -222,6 +222,7 @@ public class SensorInputFregment extends BaseFragment {
         {
             return;
         }
+        MainActivity.getInstance().mDialog.dismiss();
         if(readOutBuf1.length<5)
         {
             ToastUtils.showToast(getActivity(), "数据长度短");
