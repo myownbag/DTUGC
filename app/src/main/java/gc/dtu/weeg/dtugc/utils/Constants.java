@@ -16,7 +16,27 @@ public class Constants {
     public static final int  GCCLOSETIME = 6000;
     public static final int  G6OPENTIME = 15000;
     public static final int  G6CLOSETIME = 9000;
+    //SQL
 
+    public static final String TABLENAME1 = "freezedatasensor" ;			// 数据表名称
+    public static final String TABLENAME2 = "freezedatainstrument" ;
+
+    public static final String COLUMN_TEM="temperature";
+    public static final String COLUMN_MAC="mac";
+    public static final String COLUMN_PRESS1="press1";
+    public static final String COLUMN_PRESS2="press2";
+
+    public static final String COLUMN_INS1="instrument1";
+    public static final String COLUMN_INS2="instrument2";
+
+    public static final String COLUMN_DATE="date";
+
+    public static final String DATE_FORMAT="YYYY-MM-DD HH:MM:SS";
+
+    /**
+     * 时间字段的降序，采用date函数比较
+     */
+    public static final String ORDER_BY="date("+COLUMN_DATE+") desc";
     //----------------------------------------------------
     //本地设置详情
 }

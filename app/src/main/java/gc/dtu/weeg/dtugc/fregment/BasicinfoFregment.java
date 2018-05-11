@@ -143,7 +143,7 @@ public class BasicinfoFregment extends BaseFragment {
     }
 
     private void verycutstatus(String readOutMsg) {
-        Log.d("zl",readOutMsg);
+       // Log.d("zl",readOutMsg);
         MainActivity parentActivity1 = (MainActivity) getActivity();
         String strState1 = parentActivity1.GetStateConnect();
         if(!strState1.equalsIgnoreCase("无连接"))
@@ -162,7 +162,7 @@ public class BasicinfoFregment extends BaseFragment {
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
         String temp;
-        Log.d("zl",CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
+      //  Log.d("zl",CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
         if(mIsatart==false)
         {
             return;
