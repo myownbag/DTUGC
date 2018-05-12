@@ -1,5 +1,6 @@
 package gc.dtu.weeg.dtugc.fregment;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -22,13 +23,19 @@ import android.widget.Toast;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
+import gc.dtu.weeg.dtugc.sqltools.FreezedataSqlHelper;
+import gc.dtu.weeg.dtugc.sqltools.MytabCursor;
+import gc.dtu.weeg.dtugc.sqltools.MytabOperate;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
+import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
 import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
@@ -39,14 +46,21 @@ import gc.dtu.weeg.dtugc.utils.ToastUtils;
 public class FrozendataFregment extends BaseFragment implements View.OnClickListener {
     View mView;
     public Button mBut;
+    private Button Btest;
+    private Button Brd;
     public Spinner mSpiner;
     public boolean mIsTotleRDing=false;
     public ListView mlistview;
     public listviewadpater myadpater;
     public ArrayList<Map<String,String>> mlistdata;
+    public SimpleDateFormat myFmt;
     String [] mylist={"最新第一条","最新第二条","最新第三条","最新第四条","最新第五条","全部历史数据"};
     byte sendbufread[]={(byte) 0xFD, 0x00 ,0x00 ,0x0E ,        0x00 ,0x24 ,0x00 ,        0x00 ,0x00 ,0x00
             ,0x00 ,0x00 ,0x00 ,0x00 , (byte) 0xD9 ,0x00 ,0x0C , (byte) 0xA0,0x00};
+
+    public FreezedataSqlHelper helper = null ;		 //mysqlhelper				// 数据库操作
+    private MytabOperate mtab = null ;
+    //private MytabCursor mycur=null;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -56,8 +70,10 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
             return mView;
         }
         mView = inflater.inflate(R.layout.freeze_data_layout, container, false);
-        initView();
         mlistdata=new ArrayList<>();
+        helper = new FreezedataSqlHelper(getContext(), Constants.TABLENAME1
+                ,null,1);  //this.helper = new MyDatabaseHelper(this) ;
+        initView();
         return  mView;
 
     }
@@ -70,16 +86,56 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         myadpater=new listviewadpater();
         mlistview.setAdapter(myadpater);
         setSpinneradpater(mSpiner,mylist);
+        Btest=mView.findViewById(R.id.testdb);
+        Btest.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SimpleDateFormat")
+            @Override
+            public void onClick(View v) {
+                Date now=new Date();
+                myFmt = new SimpleDateFormat(Constants.DATE_FORMAT);
+                FrozendataFregment.this.mtab = new MytabOperate(
+                        FrozendataFregment.this.helper.getWritableDatabase());
+                FrozendataFregment.this.mtab.insert1("14010001","20.5"
+                        ,"23","55",myFmt.format(now));
+            }
+        });
+        Brd=mView.findViewById(R.id.testrd);
+        Brd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MytabCursor cur = new MytabCursor(	// 实例化查询
+                        // 取得SQLiteDatabase对象
+                        FrozendataFregment.this.helper.getReadableDatabase()) ;
+                ArrayList<Map<String,String>> all  =      cur.find1("14010001");
+                if(all==null)
+                {
+                    Log.d("zl","all=null");
+                    return;
+                }
+                int count=all.size();
+                int i;
+                for(i=0;i<count;i++)
+                {
+                    Log.d("zl",""+i+":"
+                            +all.get(i).get("mac")+"  "
+                            +all.get(i).get("temp")+"  "
+                            +all.get(i).get("press1")+"  "
+                            +all.get(i).get("press2")+"  "
+                            +all.get(i).get("time")+"\r\n"
+                    );
+                }
+
+            }
+        });
     }
 
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
-        int i=0;
-        if(mIsatart==false)
+        int i;
+        if(!mIsatart)
         {
             return;
         }
-        int temp=0;
         if(readOutBuf1.length<5)
         {
             ToastUtils.showToast(getActivity(), "数据长度短");
@@ -93,7 +149,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                 return;
             }
         }
-        if(mIsTotleRDing==false)
+        if(!mIsTotleRDing)
         {
             byte [] buf=new byte[31];
             ByteBuffer buf1;
@@ -118,7 +174,9 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                 }
             }
             Map<String,String> map=new HashMap();
-            String time1="20"+timeinfo[0]+"-"+timeinfo[1]+"-"+timeinfo[2]+" "+timeinfo[4]+":"+timeinfo[5]+":"+timeinfo[6];
+            String time1="20"+timeinfo[0]+timeinfo[1]+timeinfo[2]+" "
+                    +timeinfo[4]+timeinfo[5]+timeinfo[6];
+
             MainActivity.getInstance().mDialog.dismiss();
         }
         else

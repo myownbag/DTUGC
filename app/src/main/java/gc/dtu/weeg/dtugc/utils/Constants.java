@@ -31,7 +31,7 @@ public class Constants {
 
     public static final String COLUMN_DATE="date";
 
-    public static final String DATE_FORMAT="YYYY-MM-DD HH:MM:SS";
+    public static final String DATE_FORMAT="yyyyMMdd HHmmss";
 
     /**
      * 时间字段的降序，采用date函数比较
@@ -39,4 +39,5 @@ public class Constants {
     public static final String ORDER_BY="date("+COLUMN_DATE+") desc";
     //----------------------------------------------------
     //本地设置详情
+
 }

@@ -1,5 +1,6 @@
 package gc.dtu.weeg.dtugc;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -23,6 +24,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.xutils.x;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,12 +49,14 @@ import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
 import static gc.dtu.weeg.dtugc.bluetooth.BluetoothState.REQUEST_CONNECT_DEVICE;
 import static gc.dtu.weeg.dtugc.bluetooth.BluetoothState.REQUEST_ENABLE_BT;
+import static gc.dtu.weeg.dtugc.bluetooth.BluetoothState.TOAST;
 
 public class MainActivity extends FragmentActivity {
     //蓝牙扫描
     RelativeLayout rllBtScan;
     private TextView mTxtStatus;
-
+    //蓝牙超时线程
+    private BlueToothTimeOutMornitor mThreedTimeout;
     LayoutInflater mLayoutInflater;
     BaseFragment mCurrentpage;
     BaseFragment mPrepage;
@@ -81,9 +87,10 @@ public class MainActivity extends FragmentActivity {
     int mScrollX = 0;
     private List<BaseFragment> fragments;
     private String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置", "传感器设置", "仪表接入"};
-
+    //蓝牙状态保存
+    public Boolean mIsconnect = false;
     // Name of the connected device
-    private String mConnectedDeviceName = null;
+    public String mConnectedDeviceName = null;
     // Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
     // Member object for the services
@@ -102,6 +109,8 @@ public class MainActivity extends FragmentActivity {
     public LocalsettngsFregment fregment4;
     public SensorInputFregment  fregment5;
     public InstrumentInputFregment fregment6;
+
+
     //接口
     Ondataparse mydataparse=null;
 //    OnPageSelectedinviewpager myOnPageSelectedinviewpager=null;
@@ -112,6 +121,8 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        x.Ext.init(getApplication());
+       // x.Ext.setDebug(BuildConfig.DEBUG); // 是否输出debug日志, 开启debug会影响性能.
         instanceMainActivity = this;
         mydataparse=null;
         InitView();
@@ -165,6 +176,7 @@ public class MainActivity extends FragmentActivity {
             mBTService.stop();
     }
     // The Handler that gets information back from the BluetoothService
+    @SuppressLint("HandlerLeak")
     private final Handler mHandler = new Handler()
     {
         @Override
@@ -182,17 +194,19 @@ public class MainActivity extends FragmentActivity {
                             mTxtStatus.setText("已连接到:" + mConnectedDeviceName);
 
                             // mConversationArrayAdapter.clear();
-
+                            mIsconnect=true;
                             break;
                         case BluetoothState.STATE_CONNECTING:
                             //setStatus(R.string.title_connecting);
                             mTxtStatus.setText(R.string.title_connecting);
+                            mIsconnect=false;
                             break;
                         case BluetoothState.STATE_LISTEN:
                         case BluetoothState.STATE_NONE:
                          //   Log.d("zl","BluetoothState_state:"+"STATE_NONE/STATE_LISTEN");
                             //setStatus(R.string.title_not_connected);
                             mTxtStatus.setText(R.string.title_not_connected);
+                            mIsconnect=false;
                             break;
                     }
                     break;
@@ -203,6 +217,8 @@ public class MainActivity extends FragmentActivity {
                     // mConversationArrayAdapter.add("Me:  " + writeMessage);
                     break;
                 case BluetoothState.MESSAGE_READ:
+                    mThreedTimeout.interrupt();
+                    mThreedTimeout=null;
                     byte[] readBuf = (byte[]) msg.obj;
 
                     String readMessage = "";
@@ -233,6 +249,7 @@ public class MainActivity extends FragmentActivity {
                         mCurrentpage.OndataCometoParse(readOutMsg,readOutBuf);
                     }
                     //mDialog.dismiss();
+
                     break;
                 case BluetoothState.MESSAGE_DEVICE_NAME:
                     // save the connected device's name
@@ -244,6 +261,22 @@ public class MainActivity extends FragmentActivity {
 
                     ToastUtils.showToast(getApplicationContext(),
                             msg.getData().getString(BluetoothState.TOAST));
+                    break;
+                case BluetoothState.MESSAGE_STATE_TIMEOUT:
+                    if(mIsconnect)
+                    {
+                        // 关闭连接socket
+                        try {
+                            // 关闭蓝牙
+                            mTxtStatus.setText(R.string.title_not_connected);
+                            mBTService.stop();
+                        } catch (Exception e) {
+                        }
+                    }
+                    mThreedTimeout=null;
+                    mDialog.dismiss();
+                   // ToastUtils.showToast(getActivity(), "数据长度异常");
+                    Toast.makeText(MainActivity.this,"蓝牙无回应请重连",Toast.LENGTH_SHORT).show();
                     break;
             }
         }
@@ -469,6 +502,11 @@ public class MainActivity extends FragmentActivity {
             byte[] buff = DigitalTrans.hex2byte(hexString);
 
             mBTService.write(buff);
+            if(mThreedTimeout==null)
+            {
+                mThreedTimeout=new BlueToothTimeOutMornitor();
+                mThreedTimeout.start();
+            }
         }
     }
     // 双击退出-----------------------------------------------
@@ -499,8 +537,21 @@ public class MainActivity extends FragmentActivity {
             switch(v.getId())
             {
                 case R.id.rll_bt_scan:// 蓝牙扫描
-                    Intent serverIntent = new Intent(MainActivity.this, DeviceListActivity.class);
-                    startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+                    if(!mIsconnect)
+                    {
+                        Intent serverIntent = new Intent(MainActivity.this, DeviceListActivity.class);
+                        startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+                    }
+                    else
+                    {
+                        // 关闭连接socket
+                        try {
+                            // 关闭蓝牙
+                            mTxtStatus.setText(R.string.title_not_connected);
+                            mBTService.stop();
+                        } catch (Exception e) {
+                        }
+                    }
                     break;
                 default:
                     break;
@@ -578,6 +629,19 @@ public class MainActivity extends FragmentActivity {
         mydataparse=ondataparse;
     }
 
-
+    public class BlueToothTimeOutMornitor extends Thread
+    {
+        @Override
+        public void run() {
+            try {
+                sleep(2000);
+                MainActivity.this.mHandler.obtainMessage(BluetoothState.MESSAGE_STATE_TIMEOUT)
+                        .sendToTarget(); //       mHandler.obtainMessage(BluetoothState.MESSAGE_READ, bytes, -1, buffer)
+                      //  .sendToTarget();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 }

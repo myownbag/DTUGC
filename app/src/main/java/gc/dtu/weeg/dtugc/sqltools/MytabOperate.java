@@ -1,6 +1,7 @@
 package gc.dtu.weeg.dtugc.sqltools;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import gc.dtu.weeg.dtugc.utils.Constants;
 
@@ -23,7 +24,9 @@ public class MytabOperate {
                 + press1 + "','"
                 + press2 + "','"
                 + timeinfo
-                + "')"; 					// SQL语句
+                + "')";
+        // SQL语句
+       // Log.d("zl","SQL:"+sql);
         this.db.execSQL(sql);										// 执行SQL语句
         this.db.close() ;											// 关闭数据库操作
     }
@@ -40,6 +43,8 @@ public class MytabOperate {
                 + ins2 + "','"
                 + timeinfo
                 + "')"; 					// SQL语句
+
+
         this.db.execSQL(sql);										// 执行SQL语句
         this.db.close() ;												// 关闭数据库操作
     }

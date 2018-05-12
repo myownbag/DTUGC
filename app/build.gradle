@@ -28,4 +28,5 @@ dependencies {
     compile 'com.github.d-max:spots-dialog:0.7@aar'
     implementation project(':indicatorseekbar')
     compile 'com.github.lecho:hellocharts-android:v1.5.8'
+    compile 'org.xutils:xutils:3.5.0'
 }
