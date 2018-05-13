@@ -68,7 +68,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+
         android:orientation="horizontal">
         <Button
             android:id="@+id/testdb"
@@ -80,6 +80,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="读取"/>
+        <Button
+            android:id="@+id/testtotle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="总数"/>
     </LinearLayout>
 
 </LinearLayout>

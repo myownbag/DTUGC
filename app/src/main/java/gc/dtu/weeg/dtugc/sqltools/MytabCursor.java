@@ -17,7 +17,16 @@ public class MytabCursor {
         this.db = db ;											// 接收SQLiteDatabase
     }
 
-    public ArrayList<Map<String,String>> find1(String idinfo) {								// 查询数据表
+    public ArrayList<Map<String,String>> find1(String idinfo,String orderby,int limte,int OFFSET ) {								// 查询数据表
+        String offset=null;
+        if(limte>0)
+        {
+             offset=OFFSET+" , "+limte;
+        }
+        else
+        {
+            offset=null;
+        }
         ArrayList<Map<String,String>> all = new ArrayList<>() ;			// 定义List集合
         String columns[] = new String[] {"id",Constants.COLUMN_MAC,Constants.COLUMN_TEM
                 ,Constants.COLUMN_PRESS1,Constants.COLUMN_PRESS2,Constants.COLUMN_DATE} ;	// 查询列
@@ -25,7 +34,7 @@ public class MytabCursor {
         String[] selectionArgs = new  String[]{ idinfo };
         Cursor result = this.db.query(Constants.TABLENAME1, columns,
                 select, selectionArgs, null,
-                null,Constants.COLUMN_DATE+" ASC");	 //		DESC/ASC 降序/升序
+                null,Constants.COLUMN_DATE+" "+orderby,offset);	 //		DESC/ASC 降序/升序
         // 查询数据表
         for (result.moveToFirst(); !result.isAfterLast(); result.moveToNext()) {
 //            all.add("【" + result.getInt(0) + "】" + " " + result.getString(1)
@@ -55,4 +64,18 @@ public class MytabCursor {
 //        this.db.close() ;										// 关闭数据库连接
 //        return all ;
 //    }
+    public int getcount(String idinfo)
+    {
+        String columns[] = new String[] {"id",Constants.COLUMN_MAC,Constants.COLUMN_TEM
+                ,Constants.COLUMN_PRESS1,Constants.COLUMN_PRESS2,Constants.COLUMN_DATE} ;	// 查询列
+        String select=Constants.COLUMN_MAC+"=?";
+        String[] selectionArgs = new  String[]{ idinfo };
+        Cursor result = this.db.query(Constants.TABLENAME1, columns,
+                select, selectionArgs, null,
+                null,Constants.COLUMN_DATE+" "+"DESC");
+        int count=result.getCount();
+        this.db.close() ;// 关闭数据库连接
+        return count;
+
+    }
 }

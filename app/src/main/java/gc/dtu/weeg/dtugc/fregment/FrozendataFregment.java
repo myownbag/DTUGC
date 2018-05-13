@@ -48,6 +48,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     public Button mBut;
     private Button Btest;
     private Button Brd;
+    private Button Btotle;
     public Spinner mSpiner;
     public boolean mIsTotleRDing=false;
     public ListView mlistview;
@@ -106,7 +107,9 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                 MytabCursor cur = new MytabCursor(	// 实例化查询
                         // 取得SQLiteDatabase对象
                         FrozendataFregment.this.helper.getReadableDatabase()) ;
-                ArrayList<Map<String,String>> all  =      cur.find1("14010001");
+                ArrayList<Map<String,String>> all  =      cur.find1("14010001",
+                        "DESC"
+                        ,-1,3);
                 if(all==null)
                 {
                     Log.d("zl","all=null");
@@ -125,6 +128,18 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                     );
                 }
 
+            }
+        });
+
+        Btotle=mView.findViewById(R.id.testtotle);
+        Btotle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MytabCursor cur = new MytabCursor(	// 实例化查询
+                        // 取得SQLiteDatabase对象
+                        FrozendataFregment.this.helper.getReadableDatabase()) ;
+             int temp=   cur.getcount("14010001");
+             Log.d("zl","总数是:"+temp);
             }
         });
     }
