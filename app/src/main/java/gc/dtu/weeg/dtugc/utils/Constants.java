@@ -39,5 +39,7 @@ public class Constants {
     public static final String ORDER_BY="date("+COLUMN_DATE+") desc";
     //----------------------------------------------------
     //本地设置详情
-
+    //传感器状态
+    public static final String SENSOR_ERROR="传感器故障";
+    public static final String SENSOR_DISCONNECT="未连接";
 }

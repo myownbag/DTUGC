@@ -6,12 +6,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -26,8 +24,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import org.xutils.x;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +49,6 @@ import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
 import static gc.dtu.weeg.dtugc.bluetooth.BluetoothState.REQUEST_CONNECT_DEVICE;
 import static gc.dtu.weeg.dtugc.bluetooth.BluetoothState.REQUEST_ENABLE_BT;
-import static gc.dtu.weeg.dtugc.bluetooth.BluetoothState.TOAST;
 
 public class MainActivity extends FragmentActivity {
     //蓝牙扫描
@@ -91,6 +90,7 @@ public class MainActivity extends FragmentActivity {
     public Boolean mIsconnect = false;
     // Name of the connected device
     public String mConnectedDeviceName = null;
+
     // Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
     // Member object for the services
@@ -246,7 +246,11 @@ public class MainActivity extends FragmentActivity {
                     }
                     else
                     {
-                        mCurrentpage.OndataCometoParse(readOutMsg,readOutBuf);
+                        try {
+                            mCurrentpage.OndataCometoParse(readOutMsg,readOutBuf);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     }
                     //mDialog.dismiss();
 
@@ -643,5 +647,14 @@ public class MainActivity extends FragmentActivity {
             }
         }
     }
-
+    public String getmConnectedDeviceName()
+    {
+        String str="";
+        int len=mConnectedDeviceName.length();
+        for(int i=0;i<len;i++)
+        {
+            //if(mConnectedDeviceName.charAt(i)>=48&&mConnectedDeviceName.charAt(i)<=)
+        }
+        return str;
+    }
 }

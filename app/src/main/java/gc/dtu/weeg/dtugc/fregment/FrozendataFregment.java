@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -145,7 +146,8 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     }
 
     @Override
-    public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
+    public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1)  {
+        Log.d("zl","OndataCometoParse:"+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
         int i;
         if(!mIsatart)
         {
@@ -164,39 +166,123 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                 return;
             }
         }
+        MainActivity.getInstance().mDialog.dismiss();
         if(!mIsTotleRDing)
         {
             byte [] buf=new byte[31];
+            int tempint;
+            float tempfloat;
             ByteBuffer buf1;
             buf1=ByteBuffer.allocateDirect(29);
             buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
             buf1.put(readOutBuf1,16,29);
             buf1.rewind();
-            buf1.get(buf);
+            buf1.get(buf,0,29);
 
             short crc= CodeFormat.crcencode(buf);
             String[] timeinfo=new String[7];
-            if(crc==0)
+            if(crc!=0)
             {
-
-                for(i=0;i<buf.length;i++)
-                {
-                    String hex = Integer.toHexString(buf[i+2] & 0xFF);
-                    if (hex.length() == 1) {
-                        hex = '0' + hex;
-                    }
-                    timeinfo[i]=hex;
-                }
+                MainActivity.getInstance().mDialog.dismiss();
+                Toast.makeText(getActivity(),"数据区CRC错误",Toast.LENGTH_SHORT).show();
+                return;
             }
-            Map<String,String> map=new HashMap();
+            for(i=0;i<buf.length;i++)
+            {
+                String hex = Integer.toHexString(buf[i+2] & 0xFF);
+                if (hex.length() == 1) {
+                    hex = '0' + hex;
+                }
+                timeinfo[i]=hex;
+            }
+           // Map<String,String> map=new HashMap();
+            //解析时间
             String time1="20"+timeinfo[0]+timeinfo[1]+timeinfo[2]+" "
                     +timeinfo[4]+timeinfo[5]+timeinfo[6];
+            Date date1=null,date2 = null;
+            date1=datecompare(time1);
 
-            MainActivity.getInstance().mDialog.dismiss();
+
+            MytabCursor cursor=new MytabCursor(	// 实例化查询
+                    // 取得SQLiteDatabase对象
+                    FrozendataFregment.this.helper.getReadableDatabase()) ;
+            ArrayList<Map<String,String>> all=   cursor.find1(MainActivity.getInstance().mConnectedDeviceName
+                    ,"DESC",1,0);
+            String dbtime= all.get(0).get("time");
+            date2=datecompare(dbtime);
+            if(date2!=null&&date1!=null)
+            {
+                if(date2.compareTo(date1)>=0)
+                {
+                    Toast.makeText(getActivity(),"该条记录已在数据库中",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
+            //解析温度
+            /*
+            buf1=ByteBuffer.allocateDirect(4);
+            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+            buf1.put(buf,11,4);
+            buf1.rewind();
+            */
+            //解析压力1
+            buf1=ByteBuffer.allocateDirect(4);
+            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+            buf1.put(buf,15,4);
+            buf1.rewind();
+            tempint=buf1.getInt();
+            String press1;
+            if(tempint==0)
+            {
+               press1=Constants.SENSOR_DISCONNECT;
+            }
+            else if(tempint==0xffffffff)
+            {
+                press1=Constants.SENSOR_ERROR;
+            }
+            else
+            {
+                buf1=ByteBuffer.allocateDirect(4);
+                buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+                buf1.put(buf,15,4);
+                buf1.rewind();
+                tempfloat=buf1.getFloat();
+                press1=""+tempfloat;
+            }
+            //解析压力2
+            buf1=ByteBuffer.allocateDirect(4);
+            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+            buf1.put(buf,19,4);
+            buf1.rewind();
+            tempint=buf1.getInt();
+            String press2;
+            if(tempint==0)
+            {
+                press2=Constants.SENSOR_DISCONNECT;
+            }
+            else if(tempint==0xffffffff)
+            {
+                press2=Constants.SENSOR_ERROR;
+            }
+            else
+            {
+                buf1=ByteBuffer.allocateDirect(4);
+                buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+                buf1.put(buf,15,4);
+                buf1.rewind();
+                tempfloat=buf1.getFloat();
+                press2=""+tempfloat;
+            }
+            FrozendataFregment.this.mtab = new MytabOperate(
+                    FrozendataFregment.this.helper.getWritableDatabase());
+            FrozendataFregment.this.mtab.insert1("14010001"," "
+                    ,press1,press2,time1);
+
         }
         else
         {
-
+            //alldatacomtoparse()
         }
 
         Log.d("zl","data:"+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
@@ -352,5 +438,25 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                 timeinfo.setText(temp);
             return convertView;
         }
+    }
+
+    @Override
+    public void Ondlgcancled() {
+        super.Ondlgcancled();
+        String temp="cancel";
+
+        String readOutMsg = DigitalTrans.byte2hex(temp.getBytes());
+        verycutstatus(readOutMsg);
+    }
+    public Date datecompare(String d)
+    {
+        Date d1=null;
+        SimpleDateFormat timefm= new SimpleDateFormat(Constants.DATE_FORMAT);
+        try {
+            d1=timefm.parse(d);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return d1;
     }
 }

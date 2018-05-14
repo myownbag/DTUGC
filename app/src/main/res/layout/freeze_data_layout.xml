@@ -20,7 +20,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="40dp"
-                android:text="选择数量:"/>
+                android:text="数据记录位置:"/>
             <Spinner
                 android:id="@+id/freeze_selc"
                 android:layout_width="match_parent"
