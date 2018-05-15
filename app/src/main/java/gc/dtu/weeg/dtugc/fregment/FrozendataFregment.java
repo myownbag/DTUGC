@@ -150,6 +150,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     {
         //MainActivity.getInstance().mDialog.dismiss();
         Log.d("zl","OndataCometoParse:"+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
+        Log.d("zl","name:"+MainActivity.getInstance().getmConnectedDeviceName());
         boolean need2stroe=false;
         int i;
         if(!mIsatart)
@@ -301,6 +302,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         }
         else
         {
+
             alldatacomtoparse(readOutBuf1);
         }
 
