@@ -385,6 +385,11 @@ public class MainActivity extends FragmentActivity {
                         mPrepage.Oncurrentpageselect(mCurClassIndex);
                     }
                     mPrepage=mCurrentpage;
+                    if(mCurClassIndex!=2)
+                    {
+                        Log.d("zl","addScrollView bluetoothblockdisable");
+                        bluetoothblockdisable();
+                    }
                 }
             });
 
@@ -566,6 +571,11 @@ public class MainActivity extends FragmentActivity {
         public void onPageSelected(int position) {
             Log.d("zl","in onPageSelected");
             mCurrentpage=fragments.get(position);
+            if(position!=2)
+            {
+                bluetoothblockdisable();
+                Log.d("zl","OnpagechangedListernerImp bluetoothblockdisable");
+            }
             mCurrentpage.Oncurrentpageselect(position);
             if(mPrepage!=null)
             {
@@ -601,6 +611,9 @@ public class MainActivity extends FragmentActivity {
 
         }
     }
+
+
+
     public String GetStateConnect()
     {
         return mTxtStatus.getText().toString();
@@ -654,5 +667,15 @@ public class MainActivity extends FragmentActivity {
 
         }
         return str;
+    }
+
+    public BluetoothService getcurblueservice()
+    {
+       return   mBTService;
+    }
+    public void bluetoothblockdisable() {
+        mBTService.SetBlockmode(false);
+        mBTService.emptyalldata();
+        mBTService.getcurSemaphore().release();
     }
 }

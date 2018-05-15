@@ -150,7 +150,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     {
         //MainActivity.getInstance().mDialog.dismiss();
         Log.d("zl","OndataCometoParse:"+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
-        Log.d("zl","name:"+MainActivity.getInstance().getmConnectedDeviceName());
+        //Log.d("zl","name:"+MainActivity.getInstance().getmConnectedDeviceName());
         boolean need2stroe=false;
         int i;
         if(!mIsatart)
@@ -302,7 +302,11 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         }
         else
         {
-
+            try {
+                MainActivity.getInstance().getcurblueservice().getcurSemaphore().acquire();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             alldatacomtoparse(readOutBuf1);
         }
 
@@ -358,10 +362,12 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                                 }
                             }).create(); 							// 创建Dialog
             dialog.show();
+            MainActivity.getInstance().getcurblueservice().SetBlockmode(true);
         }
         else
         {
             dofrozendataread(index+1);
+            MainActivity.getInstance().bluetoothblockdisable();
         }
 
     }

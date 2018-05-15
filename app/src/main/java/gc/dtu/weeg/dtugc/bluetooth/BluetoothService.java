@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
+import java.util.concurrent.Semaphore;
 
 
 /**
@@ -46,6 +47,8 @@ public class BluetoothService {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private int mState;
+    public Semaphore mSemaphore;
+    public boolean mIsblock=false;
 
     /**
      * Constructor. Prepares a new Bluetooth session.
@@ -56,7 +59,7 @@ public class BluetoothService {
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = BluetoothState.STATE_NONE;
         mHandler = handler;
-
+        mSemaphore=new Semaphore(1);
     }
 
     /**
@@ -204,6 +207,8 @@ public class BluetoothService {
         msg.setData(bundle);
         mHandler.sendMessage(msg);
     }
+
+   
 
     /**
      * This thread runs while listening for incoming connections. It behaves
@@ -406,17 +411,33 @@ public class BluetoothService {
                     // eRead from the InputStream
                     bytes = mmInStream.read(buffer);
                     // Send the obtained bytes to the UI Activity
+
                     mHandler.obtainMessage(BluetoothState.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
+                    if(mIsblock)
+                    {
+                        Log.d("zl","ConnectedThread:"+"in blocking");
+                        sleep(2);
+                        mSemaphore.acquire();
+                        mSemaphore.release();
+                    }
+
 
                 } catch (IOException e) {
                     connectionLost();
                     // Start the service over to restart listening mode
                     BluetoothService.this.start();
+
                     break;
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
+                    Log.d("zl","InterruptedException"+e.toString());
+                    try {
+                        mmInStream.reset();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
         }
@@ -434,6 +455,7 @@ public class BluetoothService {
                         .sendToTarget();
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
+
             }
         }
 
@@ -443,6 +465,24 @@ public class BluetoothService {
             } catch (IOException e) {
                 Log.e(TAG, "close() of connect socket failed", e);
             }
+        }
+    }
+
+    public Semaphore getcurSemaphore()
+    {
+        return  mSemaphore;
+    }
+    public void SetBlockmode(Boolean flag)
+    {
+        mIsblock=flag;
+
+
+    }
+    public void emptyalldata()
+    {
+        if(mConnectedThread!=null)
+        {
+            mConnectedThread.interrupt();
         }
     }
 }
