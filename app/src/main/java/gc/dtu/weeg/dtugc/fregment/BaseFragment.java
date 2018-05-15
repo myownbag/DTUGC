@@ -7,7 +7,7 @@ import java.text.ParseException;
 public abstract class BaseFragment extends Fragment {
     public Boolean mIsatart=false;
     public boolean m_dlgcancled=false;
-    abstract public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) throws ParseException;
+    abstract public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) ;
     public void Oncurrentpageselect(int index)
     {
 

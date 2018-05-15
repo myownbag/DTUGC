@@ -6,13 +6,12 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
+
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -56,6 +55,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     public listviewadpater myadpater;
     public ArrayList<Map<String,String>> mlistdata;
     public SimpleDateFormat myFmt;
+
     String [] mylist={"最新第一条","最新第二条","最新第三条","最新第四条","最新第五条","全部历史数据"};
     byte sendbufread[]={(byte) 0xFD, 0x00 ,0x00 ,0x0E ,        0x00 ,0x24 ,0x00 ,        0x00 ,0x00 ,0x00
             ,0x00 ,0x00 ,0x00 ,0x00 , (byte) 0xD9 ,0x00 ,0x0C , (byte) 0xA0,0x00};
@@ -146,146 +146,9 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     }
 
     @Override
-    public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1)  {
-        Log.d("zl","OndataCometoParse:"+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
-        int i;
-        if(!mIsatart)
-        {
-            return;
-        }
-        if(readOutBuf1.length<5)
-        {
-            ToastUtils.showToast(getActivity(), "数据长度短");
-            return;
-        }
-        else
-        {
-            if(readOutBuf1[3]!=(readOutBuf1.length-5))
-            {
-                ToastUtils.showToast(getActivity(), "数据长度异常");
-                return;
-            }
-        }
-        MainActivity.getInstance().mDialog.dismiss();
-        if(!mIsTotleRDing)
-        {
-            byte [] buf=new byte[31];
-            int tempint;
-            float tempfloat;
-            ByteBuffer buf1;
-            buf1=ByteBuffer.allocateDirect(29);
-            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
-            buf1.put(readOutBuf1,16,29);
-            buf1.rewind();
-            buf1.get(buf,0,29);
-
-            short crc= CodeFormat.crcencode(buf);
-            String[] timeinfo=new String[7];
-            if(crc!=0)
-            {
-                MainActivity.getInstance().mDialog.dismiss();
-                Toast.makeText(getActivity(),"数据区CRC错误",Toast.LENGTH_SHORT).show();
-                return;
-            }
-            for(i=0;i<buf.length;i++)
-            {
-                String hex = Integer.toHexString(buf[i+2] & 0xFF);
-                if (hex.length() == 1) {
-                    hex = '0' + hex;
-                }
-                timeinfo[i]=hex;
-            }
-           // Map<String,String> map=new HashMap();
-            //解析时间
-            String time1="20"+timeinfo[0]+timeinfo[1]+timeinfo[2]+" "
-                    +timeinfo[4]+timeinfo[5]+timeinfo[6];
-            Date date1=null,date2 = null;
-            date1=datecompare(time1);
-
-
-            MytabCursor cursor=new MytabCursor(	// 实例化查询
-                    // 取得SQLiteDatabase对象
-                    FrozendataFregment.this.helper.getReadableDatabase()) ;
-            ArrayList<Map<String,String>> all=   cursor.find1(MainActivity.getInstance().mConnectedDeviceName
-                    ,"DESC",1,0);
-            String dbtime= all.get(0).get("time");
-            date2=datecompare(dbtime);
-            if(date2!=null&&date1!=null)
-            {
-                if(date2.compareTo(date1)>=0)
-                {
-                    Toast.makeText(getActivity(),"该条记录已在数据库中",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-            }
-
-            //解析温度
-            /*
-            buf1=ByteBuffer.allocateDirect(4);
-            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
-            buf1.put(buf,11,4);
-            buf1.rewind();
-            */
-            //解析压力1
-            buf1=ByteBuffer.allocateDirect(4);
-            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
-            buf1.put(buf,15,4);
-            buf1.rewind();
-            tempint=buf1.getInt();
-            String press1;
-            if(tempint==0)
-            {
-               press1=Constants.SENSOR_DISCONNECT;
-            }
-            else if(tempint==0xffffffff)
-            {
-                press1=Constants.SENSOR_ERROR;
-            }
-            else
-            {
-                buf1=ByteBuffer.allocateDirect(4);
-                buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
-                buf1.put(buf,15,4);
-                buf1.rewind();
-                tempfloat=buf1.getFloat();
-                press1=""+tempfloat;
-            }
-            //解析压力2
-            buf1=ByteBuffer.allocateDirect(4);
-            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
-            buf1.put(buf,19,4);
-            buf1.rewind();
-            tempint=buf1.getInt();
-            String press2;
-            if(tempint==0)
-            {
-                press2=Constants.SENSOR_DISCONNECT;
-            }
-            else if(tempint==0xffffffff)
-            {
-                press2=Constants.SENSOR_ERROR;
-            }
-            else
-            {
-                buf1=ByteBuffer.allocateDirect(4);
-                buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
-                buf1.put(buf,15,4);
-                buf1.rewind();
-                tempfloat=buf1.getFloat();
-                press2=""+tempfloat;
-            }
-            FrozendataFregment.this.mtab = new MytabOperate(
-                    FrozendataFregment.this.helper.getWritableDatabase());
-            FrozendataFregment.this.mtab.insert1("14010001"," "
-                    ,press1,press2,time1);
-
-        }
-        else
-        {
-            //alldatacomtoparse()
-        }
-
-        Log.d("zl","data:"+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
+    public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1)
+    {
+        
     }
 
     private void setSpinneradpater(Spinner spinner, String[] list )

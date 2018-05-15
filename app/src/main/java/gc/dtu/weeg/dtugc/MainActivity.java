@@ -175,38 +175,36 @@ public class MainActivity extends FragmentActivity {
         if (mBTService != null)
             mBTService.stop();
     }
+
     // The Handler that gets information back from the BluetoothService
     @SuppressLint("HandlerLeak")
-    private final Handler mHandler = new Handler()
-    {
+    private final Handler mHandler = new Handler() {
         @Override
-        public void handleMessage(Message msg)
-        {
+        public void handleMessage(Message msg) {
             switch (msg.what) {
                 case BluetoothState.MESSAGE_STATE_CHANGE:
                     // if (D)
                     //    Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
-                    switch (msg.arg1)
-                    {
+                    switch (msg.arg1) {
                         case BluetoothState.STATE_CONNECTED:
                             //setStatus(getString(R.string.title_connected_to,
                             //		mConnectedDeviceName));
                             mTxtStatus.setText("已连接到:" + mConnectedDeviceName);
 
                             // mConversationArrayAdapter.clear();
-                            mIsconnect=true;
+                            mIsconnect = true;
                             break;
                         case BluetoothState.STATE_CONNECTING:
                             //setStatus(R.string.title_connecting);
                             mTxtStatus.setText(R.string.title_connecting);
-                            mIsconnect=false;
+                            mIsconnect = false;
                             break;
                         case BluetoothState.STATE_LISTEN:
                         case BluetoothState.STATE_NONE:
-                         //   Log.d("zl","BluetoothState_state:"+"STATE_NONE/STATE_LISTEN");
+                            //   Log.d("zl","BluetoothState_state:"+"STATE_NONE/STATE_LISTEN");
                             //setStatus(R.string.title_not_connected);
                             mTxtStatus.setText(R.string.title_not_connected);
-                            mIsconnect=false;
+                            mIsconnect = false;
                             break;
                     }
                     break;
@@ -217,13 +215,14 @@ public class MainActivity extends FragmentActivity {
                     // mConversationArrayAdapter.add("Me:  " + writeMessage);
                     break;
                 case BluetoothState.MESSAGE_READ:
+                    if (mThreedTimeout == null)
+                        return;
                     mThreedTimeout.interrupt();
-                    mThreedTimeout=null;
+                    mThreedTimeout = null;
                     byte[] readBuf = (byte[]) msg.obj;
 
                     String readMessage = "";
-                    for(int i = 0; i < msg.arg1; i++)
-                    {
+                    for (int i = 0; i < msg.arg1; i++) {
                         //readMessage += readBuf[i];
 
                         String hex = Integer.toHexString(readBuf[i] & 0xFF);
@@ -240,17 +239,10 @@ public class MainActivity extends FragmentActivity {
                     //获取接收的返回数据
                     Log.v("ttt", "recv:" + readOutMsg);
 
-                    if(mydataparse!=null)
-                    {
-                        mydataparse.datacometoparse(readOutMsg,readOutBuf);
-                    }
-                    else
-                    {
-                        try {
-                            mCurrentpage.OndataCometoParse(readOutMsg,readOutBuf);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
+                    if (mydataparse != null) {
+                        mydataparse.datacometoparse(readOutMsg, readOutBuf);
+                    } else {
+                        mCurrentpage.OndataCometoParse(readOutMsg, readOutBuf);
                     }
                     //mDialog.dismiss();
 
@@ -267,8 +259,7 @@ public class MainActivity extends FragmentActivity {
                             msg.getData().getString(BluetoothState.TOAST));
                     break;
                 case BluetoothState.MESSAGE_STATE_TIMEOUT:
-                    if(mIsconnect)
-                    {
+                    if (mIsconnect) {
                         // 关闭连接socket
                         try {
                             // 关闭蓝牙
@@ -277,10 +268,10 @@ public class MainActivity extends FragmentActivity {
                         } catch (Exception e) {
                         }
                     }
-                    mThreedTimeout=null;
+                    mThreedTimeout = null;
                     mDialog.dismiss();
-                   // ToastUtils.showToast(getActivity(), "数据长度异常");
-                    Toast.makeText(MainActivity.this,"蓝牙无回应请重连",Toast.LENGTH_SHORT).show();
+                    // ToastUtils.showToast(getActivity(), "数据长度异常");
+                    Toast.makeText(MainActivity.this, "蓝牙无回应请重连", Toast.LENGTH_SHORT).show();
                     break;
             }
         }
@@ -650,10 +641,18 @@ public class MainActivity extends FragmentActivity {
     public String getmConnectedDeviceName()
     {
         String str="";
+        if(mConnectedDeviceName.equals(getResources().getString(R.string.not_connected)))
+        {
+            return null;
+        }
         int len=mConnectedDeviceName.length();
         for(int i=0;i<len;i++)
         {
-            //if(mConnectedDeviceName.charAt(i)>=48&&mConnectedDeviceName.charAt(i)<=)
+            if(mConnectedDeviceName.charAt(i)>=48&&mConnectedDeviceName.charAt(i)<=57)
+            {
+                str+=mConnectedDeviceName.charAt(i);
+            }
+
         }
         return str;
     }
