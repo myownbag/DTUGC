@@ -215,9 +215,8 @@ public class MainActivity extends FragmentActivity {
                     // mConversationArrayAdapter.add("Me:  " + writeMessage);
                     break;
                 case BluetoothState.MESSAGE_READ:
-                    if (mThreedTimeout == null)
-                        return;
-                    mThreedTimeout.interrupt();
+                    if (mThreedTimeout != null)
+                                mThreedTimeout.interrupt();
                     mThreedTimeout = null;
                     byte[] readBuf = (byte[]) msg.obj;
 

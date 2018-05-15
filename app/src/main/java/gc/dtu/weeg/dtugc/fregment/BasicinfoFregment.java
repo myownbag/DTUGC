@@ -162,7 +162,7 @@ public class BasicinfoFregment extends BaseFragment {
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
         String temp;
-      //  Log.d("zl",CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
+//        Log.d("zl",CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
         if(mIsatart==false)
         {
             return;
