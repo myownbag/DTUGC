@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+       android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textSize="30sp"
+        android:textColor="@color/colorPrimary"
+        android:text="请在工程模式下运行"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:layout_height="50dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="运行结果："
+        />
+    <TextView
+        android:id="@+id/press_sensor_set_result"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        />
+</LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+    <RadioGroup
+        android:id="@+id/press_sensor_set_but_group"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_height="wrap_content"
+
+        >
+        <RadioButton
+            android:id="@+id/press_sensor_set_but_press1rd"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="读取第一路压力"
+            android:checked="true"
+            />
+        <RadioButton
+            android:id="@+id/press_sensor_set_but_press2rd"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="读取第二路压力"/>
+        <RadioButton
+            android:id="@+id/press_sensor_set_but_press1wd"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="地址修改1->2"/>
+        <RadioButton
+            android:id="@+id/press_sensor_set_but_press2wd"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="地址修改2->1"/>
+    </RadioGroup>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+</LinearLayout>
+    <LinearLayout
+        android:id="@+id/freeze_buttoncanter1"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_weight="2"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:layout_marginBottom="20dp"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/freeze_but1"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/round_button"
+            android:text="读取数据"
+            android:textColor="#fff"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+</RelativeLayout>

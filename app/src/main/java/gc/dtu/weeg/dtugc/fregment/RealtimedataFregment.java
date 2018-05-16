@@ -55,6 +55,10 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
        // Log.d("zl", "OndataCometoParse: "+readOutMsg1);
+        if(!mIsatart)
+        {
+            return;
+        }
         int temp=0;
         if(readOutBuf1.length<5)
         {
@@ -135,6 +139,7 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
 
         String readOutMsg = DigitalTrans.byte2hex(sendbufread);
         verycutstatus(readOutMsg);
+        mIsatart=true;
         mPress1view.setText("");
         mPress2view.setText("");
     }
@@ -153,4 +158,13 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
             ToastUtils.showToast(getActivity(), "请先建立蓝牙连接!");
         }
     }
+
+    @Override
+    public void Oncurrentpageselect(int index) {
+        if(index!=1)
+        {
+            mIsatart=false;
+        }
+    }
+
 }

@@ -7,4 +7,5 @@
     <color name="color_unselected">#777777</color>
     <!--标签Tab选中的颜色-->
     <color name="color_selected">#303F9F</color>
+
 </resources>

@@ -56,9 +56,9 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     public ArrayList<Map<String,String>> mlistdata;
     public SimpleDateFormat myFmt;
 
-    String [] mylist={"最新第一条","最新第二条","最新第三条","最新第四条","最新第五条","全部历史数据"};
-    byte sendbufread[]={(byte) 0xFD, 0x00 ,0x00 ,0x0E ,        0x00 ,0x24 ,0x00 ,        0x00 ,0x00 ,0x00
-            ,0x00 ,0x00 ,0x00 ,0x00 , (byte) 0xD9 ,0x00 ,0x0C , (byte) 0xA0,0x00};
+    String [] mylist={"最新第一条","最新第二条","最新第三条","最新第四条","最新第五条"};
+    byte sendbufread[]={(byte) 0xFD, 0x00 ,0x00 ,0x11 ,        0x00 ,0x24 ,0x00 ,        0x00 ,0x00 ,0x00
+            ,0x00 ,0x00 ,0x00 ,0x00 , (byte) 0xD9 ,0x00 ,0x0C ,0x00,0x00,0x00, (byte) 0xA0,0x00};
 
     public FreezedataSqlHelper helper = null ;		 //mysqlhelper				// 数据库操作
     private MytabOperate mtab = null ;
@@ -151,11 +151,22 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         //MainActivity.getInstance().mDialog.dismiss();
         Log.d("zl","OndataCometoParse:"+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
         //Log.d("zl","name:"+MainActivity.getInstance().getmConnectedDeviceName());
+
         boolean need2stroe=false;
         int i;
         if(!mIsatart)
         {
             return;
+        }
+        if(mIsTotleRDing)
+        {
+
+//            boolean flag= MainActivity.getInstance().getcurblueservice().getcurSemaphore().tryAcquire();
+//            if(flag==false)
+//            {
+//                Log.d("zl", "OndataCometoParse: 获取信号量失败");
+//            }
+            alldatacomtoparse(readOutBuf1);
         }
         if(readOutBuf1.length<5)
         {
@@ -300,15 +311,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
             map.put("time",time1);
             myadpater.notifyDataSetChanged();
         }
-        else
-        {
-            try {
-                MainActivity.getInstance().getcurblueservice().getcurSemaphore().acquire();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            alldatacomtoparse(readOutBuf1);
-        }
+
 
         //Log.d("zl","data:"+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
     }
@@ -342,34 +345,35 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     @Override
     public void onClick(View v) {
         int index=mSpiner.getSelectedItemPosition();
-        if(index==(mylist.length-1))
-        {
-            Dialog dialog=new AlertDialog.Builder(getActivity())
-                    .setTitle("警告！！！")
-                    .setIcon(R.drawable.warning_icon)
-                    .setMessage("全部读出历史数据需耗时约30分钟！！\r\n是否继续？")
-                    .setPositiveButton("确定", 						// 增加一个确定按钮
-                            new DialogInterface.OnClickListener() {	// 设置操作监听
-                                public void onClick(DialogInterface dialog,
-                                                    int whichButton) { 			// 单击事件
-                                 FrozendataFregment.this.dofrozendataread(0);
-                                }
-                            }).setNegativeButton("取消", 			// 增加取消按钮
-                            new DialogInterface.OnClickListener() {	// 设置操作监听
-                                public void onClick(DialogInterface dialog,
-                                                    int whichButton) { 			// 单击事件
-
-                                }
-                            }).create(); 							// 创建Dialog
-            dialog.show();
-            MainActivity.getInstance().getcurblueservice().SetBlockmode(true);
-        }
-        else
-        {
-            dofrozendataread(index+1);
-            MainActivity.getInstance().bluetoothblockdisable();
-        }
-
+//        if(index==(mylist.length-1))
+//        {
+//            Dialog dialog=new AlertDialog.Builder(getActivity())
+//                    .setTitle("警告！！！")
+//                    .setIcon(R.drawable.warning_icon)
+//                    .setMessage("全部读出历史数据需耗时约30分钟！！\r\n是否继续？")
+//                    .setPositiveButton("确定", 						// 增加一个确定按钮
+//                            new DialogInterface.OnClickListener() {	// 设置操作监听
+//                                public void onClick(DialogInterface dialog,
+//                                                    int whichButton) { 			// 单击事件
+//                                 FrozendataFregment.this.dofrozendataread(0);
+//                                }
+//                            }).setNegativeButton("取消", 			// 增加取消按钮
+//                            new DialogInterface.OnClickListener() {	// 设置操作监听
+//                                public void onClick(DialogInterface dialog,
+//                                                    int whichButton) { 			// 单击事件
+//
+//                                }
+//                            }).create(); 							// 创建Dialog
+//            dialog.show();
+//            MainActivity.getInstance().getcurblueservice().SetBlockmode(true);
+//        }
+//        else
+//        {
+//            dofrozendataread(index+1);
+//            MainActivity.getInstance().bluetoothblockdisable();
+//        }
+        dofrozendataread(index+1);
+      //  dofrozendataread(0);
     }
 
     private void dofrozendataread(int i) {
@@ -379,10 +383,12 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         if(i==0)
         {
             mIsTotleRDing=true;
+            //MainActivity.getInstance().getcurblueservice().SetBlockmode(true);
         }
         else
         {
             mIsTotleRDing=false;
+            //MainActivity.getInstance().getcurblueservice().SetBlockmode(false);
         }
         ByteBuffer buf1;
         buf1=ByteBuffer.allocateDirect(4);
@@ -395,7 +401,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
         buf1.putInt(i);
         buf1.rewind();
-        buf1.get(sendbufread,16,1);
+        buf1.get(sendbufread,16,4);
 
         CodeFormat.crcencode(sendbufread);
         String readOutMsg = DigitalTrans.byte2hex(sendbufread);
@@ -475,10 +481,10 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     public void Ondlgcancled() {
         super.Ondlgcancled();
 
-//        String temp="cancel";
-//
-//        String readOutMsg = DigitalTrans.byte2hex(temp.getBytes());
-//        verycutstatus(readOutMsg);
+        String temp="cancel";
+        Log.d("zl","cancel");
+        String readOutMsg = DigitalTrans.byte2hex(temp.getBytes());
+        verycutstatus(readOutMsg);
     }
     public Date datecompare(String d)
     {

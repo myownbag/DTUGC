@@ -417,7 +417,7 @@ public class BluetoothService {
                     if(mIsblock)
                     {
                         Log.d("zl","ConnectedThread:"+"in blocking");
-                        sleep(2);
+                        sleep(100);
                         mSemaphore.acquire();
                         mSemaphore.release();
                     }
@@ -433,11 +433,13 @@ public class BluetoothService {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                     Log.d("zl","InterruptedException"+e.toString());
-                    try {
-                        mmInStream.reset();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
+//                    try {
+//                       // mmInStream.reset();
+//                    } catch (IOException e1) {
+//                        e1.printStackTrace();
+//                    }
+                  //  connectionLost();
+                 //   BluetoothService.this.start();
                 }
             }
         }

@@ -40,6 +40,8 @@ import gc.dtu.weeg.dtugc.fregment.CNKFixedPagerAdapter;
 import gc.dtu.weeg.dtugc.fregment.FrozendataFregment;
 import gc.dtu.weeg.dtugc.fregment.InstrumentInputFregment;
 import gc.dtu.weeg.dtugc.fregment.LocalsettngsFregment;
+import gc.dtu.weeg.dtugc.fregment.NBRegisiterfragment;
+import gc.dtu.weeg.dtugc.fregment.PressSensoraddSetframent;
 import gc.dtu.weeg.dtugc.fregment.RealtimedataFregment;
 import gc.dtu.weeg.dtugc.fregment.SensorInputFregment;
 import gc.dtu.weeg.dtugc.myview.CustomDialog;
@@ -51,6 +53,8 @@ import static gc.dtu.weeg.dtugc.bluetooth.BluetoothState.REQUEST_CONNECT_DEVICE;
 import static gc.dtu.weeg.dtugc.bluetooth.BluetoothState.REQUEST_ENABLE_BT;
 
 public class MainActivity extends FragmentActivity {
+
+
     //蓝牙扫描
     RelativeLayout rllBtScan;
     private TextView mTxtStatus;
@@ -65,6 +69,8 @@ public class MainActivity extends FragmentActivity {
      * 当前选择的分类
      */
     private int mCurClassIndex=0;
+    public int mPreClassIndex=0;
+    public int mCurClassIndex1=0;
     /**
      * 选择的分类字体颜色
      */
@@ -85,7 +91,7 @@ public class MainActivity extends FragmentActivity {
     private ViewGroup mClassContainer;
     int mScrollX = 0;
     private List<BaseFragment> fragments;
-    private String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置", "传感器设置", "仪表接入"};
+    private String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置", "传感器设置", "仪表接入","压力传感器配置","NB业务注册"};
     //蓝牙状态保存
     public Boolean mIsconnect = false;
     // Name of the connected device
@@ -109,6 +115,8 @@ public class MainActivity extends FragmentActivity {
     public LocalsettngsFregment fregment4;
     public SensorInputFregment  fregment5;
     public InstrumentInputFregment fregment6;
+    public PressSensoraddSetframent fregment7;
+    public NBRegisiterfragment      fregment8;
 
 
     //接口
@@ -325,6 +333,18 @@ public class MainActivity extends FragmentActivity {
         //fifthFragment.setArguments(bundle5);
         fragments.add(fregment6);
 
+        fregment7 =new PressSensoraddSetframent();
+        Bundle bundle6 = new Bundle();
+        bundle6.putString("extra",titles[index++]);
+        //fifthFragment.setArguments(bundle5);
+        fragments.add(fregment7);
+
+        fregment8 =new NBRegisiterfragment();
+        Bundle bundle7 = new Bundle();
+        bundle7.putString("extra",titles[index++]);
+        //fifthFragment.setArguments(bundle5);
+        fragments.add(fregment8);
+
 //        sixthFragment = new Pressure2Fragment();
 //        Bundle bundle6 = new Bundle();
 //        bundle6.putString("extra",titles[index++]);
@@ -371,6 +391,7 @@ public class MainActivity extends FragmentActivity {
                     ((TextView)(currentItem.findViewById(R.id.horizontal_tv_type))).setTextColor(ContextCompat.getColor(getBaseContext(), R.color.color_unselected));
                     ((ImageView)(currentItem.findViewById(R.id.horizontal_img_type))).setImageResource(R.drawable.bottom_line_gray);
                     mCurClassIndex=index;
+                    mCurClassIndex1=index;
                     // Log.e("tchl","onclick: first index:"+index);
                     //设置点击状态
                     img_type.setImageResource(R.drawable.bottom_line_blue);
@@ -385,11 +406,15 @@ public class MainActivity extends FragmentActivity {
                         mPrepage.Oncurrentpageselect(mCurClassIndex);
                     }
                     mPrepage=mCurrentpage;
-                    if(mCurClassIndex!=2)
+                    if(mCurClassIndex1!=2)
                     {
-                        Log.d("zl","addScrollView bluetoothblockdisable");
-                        bluetoothblockdisable();
+                        if(mPreClassIndex==2)
+                        {
+                            Log.d("zl","addScrollView bluetoothblockdisable");
+                            bluetoothblockdisable();
+                        }
                     }
+                    mPreClassIndex=mCurClassIndex1;
                 }
             });
 
@@ -570,12 +595,17 @@ public class MainActivity extends FragmentActivity {
         @Override
         public void onPageSelected(int position) {
             Log.d("zl","in onPageSelected");
+            mCurClassIndex1=position;
             mCurrentpage=fragments.get(position);
-            if(position!=2)
+            if(mCurClassIndex1!=2)
             {
-                bluetoothblockdisable();
-                Log.d("zl","OnpagechangedListernerImp bluetoothblockdisable");
+                if(mPreClassIndex==2)
+                {
+                    bluetoothblockdisable();
+                    Log.d("zl","OnpagechangedListernerImp bluetoothblockdisable");
+                }
             }
+            mPreClassIndex=mCurClassIndex1;
             mCurrentpage.Oncurrentpageselect(position);
             if(mPrepage!=null)
             {

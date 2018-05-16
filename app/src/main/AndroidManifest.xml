@@ -35,5 +35,7 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".utils.InstrumemtItemseetingActivity"
             android:screenOrientation="portrait"/>
+        <activity android:name=".utils.NbServiceAddrInputActivity"
+            android:screenOrientation="portrait"/>
     </application>
 </manifest>
