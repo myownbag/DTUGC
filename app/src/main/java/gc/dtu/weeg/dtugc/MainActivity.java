@@ -341,8 +341,9 @@ public class MainActivity extends FragmentActivity {
 
         fregment8 =new NBRegisiterfragment();
         Bundle bundle7 = new Bundle();
+        bundle7.putInt("position",index);
         bundle7.putString("extra",titles[index++]);
-        //fifthFragment.setArguments(bundle5);
+        fregment8.setArguments(bundle7);
         fragments.add(fregment8);
 
 //        sixthFragment = new Pressure2Fragment();

@@ -47,4 +47,5 @@ public class Constants {
     //NB service
     public static final String NB_SERVICE_KEY="service";
     public static final String NB_Service_END="/WeegNB/registerDevice?verifyCode=%s&serial=%s";
+    public static final String NB_Service_END1="/WeegNB/setInfoDevice?deviceId=%s&type=%s&deviceType=DTU&model=WeegDTU";
 }

@@ -202,7 +202,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                 Toast.makeText(getActivity(),"数据区CRC错误",Toast.LENGTH_SHORT).show();
                 return;
             }
-            for(i=0;i<buf.length;i++)
+            for(i=0;i<timeinfo.length;i++)
             {
                 String hex = Integer.toHexString(buf[i+2] & 0xFF);
                 if (hex.length() == 1) {
