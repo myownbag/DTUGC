@@ -421,11 +421,4 @@ public class InstrumentInputFregment extends BaseFragment {
         }
     }
 
-    @Override
-    public void Oncurrentpageselect(int index) {
-        if(index!=5)
-        {
-            mIsatart=false;
-        }
-    }
 }

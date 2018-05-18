@@ -298,45 +298,52 @@ public class MainActivity extends FragmentActivity {
         fragments=new ArrayList<BaseFragment>();
 
         fregment1 = new BasicinfoFregment();
-        Bundle bundle1 = new Bundle();
-        bundle1.putString("extra",titles[index++]);
-        //BasicinfoFregment.setArguments(bundle1);
+        Bundle bundle0 = new Bundle();
+        bundle0.putInt("position",index);
+        bundle0.putString("extra",titles[index++]);
+        fregment1.setArguments(bundle0);
         fragments.add(fregment1);
 
         fregment2 =new RealtimedataFregment();
-        Bundle bundle11 = new Bundle();
+        Bundle bundle1 = new Bundle();
+        bundle1.putInt("position",index);
         bundle1.putString("extra",titles[index++]);
-        //oneFragment.setArguments(bundle11);
+        fregment2.setArguments(bundle1);
         fragments.add(fregment2);
 
         fregment3 = new FrozendataFregment();
         Bundle bundle2 = new Bundle();
+        bundle2.putInt("position",index);
         bundle2.putString("extra",titles[index++]);
-        //secondFragment.setArguments(bundle2);
+        fregment3.setArguments(bundle2);
         fragments.add(fregment3);
 
         fregment4 = new LocalsettngsFregment();
         Bundle bundle3 = new Bundle();
+        bundle3.putInt("position",index);
         bundle3.putString("extra",titles[index++]);
-        //thirdFragment.setArguments(bundle3);
+        fregment4.setArguments(bundle3);
         fragments.add(fregment4);
 
         fregment5 = new SensorInputFregment();
         Bundle bundle4 = new Bundle();
+        bundle4.putInt("position",index);
         bundle4.putString("extra",titles[index++]);
-        //fourthFragment.setArguments(bundle4);
+        fregment5.setArguments(bundle4);
         fragments.add(fregment5);
 
         fregment6 = new InstrumentInputFregment();
         Bundle bundle5 = new Bundle();
+        bundle5.putInt("position",index);
         bundle5.putString("extra",titles[index++]);
-        //fifthFragment.setArguments(bundle5);
+        fregment6.setArguments(bundle5);
         fragments.add(fregment6);
 
         fregment7 =new PressSensoraddSetframent();
         Bundle bundle6 = new Bundle();
+        bundle6.putInt("position",index);
         bundle6.putString("extra",titles[index++]);
-        //fifthFragment.setArguments(bundle5);
+        fregment7.setArguments(bundle6);
         fragments.add(fregment7);
 
         fregment8 =new NBRegisiterfragment();
@@ -534,6 +541,38 @@ public class MainActivity extends FragmentActivity {
             }
         }
     }
+
+
+    public void sendData(String data, String strOwner,int timeout) {
+
+
+        // Check that we're actually connected before trying anything
+        if (mBTService.getState() != BluetoothState.STATE_CONNECTED) {
+
+            ToastUtils.showToast(this,  R.string.not_connected);
+            return;
+        }
+
+        // Check that there's actually something to send
+        if (data.length() > 0) {
+            gOwner = strOwner;
+            Log.v("ttt", "Send: " + data);
+            String hexString = data;
+            byte[] buff = DigitalTrans.hex2byte(hexString);
+
+            mBTService.write(buff);
+            if(timeout>0)
+            {
+                if(mThreedTimeout==null)
+                {
+                    mThreedTimeout=new BlueToothTimeOutMornitor(timeout);
+                    mThreedTimeout.start();
+                }
+            }
+        }
+    }
+
+
     // 双击退出-----------------------------------------------
     public boolean dispatchKeyEvent(KeyEvent event) {
 
@@ -669,10 +708,19 @@ public class MainActivity extends FragmentActivity {
 
     public class BlueToothTimeOutMornitor extends Thread
     {
+       public int mtimeout;
+        BlueToothTimeOutMornitor()
+        {
+            mtimeout=2000;
+        }
+        BlueToothTimeOutMornitor(int timeout)
+        {
+            mtimeout=timeout;
+        }
         @Override
         public void run() {
             try {
-                sleep(2000);
+                sleep(mtimeout);
                 MainActivity.this.mHandler.obtainMessage(BluetoothState.MESSAGE_STATE_TIMEOUT)
                         .sendToTarget(); //       mHandler.obtainMessage(BluetoothState.MESSAGE_READ, bytes, -1, buffer)
                       //  .sendToTarget();

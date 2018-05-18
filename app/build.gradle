@@ -29,4 +29,5 @@ dependencies {
     implementation project(':indicatorseekbar')
     compile 'com.github.lecho:hellocharts-android:v1.5.8'
     compile 'org.xutils:xutils:3.5.0'
+    compile 'com.google.code.gson:gson:2.6.2'
 }

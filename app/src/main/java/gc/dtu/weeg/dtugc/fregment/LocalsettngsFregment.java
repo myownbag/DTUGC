@@ -136,14 +136,6 @@ public class LocalsettngsFregment extends BaseFragment {
 //    }
 
     @Override
-    public void Oncurrentpageselect(int index) {
-        if(index!=3)
-        {
-            mIsatart=false;
-        }
-    }
-
-    @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
 //        Log.d("zl","in LocalsettngsFregment");
         if(mIsatart==false)

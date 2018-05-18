@@ -1,5 +1,6 @@
 package gc.dtu.weeg.dtugc.fregment;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +13,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
@@ -22,6 +26,7 @@ import java.nio.ByteOrder;
 
 import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
+import gc.dtu.weeg.dtugc.nbregisterdetaildata.RegisterName;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
@@ -32,6 +37,8 @@ public class NBRegisiterfragment  extends BaseFragment {
     public  View mView;
     public ImageView mImageView;
     public TextView maddrview;
+    public TextView mimeiview;
+    public TextView mresultview;
     private SharedPreferences sp ;
     private String addrurl;
     private Button mbutsend;
@@ -40,28 +47,14 @@ public class NBRegisiterfragment  extends BaseFragment {
     private String mSdeviceId;
     private String mImei;
     private String mDeviceType;
-    Bundle bundle;
-    private int position=0;
+
+    private int mAtmpindex=0;
+
     private int mIndexCMD;
     byte sendbufread[]={(byte) 0xFD, 0x00 ,0x00 ,0x0D ,        0x00 ,0x19 ,0x00 ,        0x00 ,0x00 ,0x00
             ,0x00 ,0x00 ,0x00 ,0x00 , (byte) 0xD9 ,0x00 ,0x0C , (byte) 0xA0};
 
     byte[][] mComd=new byte[3][sendbufread.length];
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        bundle = getArguments();
-        if (bundle != null) {
-            position=bundle.getInt("position");
-            Log.d("zl","position:"+position);
-        }
-        else
-        {
-            Log.d("zl","position:"+"ERROR");
-        }
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -81,6 +74,8 @@ public class NBRegisiterfragment  extends BaseFragment {
         mImageView=mView.findViewById(R.id.nb_img_set_addr);
         maddrview=mView.findViewById(R.id.nb_add_info);
         mbutsend=mView.findViewById(R.id.nb_but1);
+        mimeiview=mView.findViewById(R.id.nb_imei_info);
+        mresultview=mView.findViewById(R.id.nb_result_info);
         sp=MainActivity.getInstance().getSharedPreferences("User", Context.MODE_PRIVATE);
 
         initdata();
@@ -174,11 +169,23 @@ public class NBRegisiterfragment  extends BaseFragment {
                 }
                 else
                 {
-                    String readOutMsg = DigitalTrans.byte2hex(mComd[mIndexCMD]);
-                    verycutstatus(readOutMsg);
+                    mAtmpindex++;
+                    if(mAtmpindex<3)
+                    {
+                        String readOutMsg = DigitalTrans.byte2hex(mComd[mIndexCMD]);
+                        verycutstatus(readOutMsg);
+                    }
+                    else
+                    {
+                       MainActivity.getInstance().mDialog.dismiss();
+                       Toast.makeText(getActivity(),"获取IMEI失败",Toast.LENGTH_SHORT).show();
+                        mresultview.setText("获取IMEI失败");
+                        mresultview.setTextColor(getResources().getColor(R.color.color_warning));
+                    }
                     return;
                 }
                 mImei=str;
+                mimeiview.setText(mImei);
             }
           //  Log.d("zl","mImei:"+mImei);
         }
@@ -238,39 +245,16 @@ public class NBRegisiterfragment  extends BaseFragment {
     }
 
     private void regiditer() {
-
+        if(addrurl.equals(""))
+        {
+            Toast.makeText(getActivity(),"请完善URL",Toast.LENGTH_SHORT).show();
+            return;
+        }
         String urlrequest=addrurl+Constants.NB_Service_END;
-        //mImei="868744031495256";
         String url=String.format(urlrequest,mImei,mSDevcieSn);
         Log.d("zl",url);
         RequestParams params = new RequestParams(url);
-        x.http().post(params, new Callback.CommonCallback<String>(){
-
-            @Override
-            public void onSuccess(String result) {
-                Log.d("zl","urlRegisiter onSuccess:"+result);
-              //  Gson gson = new Gson();
-            }
-
-            @Override
-            public void onError(Throwable ex, boolean isOnCallback) {
-
-            }
-
-            @Override
-            public void onCancelled(CancelledException cex) {
-
-            }
-
-            @Override
-            public void onFinished() {
-
-            }
-        });
-        urlrequest=addrurl+Constants.NB_Service_END1;
-        String DI="cc6364ea-5be9-4f1a-8827-9a8945c3dd66";
-        url=String.format(urlrequest,DI,mDeviceType);
-        Log.d("zl",url);
+        x.http().post(params, new httppost2register1impl());
     }
 
     public class OnClicklisternerIMPL implements View.OnClickListener
@@ -290,6 +274,8 @@ public class NBRegisiterfragment  extends BaseFragment {
                 case R.id.nb_but1:
                     mIsatart=true;
                     mIndexCMD=0;
+                    mAtmpindex=0;
+                    mresultview.setText("");
                     String readOutMsg = DigitalTrans.byte2hex(mComd[mIndexCMD]);
                     verycutstatus(readOutMsg);
                     Log.d("zl", "onClick: "+CodeFormat.byteToHex(mComd[mIndexCMD],mComd[mIndexCMD].length));
@@ -308,7 +294,7 @@ public class NBRegisiterfragment  extends BaseFragment {
         super.onActivityResult(requestCode, resultCode, data);
         //String addr;
 
-        addrurl=sp.getString(Constants.NB_SERVICE_KEY,"未获取");
+        addrurl=sp.getString(Constants.NB_SERVICE_KEY,"");
         Log.d("zl","onActivityResult: "+addrurl);
         maddrview.setText(addrurl);
         //url=addr+Constants.NB_Service_END;
@@ -335,6 +321,111 @@ public class NBRegisiterfragment  extends BaseFragment {
         if(index!=position)
         {
             mIsatart=false;
+        }
+    }
+
+    public class httppost2register1impl implements Callback.CommonCallback<String>
+    {
+
+        @Override
+        public void onSuccess(String result) {
+            Log.d("zl","urlRegisiter onSuccess:"+result);
+            //  Gson gson = new Gson();
+            Gson gson =new Gson();
+            RegisterName registerName= gson.fromJson(result, RegisterName.class);
+            mSdeviceId=registerName.deviceId;
+            Log.d("zl","deviceID:"+registerName.deviceId);
+            Log.d("zl","result1:"+registerName.result);
+
+            if(registerName.result.equals("true"))
+            {
+
+               String urlrequest=addrurl+Constants.NB_Service_END1;
+               String url=String.format(urlrequest,mSdeviceId,mDeviceType);
+               RequestParams params = new RequestParams(url);
+               x.http().post(params, new httppost2register2impl());
+            }
+            else
+            {
+                MainActivity.getInstance().mDialog.dismiss();
+                String str="";
+                if(registerName!=null)
+                {
+                    str =registerName.code;
+                }
+                mresultview.setText("注册任务失败:"+str);
+                mresultview.setTextColor(getResources().getColor(R.color.color_warning));
+            }
+        }
+
+        @Override
+        public void onError(Throwable ex, boolean isOnCallback) {
+            mresultview.setText("异常退出");
+            mresultview.setTextColor(getResources().getColor(R.color.color_warning));
+            MainActivity.getInstance().mDialog.dismiss();
+        }
+
+        @Override
+        public void onCancelled(CancelledException cex) {
+            mresultview.setText("异常退出");
+            mresultview.setTextColor(getResources().getColor(R.color.color_warning));
+            MainActivity.getInstance().mDialog.dismiss();
+        }
+
+        @Override
+        public void onFinished() {
+
+        }
+    }
+
+    public class httppost2register2impl implements Callback.CommonCallback<String>
+    {
+
+        @Override
+        public void onSuccess(String result) {
+            Log.d("zl","urladdinfo onSuccess:"+result);
+            Gson gson =new Gson();
+            RegisterName registerName= gson.fromJson(result, RegisterName.class);
+            MainActivity.getInstance().mDialog.dismiss();
+            if(registerName.result.equals("true"))
+            {
+                Toast.makeText(getActivity(),"注册成功",Toast.LENGTH_SHORT).show();
+                mresultview.setText("注册成功");
+                mresultview.setTextColor(getResources().getColor(R.color.color_unselected));
+            }
+            else
+            {
+                Toast.makeText(getActivity(),"添加描述失败",Toast.LENGTH_SHORT).show();
+                String str="";
+                if(registerName!=null)
+                {
+                    str=registerName.code;
+                }
+
+                mresultview.setText("添加描述失败:"+str);
+                mresultview.setTextColor(getResources().getColor(R.color.color_warning));
+
+            }
+        }
+
+        @Override
+        public void onError(Throwable ex, boolean isOnCallback) {
+            mresultview.setText("异常退出");
+            mresultview.setTextColor(getResources().getColor(R.color.color_warning));
+            MainActivity.getInstance().mDialog.dismiss();
+
+        }
+
+        @Override
+        public void onCancelled(CancelledException cex) {
+            mresultview.setText("异常退出");
+            mresultview.setTextColor(getResources().getColor(R.color.color_warning));
+            MainActivity.getInstance().mDialog.dismiss();
+        }
+
+        @Override
+        public void onFinished() {
+            MainActivity.getInstance().mDialog.dismiss();
         }
     }
 }

@@ -223,8 +223,15 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                     FrozendataFregment.this.helper.getReadableDatabase()) ;
             ArrayList<Map<String,String>> all=   cursor.find1(MainActivity.getInstance().mConnectedDeviceName
                     ,"DESC",1,0);
-            String dbtime= all.get(0).get("time");
-            //   date2=datecompare(dbtime);
+            if(all.size()>0)
+            {
+                String dbtime= all.get(0).get("time");
+                date2=datecompare(dbtime);
+            }
+            else
+            {
+                need2stroe=true;
+            }
             if(date2!=null&&date1!=null)
             {
                 if(date2.compareTo(date1)>=0)
@@ -422,14 +429,6 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         else
         {
             ToastUtils.showToast(getActivity(), "请先建立蓝牙连接!");
-        }
-    }
-
-    @Override
-    public void Oncurrentpageselect(int index) {
-        if(index!=2)
-        {
-            mIsatart=false;
         }
     }
 

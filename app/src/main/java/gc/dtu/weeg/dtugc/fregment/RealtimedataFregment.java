@@ -158,13 +158,4 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
             ToastUtils.showToast(getActivity(), "请先建立蓝牙连接!");
         }
     }
-
-    @Override
-    public void Oncurrentpageselect(int index) {
-        if(index!=1)
-        {
-            mIsatart=false;
-        }
-    }
-
 }
