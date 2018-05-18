@@ -566,6 +566,7 @@ public class MainActivity extends FragmentActivity {
                 if(mThreedTimeout==null)
                 {
                     mThreedTimeout=new BlueToothTimeOutMornitor(timeout);
+                    mThreedTimeout=new BlueToothTimeOutMornitor(timeout);
                     mThreedTimeout.start();
                 }
             }
@@ -732,6 +733,10 @@ public class MainActivity extends FragmentActivity {
     public String getmConnectedDeviceName()
     {
         String str="";
+        if(mConnectedDeviceName==null)
+        {
+            return null;
+        }
         if(mConnectedDeviceName.equals(getResources().getString(R.string.not_connected)))
         {
             return null;

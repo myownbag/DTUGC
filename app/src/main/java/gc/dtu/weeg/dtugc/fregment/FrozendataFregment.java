@@ -20,6 +20,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.ParseException;
@@ -55,14 +56,19 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     public listviewadpater myadpater;
     public ArrayList<Map<String,String>> mlistdata;
     public SimpleDateFormat myFmt;
+    public ParseallfrosendataThread parseallfrosendataThread;
+//    public ByteArrayOutputStream mbout = new ByteArrayOutputStream();
+//    public BufferedOutputStream  mbufout=new BufferedOutputStream(mbout);
 
-    String [] mylist={"最新第一条","最新第二条","最新第三条","最新第四条","最新第五条"};
+    String [] mylist={"最新第一条","最新第二条","最新第三条","最新第四条","最新第五条","全部数据"};
     byte sendbufread[]={(byte) 0xFD, 0x00 ,0x00 ,0x11 ,        0x00 ,0x24 ,0x00 ,        0x00 ,0x00 ,0x00
             ,0x00 ,0x00 ,0x00 ,0x00 , (byte) 0xD9 ,0x00 ,0x0C ,0x00,0x00,0x00, (byte) 0xA0,0x00};
 
+    byte cmddevicesn[]={(byte) 0xFD, 0x00 ,0x00 ,0x0D ,        0x00 ,0x19 ,0x00 ,        0x00 ,0x00 ,0x00
+            ,0x00 ,0x00 ,0x00 ,0x00 , (byte) 0xD9 ,0x00 ,0x0C , (byte) 0xA0};
+
     public FreezedataSqlHelper helper = null ;		 //mysqlhelper				// 数据库操作
     private MytabOperate mtab = null ;
-    //private MytabCursor mycur=null;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -160,13 +166,8 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         }
         if(mIsTotleRDing)
         {
-
-//            boolean flag= MainActivity.getInstance().getcurblueservice().getcurSemaphore().tryAcquire();
-//            if(flag==false)
-//            {
-//                Log.d("zl", "OndataCometoParse: 获取信号量失败");
-//            }
             alldatacomtoparse(readOutBuf1);
+            return;
         }
         if(readOutBuf1.length<5)
         {
@@ -215,13 +216,13 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
             String time1="20"+timeinfo[0]+timeinfo[1]+timeinfo[2]+" "
                     +timeinfo[4]+timeinfo[5]+timeinfo[6];
             Date date1=null,date2 = null;
-            //   date1=datecompare(time1);
+            date1=datecompare(time1);
 
 
             MytabCursor cursor=new MytabCursor(	// 实例化查询
                     // 取得SQLiteDatabase对象
                     FrozendataFregment.this.helper.getReadableDatabase()) ;
-            ArrayList<Map<String,String>> all=   cursor.find1(MainActivity.getInstance().mConnectedDeviceName
+            ArrayList<Map<String,String>> all=   cursor.find1(MainActivity.getInstance().getmConnectedDeviceName()
                     ,"DESC",1,0);
             if(all.size()>0)
             {
@@ -305,12 +306,11 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                 FrozendataFregment.this.mtab = new MytabOperate(
                         FrozendataFregment.this.helper.getWritableDatabase());
                 FrozendataFregment.this.mtab.insert1(MainActivity.getInstance().getmConnectedDeviceName()
-                        ," ",press1,press2,time1);
+                        ,"",press1,press2,time1);
             }
             //显示 mlistdata
             Map<String,String> map=new HashMap();
-            String ser=MainActivity.getInstance().getmConnectedDeviceName();
-            Log.d("zl","DEVICE NO:"+ser);
+
             //  map.put("mac",ser);
             map.put("temp","");
             map.put("press1",press1);
@@ -318,13 +318,143 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
             map.put("time",time1);
             myadpater.notifyDataSetChanged();
         }
-
-
         //Log.d("zl","data:"+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
     }
 
     private void alldatacomtoparse(byte[] readOutBuf1) {
+       // mbout.write(readOutBuf1,0,readOutBuf1.length);
+        int totle=readOutBuf1.length/32;
+        ByteBuffer buf1;
+        byte[] buf=new byte[31];
+        for(int i=0;i<totle;i++)
+        {
+            buf1=ByteBuffer.allocateDirect(31);
+            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+            buf1.put(readOutBuf1,i*32,31);
+            buf1.rewind();
+            buf1.get(buf);
 
+            if(CodeFormat.crcencode(buf)!=0)
+            {
+                continue;
+            }
+
+            Parsetostore(buf);
+        }
+    }
+
+    private void Parsetostore(byte[] buf) {
+
+        int i=0;
+        boolean need2stroe=false;
+        String[] timeinfo=new String[7];
+        for(i=0;i<timeinfo.length;i++)
+        {
+            String hex = Integer.toHexString(buf[i+2] & 0xFF);
+            if (hex.length() == 1) {
+                hex = '0' + hex;
+            }
+            timeinfo[i]=hex;
+        }
+        //解析时间
+        String time1="20"+timeinfo[0]+timeinfo[1]+timeinfo[2]+" "
+                +timeinfo[4]+timeinfo[5]+timeinfo[6];
+        Date date1=null,date2 = null;
+        date1=datecompare(time1);
+
+
+        MytabCursor cursor=new MytabCursor(	// 实例化查询
+                // 取得SQLiteDatabase对象
+                FrozendataFregment.this.helper.getReadableDatabase()) ;
+        ArrayList<Map<String,String>> all=   cursor.find1(MainActivity.getInstance().getmConnectedDeviceName()
+                ,"DESC",1,0);
+        if(all.size()>0)
+        {
+            String dbtime= all.get(0).get("time");
+            date2=datecompare(dbtime);
+        }
+        else
+        {
+            need2stroe=true;
+        }
+        if(date2!=null&&date1!=null)
+        {
+            if(date2.compareTo(date1)>=0)
+            {
+                // Toast.makeText(getActivity(),"该条记录已在数据库中",Toast.LENGTH_SHORT).show();
+                need2stroe=false;
+            }
+            else
+            {
+                need2stroe=true;
+            }
+        }
+
+        //解析温度
+            /*
+            buf1=ByteBuffer.allocateDirect(4);
+            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+            buf1.put(buf,11,4);
+            buf1.rewind();
+            */
+        //解析压力1
+        ByteBuffer buf1;
+        int tempint=0;
+        float tempfloat;
+        buf1=ByteBuffer.allocateDirect(4);
+        buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+        buf1.put(buf,15,4);
+        buf1.rewind();
+        tempint=buf1.getInt();
+        String press1;
+        if(tempint==0)
+        {
+            press1=Constants.SENSOR_DISCONNECT;
+        }
+        else if(tempint==0xffffffff)
+        {
+            press1=Constants.SENSOR_ERROR;
+        }
+        else
+        {
+            buf1=ByteBuffer.allocateDirect(4);
+            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+            buf1.put(buf,15,4);
+            buf1.rewind();
+            tempfloat=buf1.getFloat();
+            press1=""+tempfloat;
+        }
+        //解析压力2
+        buf1=ByteBuffer.allocateDirect(4);
+        buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+        buf1.put(buf,19,4);
+        buf1.rewind();
+        tempint=buf1.getInt();
+        String press2;
+        if(tempint==0)
+        {
+            press2=Constants.SENSOR_DISCONNECT;
+        }
+        else if(tempint==0xffffffff)
+        {
+            press2=Constants.SENSOR_ERROR;
+        }
+        else
+        {
+            buf1=ByteBuffer.allocateDirect(4);
+            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+            buf1.put(buf,15,4);
+            buf1.rewind();
+            tempfloat=buf1.getFloat();
+            press2=""+tempfloat;
+        }
+        if(need2stroe==true)
+        {
+            FrozendataFregment.this.mtab = new MytabOperate(
+                    FrozendataFregment.this.helper.getWritableDatabase());
+            FrozendataFregment.this.mtab.insert1(MainActivity.getInstance().getmConnectedDeviceName()
+                    ,"",press1,press2,time1);
+        }
     }
 
     private void setSpinneradpater(Spinner spinner, String[] list )
@@ -352,35 +482,45 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     @Override
     public void onClick(View v) {
         int index=mSpiner.getSelectedItemPosition();
-//        if(index==(mylist.length-1))
-//        {
-//            Dialog dialog=new AlertDialog.Builder(getActivity())
-//                    .setTitle("警告！！！")
-//                    .setIcon(R.drawable.warning_icon)
-//                    .setMessage("全部读出历史数据需耗时约30分钟！！\r\n是否继续？")
-//                    .setPositiveButton("确定", 						// 增加一个确定按钮
-//                            new DialogInterface.OnClickListener() {	// 设置操作监听
-//                                public void onClick(DialogInterface dialog,
-//                                                    int whichButton) { 			// 单击事件
-//                                 FrozendataFregment.this.dofrozendataread(0);
-//                                }
-//                            }).setNegativeButton("取消", 			// 增加取消按钮
-//                            new DialogInterface.OnClickListener() {	// 设置操作监听
-//                                public void onClick(DialogInterface dialog,
-//                                                    int whichButton) { 			// 单击事件
-//
-//                                }
-//                            }).create(); 							// 创建Dialog
-//            dialog.show();
-//            MainActivity.getInstance().getcurblueservice().SetBlockmode(true);
-//        }
-//        else
-//        {
-//            dofrozendataread(index+1);
-//            MainActivity.getInstance().bluetoothblockdisable();
-//        }
-        dofrozendataread(index+1);
-      //  dofrozendataread(0);
+        ByteBuffer buf1;
+        buf1=ByteBuffer.allocateDirect(4);
+        buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+        buf1.putInt(103);
+        buf1.rewind();
+        buf1.get(cmddevicesn,14,2);
+        CodeFormat.crcencode(cmddevicesn);
+
+        String ser=MainActivity.getInstance().getmConnectedDeviceName();
+        if(ser!=null)
+            Log.d("zl","DEVICE SN:"+ser);
+
+        if(index==(mylist.length-1))
+        {
+            Dialog dialog=new AlertDialog.Builder(getActivity())
+                    .setTitle("警告！！！")
+                    .setIcon(R.drawable.warning_icon)
+                    .setMessage("全部读出历史数据需耗时约30分钟！！\r\n是否继续？")
+                    .setPositiveButton("确定", 						// 增加一个确定按钮
+                            new DialogInterface.OnClickListener() {	// 设置操作监听
+                                public void onClick(DialogInterface dialog,
+                                                    int whichButton) { 			// 单击事件
+                                 FrozendataFregment.this.dofrozendataread(0);
+                                }
+                            }).setNegativeButton("取消", 			// 增加取消按钮
+                            new DialogInterface.OnClickListener() {	// 设置操作监听
+                                public void onClick(DialogInterface dialog,
+                                                    int whichButton) { 			// 单击事件
+
+                                }
+                            }).create(); 							// 创建Dialog
+            dialog.show();
+            MainActivity.getInstance().getcurblueservice().SetBlockmode(true);
+        }
+        else
+        {
+            dofrozendataread(index+1);
+            MainActivity.getInstance().bluetoothblockdisable();
+        }
     }
 
     private void dofrozendataread(int i) {
@@ -390,6 +530,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         if(i==0)
         {
             mIsTotleRDing=true;
+          // parseallfrosendataThread.start();
             //MainActivity.getInstance().getcurblueservice().SetBlockmode(true);
         }
         else
@@ -431,7 +572,21 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
             ToastUtils.showToast(getActivity(), "请先建立蓝牙连接!");
         }
     }
-
+    private void verycutstatus(String readOutMsg,int timeout) {
+        MainActivity parentActivity1 = (MainActivity) getActivity();
+        String strState1 = parentActivity1.GetStateConnect();
+        if(!strState1.equalsIgnoreCase("无连接"))
+        {
+//            parentActivity1.mDialog.show();
+//            parentActivity1.mDialog.setDlgMsg("读取中...");
+            //String input1 = Constants.Cmd_Read_Alarm_Pressure;
+            parentActivity1.sendData(readOutMsg, "FFFF",0);
+        }
+        else
+        {
+            ToastUtils.showToast(getActivity(), "请先建立蓝牙连接!");
+        }
+    }
     private class listviewadpater extends BaseAdapter
     {
 
@@ -483,7 +638,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         String temp="cancel";
         Log.d("zl","cancel");
         String readOutMsg = DigitalTrans.byte2hex(temp.getBytes());
-        verycutstatus(readOutMsg);
+        verycutstatus(readOutMsg,0);
     }
     public Date datecompare(String d)
     {
@@ -495,5 +650,15 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
             e.printStackTrace();
         }
         return d1;
+    }
+    class ParseallfrosendataThread extends Thread
+    {
+        @Override
+        public void run() {
+            while(true)
+            {
+
+            }
+        }
     }
 }

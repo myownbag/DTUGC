@@ -6,7 +6,7 @@ package gc.dtu.weeg.dtugc.utils;
 
 public class Constants {
     //超时秒数默认60秒
-    public static final int  TimeOutSecond = 60000;
+    public static final int  TimeOutSecond = 18000000;
 
     public static final int  LocalsetingFlag = 800;
     public static final int  SensorlsetingFlag = 801;

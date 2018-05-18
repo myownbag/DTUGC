@@ -15,7 +15,6 @@ import android.os.Message;
 import android.util.Log;
 
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -354,8 +353,8 @@ public class BluetoothService {
      */
     private class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
-        //private final InputStream mmInStream;
-        private final BufferedInputStream mmInStream;
+        private final InputStream mmInStream;
+        //private final BufferedInputStream mmInStream;
         private final OutputStream mmOutStream;
 
         public ConnectedThread(BluetoothSocket socket) {
@@ -372,8 +371,8 @@ public class BluetoothService {
                 Log.e(TAG, "temp sockets not created", e);
             }
 
-            //mmInStream = tmpIn;
-            mmInStream=new BufferedInputStream(tmpIn);
+            mmInStream = tmpIn;
+            //mmInStream=new BufferedInputStream(tmpIn);
             mmOutStream = tmpOut;
         }
 
