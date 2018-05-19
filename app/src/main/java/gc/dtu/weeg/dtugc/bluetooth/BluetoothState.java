@@ -21,6 +21,7 @@ public class BluetoothState {
     public static final int MESSAGE_TOAST = 5;
 
     public static final int MESSAGE_STATE_TIMEOUT = 6;
+    public static final int MESSAGE_BLOCK_TIMEOUT = 7;
 
     // Intent request codes
     public static final int REQUEST_CONNECT_DEVICE = 384;

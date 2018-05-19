@@ -186,7 +186,7 @@ public class MainActivity extends FragmentActivity {
 
     // The Handler that gets information back from the BluetoothService
     @SuppressLint("HandlerLeak")
-    private final Handler mHandler = new Handler() {
+    public final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -279,6 +279,11 @@ public class MainActivity extends FragmentActivity {
                     mDialog.dismiss();
                     // ToastUtils.showToast(getActivity(), "数据长度异常");
                     Toast.makeText(MainActivity.this, "蓝牙无回应请重连", Toast.LENGTH_SHORT).show();
+                    break;
+                case BluetoothState.MESSAGE_BLOCK_TIMEOUT:
+                    if(mCurrentpage==fregment3) {
+                        fregment3.OnBlockdataFinished();
+                    }
                     break;
             }
         }

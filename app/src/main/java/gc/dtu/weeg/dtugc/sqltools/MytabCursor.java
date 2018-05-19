@@ -78,4 +78,11 @@ public class MytabCursor {
         return count;
 
     }
+    public int ExSqlCmd(String sqlstring)
+    {
+        Cursor result = this.db.rawQuery(sqlstring, null); // 执行查询语句
+        int count=result.getCount();
+        this.db.close();;
+        return count;
+    }
 }
