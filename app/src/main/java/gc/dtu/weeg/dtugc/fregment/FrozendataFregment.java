@@ -79,9 +79,9 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
 
     //线程池
     private Semaphore semaphore = new Semaphore(1);
-    private final int CORE_POOL_SIZE = 1;//核心线程数
-    private final int MAX_POOL_SIZE = 3;//最大线程数
-    private final int BLOCK_SIZE = 2;//阻塞队列大小
+    private final int CORE_POOL_SIZE = 5;//核心线程数
+    private final int MAX_POOL_SIZE = 20;//最大线程数
+    private final int BLOCK_SIZE = 4;//阻塞队列大小
     private final long KEEP_ALIVE_TIME = 2;//空闲线程超时时间
     private ThreadPoolExecutor executorPool;
     @Nullable
