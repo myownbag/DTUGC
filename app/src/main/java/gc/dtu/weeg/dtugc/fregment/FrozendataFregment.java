@@ -376,6 +376,8 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     @Override
     public void onClick(View v) {
         int index=mSpiner.getSelectedItemPosition();
+        mlistdata.clear();
+        myadpater.notifyDataSetChanged();
         ByteBuffer buf1;
         buf1=ByteBuffer.allocateDirect(4);
         buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
