@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -64,6 +65,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     public ArrayList<Map<String,String>> mlistdata;
     public SimpleDateFormat myFmt;
     public ParseallfrosendataThread parseallfrosendataThread;
+    public detectTaskisFinishedThread detecttherad;
 //    public ByteArrayOutputStream mbout = new ByteArrayOutputStream();
 //    public BufferedOutputStream  mbufout=new BufferedOutputStream(mbout);
     public Handler handler=MainActivity.getInstance().mHandler;
@@ -81,7 +83,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     private Semaphore semaphore = new Semaphore(1);
     private final int CORE_POOL_SIZE = 5;//核心线程数
     private final int MAX_POOL_SIZE = 20;//最大线程数
-    private final int BLOCK_SIZE = 4;//阻塞队列大小
+    private final int BLOCK_SIZE = 5;//阻塞队列大小
     private final long KEEP_ALIVE_TIME = 2;//空闲线程超时时间
     private ThreadPoolExecutor executorPool;
     @Nullable
@@ -101,9 +103,10 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         executorPool = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME,
                 TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(BLOCK_SIZE),
                 Executors.defaultThreadFactory(), new ThreadPoolExecutor.AbortPolicy());
-        executorPool.allowCoreThreadTimeOut(true);
-
-
+        executorPool.allowCoreThreadTimeOut(false);
+        Log.d("zl","队列长度"+executorPool.getQueue().size());
+        Log.d("zl","getactivityTask"+executorPool.getActiveCount());
+        MainActivity.getInstance().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         initView();
         return  mView;
 
@@ -178,7 +181,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1)
     {
         //MainActivity.getInstance().mDialog.dismiss();
-        Log.d("zl","OndataCometoParse:"+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
+   //     Log.d("zl","OndataCometoParse1:"+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
         //Log.d("zl","name:"+MainActivity.getInstance().getmConnectedDeviceName());
 
         boolean need2stroe=false;
@@ -194,8 +197,9 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                 parseallfrosendataThread.interrupt();
                 parseallfrosendataThread=null;
             }
-           //alldatacomtoparse(readOutBuf1);
             executorPool.execute(new ParseBlockDataThread(readOutBuf1));
+//            Log.d("zl","队列长度"+executorPool.getQueue().size());
+//            Log.d("zl","getactivityTask"+executorPool.getActiveCount());
             parseallfrosendataThread = new ParseallfrosendataThread();
             parseallfrosendataThread.start();
             return;
@@ -216,13 +220,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         MainActivity.getInstance().mDialog.dismiss();
         if(!mIsTotleRDing)
         {
-            if(semaphore.tryAcquire()==false)
-            {
-                Log.d("zl","OndataCometoParse: tryAcquire false");
-                Toast.makeText(getActivity(),"正在存储数据，请稍后再试"
-                        ,Toast.LENGTH_SHORT).show();
-                return;
-            }
+
             byte [] buf=new byte[31];
             int tempint;
             float tempfloat;
@@ -257,6 +255,13 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                    +" FROM "+Constants.TABLENAME1
                    +" WHERE "+Constants.COLUMN_DATE+ " = "
                    +"'"+time1 +"'";
+            if(semaphore.tryAcquire()==false)
+            {
+                Log.d("zl","OndataCometoParse2: tryAcquire false");
+                Toast.makeText(getActivity(),"正在存储数据，请稍后再试"
+                        ,Toast.LENGTH_SHORT).show();
+                return;
+            }
             MytabCursor cursor=new MytabCursor(	// 实例化查询
                     // 取得SQLiteDatabase对象
                     FrozendataFregment.this.helper.getReadableDatabase()) ;
@@ -403,7 +408,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                                 }
                             }).create(); 							// 创建Dialog
             dialog.show();
-            MainActivity.getInstance().getcurblueservice().SetBlockmode(true);
+          //  MainActivity.getInstance().getcurblueservice().SetBlockmode(true);
         }
         else
         {
@@ -525,7 +530,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         super.Ondlgcancled();
 
         String temp="cancel";
-        Log.d("zl","cancel");
+//        Log.d("zl","cancel");
         String readOutMsg = DigitalTrans.byte2hex(temp.getBytes());
         verycutstatus(readOutMsg,0);
     }
@@ -544,23 +549,100 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     {
         @Override
         public void run() {
-            while(true)
+            try {
+                sleep(2000);
+//                Log.d("zl","ParseallfrosendataThread finished");
+                handler.obtainMessage(BluetoothState.MESSAGE_BLOCK_TIMEOUT
+                        ,Constants.NB_FRESONDATA_KEY_BLOCK_FINISHED,2,null).sendToTarget();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    class detectTaskisFinishedThread extends Thread
+    {
+        boolean flag=true;
+        @Override
+        public void run() {
+
+            while (flag)
             {
+//                Log.d("zl","detectTaskisFinishedThread Start");
+                if(executorPool.getActiveCount()==0)
+                {
+                    flag=false;
+                    handler.obtainMessage(BluetoothState.MESSAGE_BLOCK_TIMEOUT
+                            ,Constants.NB_FRESONDATA_KEY_TASKFINISHED_FINISHED,2,null).sendToTarget();
+                    return;
+                }
                 try {
                     sleep(2000);
-                    handler.obtainMessage(BluetoothState.MESSAGE_READ).sendToTarget();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }
     }
-
     public void OnBlockdataFinished()
     {
-            MainActivity.getInstance().mDialog.dismiss();
-    }
+        MainActivity.getInstance().mDialog.dismiss();
+        Log.d("zl","getactivityTask END"+executorPool.getActiveCount());
 
+        parseallfrosendataThread=null;
+        detecttherad=new detectTaskisFinishedThread();
+        detecttherad.start();
+    }
+    public void updatelistview()
+    {
+        detecttherad=null;
+//        Log.d("zl","updatelistview Start");
+         if(semaphore.tryAcquire()  )
+         {
+//             Log.d("zl","updatelistview run");
+             MytabCursor cur = new MytabCursor(	// 实例化查询
+                     // 取得SQLiteDatabase对象
+                     FrozendataFregment.this.helper.getReadableDatabase()) ;
+//             ArrayList<Map<String,String>> all  =      cur.find1("14010001",
+//                     "DESC"
+//                     ,-1,3);   //MainActivity.getInstance().getmConnectedDeviceName()
+
+             ArrayList<Map<String,String>> all  = cur.find1(MainActivity.getInstance().getmConnectedDeviceName(),
+                     "DESC"
+                     ,-1,0);   //MainActivity.getInstance().getmConnectedDeviceName()
+             if(all==null)
+             {
+                 Log.d("zl","all=null");
+                 return;
+             }
+             int count=all.size();
+             int i;
+             mlistdata.clear();
+             for(i=0;i<count;i++)
+             {
+                 Log.d("zl",""+i+":"
+                         +all.get(i).get("mac")+"  "
+                         +all.get(i).get("temp")+"  "
+                         +all.get(i).get("press1")+"  "
+                         +all.get(i).get("press2")+"  "
+                         +all.get(i).get("time")+"\r\n"
+                 );
+                 Map<String,String> map=new HashMap();
+                 map.put("temp","");
+                 map.put("press1",all.get(i).get("press1"));
+                 map.put("press2",all.get(i).get("press2"));
+                 map.put("time",all.get(i).get("time"));
+                 mlistdata.add(map);
+             }
+             myadpater.notifyDataSetChanged();
+             semaphore.release();
+             return;
+         }
+         else
+         {
+             detecttherad=new detectTaskisFinishedThread();
+             detecttherad.start();
+         }
+    }
     public class ParseBlockDataThread implements Runnable
     {
         byte [] mBuf;
@@ -617,8 +699,11 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                     +"'"+time1 +"'";
             try {
                 FrozendataFregment.this.semaphore.acquire();
+                Log.d("zl","获取成功");
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                FrozendataFregment.this.semaphore.release();
+                return;
             }
             MytabCursor cursor=new MytabCursor(	// 实例化查询
                     // 取得SQLiteDatabase对象
@@ -691,6 +776,8 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                 FrozendataFregment.this.semaphore.acquire();
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                FrozendataFregment.this.semaphore.release();
+                return;
             }
             FrozendataFregment.this.mtab = new MytabOperate(
                     FrozendataFregment.this.helper.getWritableDatabase());
@@ -699,4 +786,6 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
             FrozendataFregment.this.semaphore.release();
         }
     }
+
+
 }

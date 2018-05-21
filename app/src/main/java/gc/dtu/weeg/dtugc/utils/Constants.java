@@ -48,4 +48,9 @@ public class Constants {
     public static final String NB_SERVICE_KEY="service";
     public static final String NB_Service_END="/WeegNB/registerDevice?verifyCode=%s&serial=%s";
     public static final String NB_Service_END1="/WeegNB/setInfoDevice?deviceId=%s&type=%s&deviceType=DTU&model=WeegDTU";
+
+
+    //历史数据业务标记
+    public static final int NB_FRESONDATA_KEY_BLOCK_FINISHED=1;
+    public static final int NB_FRESONDATA_KEY_TASKFINISHED_FINISHED=2;
 }

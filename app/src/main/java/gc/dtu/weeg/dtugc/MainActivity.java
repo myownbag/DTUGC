@@ -282,7 +282,17 @@ public class MainActivity extends FragmentActivity {
                     break;
                 case BluetoothState.MESSAGE_BLOCK_TIMEOUT:
                     if(mCurrentpage==fregment3) {
-                        fregment3.OnBlockdataFinished();
+//                        Log.d("zl","BluetoothState.MESSAGE_BLOCK_TIMEOUT:"+msg.arg1);
+                        if(msg.arg1==Constants.NB_FRESONDATA_KEY_BLOCK_FINISHED)
+                        {
+//                            Log.d("zl","Main OnBlockdataFinished");
+                            fregment3.OnBlockdataFinished();
+                        }
+                        else if(msg.arg1==Constants.NB_FRESONDATA_KEY_TASKFINISHED_FINISHED)
+                        {
+//                            Log.d("zl","Main updatelistview");
+                            fregment3.updatelistview();
+                        }
                     }
                     break;
             }
@@ -419,14 +429,14 @@ public class MainActivity extends FragmentActivity {
                         mPrepage.Oncurrentpageselect(mCurClassIndex);
                     }
                     mPrepage=mCurrentpage;
-                    if(mCurClassIndex1!=2)
-                    {
-                        if(mPreClassIndex==2)
-                        {
-                            Log.d("zl","addScrollView bluetoothblockdisable");
-                            bluetoothblockdisable();
-                        }
-                    }
+//                    if(mCurClassIndex1!=2)
+//                    {
+//                        if(mPreClassIndex==2)
+//                        {
+//                            Log.d("zl","addScrollView bluetoothblockdisable");
+//                            bluetoothblockdisable();
+//                        }
+//                    }
                     mPreClassIndex=mCurClassIndex1;
                 }
             });
@@ -643,14 +653,14 @@ public class MainActivity extends FragmentActivity {
             Log.d("zl","in onPageSelected");
             mCurClassIndex1=position;
             mCurrentpage=fragments.get(position);
-            if(mCurClassIndex1!=2)
-            {
-                if(mPreClassIndex==2)
-                {
-                    bluetoothblockdisable();
-                    Log.d("zl","OnpagechangedListernerImp bluetoothblockdisable");
-                }
-            }
+//            if(mCurClassIndex1!=2)
+//            {
+//                if(mPreClassIndex==2)
+//                {
+//                    bluetoothblockdisable();
+//                    Log.d("zl","OnpagechangedListernerImp bluetoothblockdisable");
+//                }
+//            }
             mPreClassIndex=mCurClassIndex1;
             mCurrentpage.Oncurrentpageselect(position);
             if(mPrepage!=null)
@@ -763,8 +773,8 @@ public class MainActivity extends FragmentActivity {
        return   mBTService;
     }
     public void bluetoothblockdisable() {
-        mBTService.SetBlockmode(false);
-        mBTService.emptyalldata();
-        mBTService.getcurSemaphore().release();
+//        mBTService.SetBlockmode(false);
+//        mBTService.emptyalldata();
+//        mBTService.getcurSemaphore().release();
     }
 }

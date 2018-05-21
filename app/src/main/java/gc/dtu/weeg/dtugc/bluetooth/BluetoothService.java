@@ -46,8 +46,8 @@ public class BluetoothService {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private int mState;
-    public Semaphore mSemaphore;
-    public boolean mIsblock=false;
+//    public Semaphore mSemaphore;
+//    public boolean mIsblock=false;
 
     /**
      * Constructor. Prepares a new Bluetooth session.
@@ -58,7 +58,6 @@ public class BluetoothService {
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = BluetoothState.STATE_NONE;
         mHandler = handler;
-        mSemaphore=new Semaphore(1);
     }
 
     /**
@@ -413,13 +412,13 @@ public class BluetoothService {
 
                     mHandler.obtainMessage(BluetoothState.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
-                    if(mIsblock)
-                    {
-                        Log.d("zl","ConnectedThread:"+"in blocking");
-                        sleep(100);
-                        mSemaphore.acquire();
-                        mSemaphore.release();
-                    }
+//                    if(mIsblock)
+//                    {
+//                        Log.d("zl","ConnectedThread:"+"in blocking");
+//                        sleep(100);
+////                        mSemaphore.acquire();
+////                        mSemaphore.release();
+//                    }
 
 
                 } catch (IOException e) {
@@ -469,21 +468,21 @@ public class BluetoothService {
         }
     }
 
-    public Semaphore getcurSemaphore()
-    {
-        return  mSemaphore;
-    }
-    public void SetBlockmode(Boolean flag)
-    {
-        mIsblock=flag;
-
-
-    }
-    public void emptyalldata()
-    {
-        if(mConnectedThread!=null)
-        {
-            mConnectedThread.interrupt();
-        }
-    }
+//    public Semaphore getcurSemaphore()
+//    {
+//        return  mSemaphore;
+//    }
+//    public void SetBlockmode(Boolean flag)
+//    {
+//        mIsblock=flag;
+//
+//
+//    }
+//    public void emptyalldata()
+//    {
+//        if(mConnectedThread!=null)
+//        {
+//            mConnectedThread.interrupt();
+//        }
+//    }
 }
