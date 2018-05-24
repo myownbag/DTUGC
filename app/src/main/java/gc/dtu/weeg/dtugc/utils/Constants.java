@@ -53,4 +53,6 @@ public class Constants {
     //历史数据业务标记
     public static final int NB_FRESONDATA_KEY_BLOCK_FINISHED=1;
     public static final int NB_FRESONDATA_KEY_TASKFINISHED_FINISHED=2;
+
+    public static final int NUMOFGAGE=20;
 }

@@ -342,6 +342,7 @@ public class NBRegisiterfragment  extends BaseFragment {
 
                String urlrequest=addrurl+Constants.NB_Service_END1;
                String url=String.format(urlrequest,mSdeviceId,mDeviceType);
+                Log.d("zl",url);
                RequestParams params = new RequestParams(url);
                x.http().post(params, new httppost2register2impl());
             }
@@ -361,12 +362,14 @@ public class NBRegisiterfragment  extends BaseFragment {
         @Override
         public void onError(Throwable ex, boolean isOnCallback) {
             mresultview.setText("异常退出");
+            Log.d("zl","onError1:"+ex.toString());
             mresultview.setTextColor(getResources().getColor(R.color.color_warning));
             MainActivity.getInstance().mDialog.dismiss();
         }
 
         @Override
         public void onCancelled(CancelledException cex) {
+            Log.d("zl","onCancelled1:"+cex.toString());
             mresultview.setText("异常退出");
             mresultview.setTextColor(getResources().getColor(R.color.color_warning));
             MainActivity.getInstance().mDialog.dismiss();
@@ -411,6 +414,7 @@ public class NBRegisiterfragment  extends BaseFragment {
         @Override
         public void onError(Throwable ex, boolean isOnCallback) {
             mresultview.setText("异常退出");
+            Log.d("zl","onError2:"+ex.toString());
             mresultview.setTextColor(getResources().getColor(R.color.color_warning));
             MainActivity.getInstance().mDialog.dismiss();
 
@@ -419,6 +423,7 @@ public class NBRegisiterfragment  extends BaseFragment {
         @Override
         public void onCancelled(CancelledException cex) {
             mresultview.setText("异常退出");
+            Log.d("zl","onCancelled2:"+cex.toString());
             mresultview.setTextColor(getResources().getColor(R.color.color_warning));
             MainActivity.getInstance().mDialog.dismiss();
         }

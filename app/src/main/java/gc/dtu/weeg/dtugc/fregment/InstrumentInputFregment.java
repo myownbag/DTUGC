@@ -1,6 +1,7 @@
 package gc.dtu.weeg.dtugc.fregment;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,11 +11,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.nio.ByteBuffer;
@@ -50,8 +53,13 @@ public class InstrumentInputFregment extends BaseFragment {
     private TextView mRecodeTmTx;
     private Intent intent;
     private Button mbutread;
+    private Spinner mCannelSpiner;
+    private int mcurSelect=0;
+    private int mpreselect=0;
     private byte [][] bufofreadcmd=new byte[3][18];
     String[] listitem={"仪表状态:","仪表类型:","仪表地址:","供电时长(步长:10ms):","Elster press 地址:"};
+
+    String[] mcannel={"2000","2001"};
     ArrayList<Map<String,String>> reg2000list;
     private int sendcmeindex=0;
 
@@ -77,7 +85,7 @@ public class InstrumentInputFregment extends BaseFragment {
         mStopTx=mView.findViewById(R.id.tv_ins_stopbit_value);
         mRecodeTmTx=mView.findViewById(R.id.tv_ins_recodegap_value);
         mbutread=mView.findViewById(R.id.tv_ins_btn_read);
-
+        mCannelSpiner=mView.findViewById(R.id.ins_select_spiner);
 
         initview();
         initdata();
@@ -104,11 +112,14 @@ public class InstrumentInputFregment extends BaseFragment {
         mReg2000.setAdapter(list2000adpater);
         mReg2000.setOnItemClickListener(new OnmyOnItemClickListenerlistenerImp());
         initsendbuf();
+        setSpinneradpater(mCannelSpiner,mcannel);
+        mCannelSpiner.setOnItemSelectedListener(new OnItemSelectListernerompl());
     }
 
     private void initsendbuf() {
         byte[] temp={(byte)0xFD,0x00 ,0x00 ,0x0D ,0x00 ,0x19 ,0x00 ,0x00 ,0x00 ,0x00
                 ,0x00 ,0x00 ,0x00 ,0x00 ,(byte)0xCE ,0x07 ,0x42 ,(byte)0x92};
+        Log.d("zl","initsendbuf:"+(1998+2+mcurSelect));
         for(int i=0;i<3;i++)
         {
             ByteBuffer buf1;
@@ -117,18 +128,29 @@ public class InstrumentInputFregment extends BaseFragment {
             buf1.put(temp);
             buf1.rewind();
             buf1.get(bufofreadcmd[i]);
-
-            ByteBuffer buf;
-            buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
-            buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
-            buf.putInt(1998+i);
-            buf.rewind();
-            buf.get(bufofreadcmd[i],14,2);
+            if(i==2)
+            {
+                ByteBuffer buf;
+                buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+                buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+                buf.putInt(1998+i+mcurSelect);
+                buf.rewind();
+                buf.get(bufofreadcmd[i],14,2);
+            }
+            else
+            {
+                ByteBuffer buf;
+                buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+                buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+                buf.putInt(1998+i);
+                buf.rewind();
+                buf.get(bufofreadcmd[i],14,2);
+            }
             CodeFormat.crcencode(bufofreadcmd[i]);
         }
     }
 
-    private void putdata2000(Intent srcint)
+    private void putdata2000(Intent srcint,int addr)
     {
         String [] listdata=null;
         if(reg2000list!=null)
@@ -140,10 +162,11 @@ public class InstrumentInputFregment extends BaseFragment {
             }
         }
         srcint.putExtra("listdata",listdata);
-        srcint.putExtra("regaddr",2000);
+        srcint.putExtra("regaddr",2000+mcurSelect);
     }
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
+        Log.d("zl","OndataCometoParse:"+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
         if(mIsatart==false)
         {
             return;
@@ -151,11 +174,7 @@ public class InstrumentInputFregment extends BaseFragment {
         if(readOutBuf1.length<5)
         {
             ToastUtils.showToast(getActivity(), "数据长度短");
-//                if(mIndexcmd<senddatabuf.length)
-//                {
-//                    String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
-//                    verycutstatus(readOutMsg);
-//                }
+
             return;
         }
         else
@@ -163,11 +182,7 @@ public class InstrumentInputFregment extends BaseFragment {
             if(readOutBuf1[3]!=(readOutBuf1.length-5))
             {
                 ToastUtils.showToast(getActivity(), "数据长度异常");
-//                    if(mIndexcmd<senddatabuf.length)
-//                    {
-//                        String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
-//                        verycutstatus(readOutMsg);
-//                    }
+
                 return;
             }
         }
@@ -235,6 +250,7 @@ public class InstrumentInputFregment extends BaseFragment {
                     buf1.put(tempbyte);
                     buf1.rewind();
                     devicetype=buf1.getInt();
+                    Log.d("zl","devicetype:"+devicetype);
                     for(int i=0;i<info.length;i++)
                     {
                         if(info[i][0].equals("2000")&&info[i][1].equals("1"))
@@ -247,6 +263,7 @@ public class InstrumentInputFregment extends BaseFragment {
                         }
                         if(info[i][0].equals("2000")&&info[i][1].equals("2"))
                         {
+
                             if(Integer.valueOf(info[i][3]).intValue()== devicetype)
                             {
                                 reg2000list.get(1).put("value",info[i][2]);
@@ -340,8 +357,8 @@ public class InstrumentInputFregment extends BaseFragment {
                     intent.putExtra("regaddr",1999);
                     break;
                 case R.id.but_layout_2000:
-                    intent.putExtra("title","Reg 2000");
-                    putdata2000(intent);
+//                    intent.putExtra("title","Reg 2000");
+//                    putdata2000(intent);
                     break;
                     default:
                         break;
@@ -353,8 +370,8 @@ public class InstrumentInputFregment extends BaseFragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             intent=new Intent(mainActivity, InstrumemtItemseetingActivity.class);
-            intent.putExtra("title","Reg 2000");
-            putdata2000(intent);
+            intent.putExtra("title","Reg "+(2000+mcurSelect));
+            putdata2000(intent,(2000+mcurSelect));
             startActivityForResult(intent, Constants.InstrumemtsetingFlag);
         }
     }
@@ -364,6 +381,7 @@ public class InstrumentInputFregment extends BaseFragment {
         public void onClick(View v) {
             mIsatart=true;
             sendcmeindex=0;
+            initsendbuf();
             String readOutMsg = DigitalTrans.byte2hex(bufofreadcmd[sendcmeindex]);
             verycutstatus(readOutMsg);
         }
@@ -416,9 +434,61 @@ public class InstrumentInputFregment extends BaseFragment {
                         }
                     }
                     list2000adpater.notifyDataSetChanged();
+                case 2001:
+                    if(Set!=null)
+                    {
+                        for(int i=0;i<reg2000list.size();i++)
+                        {
+                            reg2000list.get(i).put("value",Set[i]);
+                        }
+                    }
+                    list2000adpater.notifyDataSetChanged();
                     break;
             }
         }
     }
+    private void setSpinneradpater(Spinner spinner, String[] list )
+    {
+        int i=0;
+        ArrayList<String> arrayList;
+        arrayList=new ArrayList<>();
+        for(i=0;i<list.length;i++)
+        {
+            arrayList.add(list[i]);
+        }
+        //适配器
+        ArrayAdapter<String> arr_adapter;
+        Activity activity=getActivity();
+        if(activity!=null)
+        {
+            arr_adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, arrayList);
+            //设置样式
+            arr_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            //加载适配器
+            spinner.setAdapter(arr_adapter);
+        }
+    }
 
+    private class OnItemSelectListernerompl implements AdapterView.OnItemSelectedListener {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            Log.d("zl","OnItemSelectListernerompl:"+position);
+            mcurSelect=position;
+            if(mcurSelect!=mpreselect)
+            {
+                initsendbuf();
+                sendcmeindex=2;
+                String readOutMsg = DigitalTrans.byte2hex(bufofreadcmd[sendcmeindex]);
+                Log.d("zl","OnItemSelectListernerompl:"+CodeFormat.byteToHex(bufofreadcmd[sendcmeindex],bufofreadcmd[sendcmeindex].length));
+                verycutstatus(readOutMsg);
+            }
+            mpreselect=mcurSelect;
+            mIsatart=true;
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    }
 }

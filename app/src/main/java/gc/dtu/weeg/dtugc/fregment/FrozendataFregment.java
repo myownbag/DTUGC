@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.view.WindowManager;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -40,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
 import gc.dtu.weeg.dtugc.bluetooth.BluetoothState;
+import gc.dtu.weeg.dtugc.myview.CustomDialog;
 import gc.dtu.weeg.dtugc.sqltools.FreezedataSqlHelper;
 import gc.dtu.weeg.dtugc.sqltools.MytabCursor;
 import gc.dtu.weeg.dtugc.sqltools.MytabOperate;
@@ -86,6 +88,11 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     private final int BLOCK_SIZE = 5;//阻塞队列大小
     private final long KEEP_ALIVE_TIME = 2;//空闲线程超时时间
     private ThreadPoolExecutor executorPool;
+
+    public  int mTotleitems=0;
+    public  int mCurpage=0;
+    public  int mTotlepage=0;
+    public CustomDialog minfodlg;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -119,6 +126,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         mlistview=mView.findViewById(R.id.freeze_data_list_view);
         myadpater=new listviewadpater();
         mlistview.setAdapter(myadpater);
+      //  mlistview.setOnScrollListener(new Onscallingimpl());
         setSpinneradpater(mSpiner,mylist);
         Btest=mView.findViewById(R.id.testdb);
         Btest.setOnClickListener(new View.OnClickListener() {
@@ -173,6 +181,13 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                         FrozendataFregment.this.helper.getReadableDatabase()) ;
              int temp=   cur.getcount("14010001");
              Log.d("zl","总数是:"+temp);
+            }
+        });
+
+        minfodlg= CustomDialog.createProgressDialog(MainActivity.getInstance(), 5000, new CustomDialog.OnTimeOutListener() {
+            @Override
+            public void onTimeOut(CustomDialog dialog) {
+                minfodlg.dismiss();
             }
         });
     }
@@ -428,6 +443,10 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
             mIsTotleRDing=true;
           // parseallfrosendataThread.start();
             //MainActivity.getInstance().getcurblueservice().SetBlockmode(true);
+            mTotlepage=0;
+            mTotleitems=0;
+            mCurpage=0;
+            mlistdata.clear();
         }
         else
         {
@@ -469,8 +488,9 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         }
     }
     private void verycutstatus(String readOutMsg,int timeout) {
-        MainActivity parentActivity1 = (MainActivity) getActivity();
-        String strState1 = parentActivity1.GetStateConnect();
+        MainActivity parentActivity1 = MainActivity.getInstance();
+        String strState1="无连接";
+        strState1 = parentActivity1.GetStateConnect();
         if(!strState1.equalsIgnoreCase("无连接"))
         {
 //            parentActivity1.mDialog.show();
@@ -601,13 +621,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
          if(semaphore.tryAcquire()  )
          {
 //             Log.d("zl","updatelistview run");
-             MytabCursor cur = new MytabCursor(	// 实例化查询
-                     // 取得SQLiteDatabase对象
-                     FrozendataFregment.this.helper.getReadableDatabase()) ;
-//             ArrayList<Map<String,String>> all  =      cur.find1("14010001",
-//                     "DESC"
-//                     ,-1,3);   //MainActivity.getInstance().getmConnectedDeviceName()
-
+             MytabCursor cur = new MytabCursor(FrozendataFregment.this.helper.getReadableDatabase());
              ArrayList<Map<String,String>> all  = cur.find1(MainActivity.getInstance().getmConnectedDeviceName(),
                      "DESC"
                      ,-1,0);   //MainActivity.getInstance().getmConnectedDeviceName()
@@ -616,25 +630,34 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                  Log.d("zl","all=null");
                  return;
              }
-             int count=all.size();
-             int i;
-             mlistdata.clear();
-             for(i=0;i<count;i++)
+             mTotleitems=all.size();
+             mTotlepage=mTotleitems/Constants.NUMOFGAGE;
+             if(mTotleitems%Constants.NUMOFGAGE>0)
              {
-                 Log.d("zl",""+i+":"
-                         +all.get(i).get("mac")+"  "
-                         +all.get(i).get("temp")+"  "
-                         +all.get(i).get("press1")+"  "
-                         +all.get(i).get("press2")+"  "
-                         +all.get(i).get("time")+"\r\n"
-                 );
-                 Map<String,String> map=new HashMap();
-                 map.put("temp","");
-                 map.put("press1",all.get(i).get("press1"));
-                 map.put("press2",all.get(i).get("press2"));
-                 map.put("time",all.get(i).get("time"));
-                 mlistdata.add(map);
+                 mTotlepage+=1;
              }
+             mlistdata.clear();
+//             int i;
+//             for(i=0;i<Constants.NUMOFGAGE;i++)
+//             {
+//                 /*
+//                 Log.d("zl",""+i+":"
+//                         +all.get(i).get("mac")+"  "
+//                         +all.get(i).get("temp")+"  "
+//                         +all.get(i).get("press1")+"  "
+//                         +all.get(i).get("press2")+"  "
+//                         +all.get(i).get("time")+"\r\n"
+//                 );
+////                 */
+//                 Map<String,String> map=new HashMap();
+//                 map.put("temp","");
+//                 map.put("press1",all.get(i).get("press1"));
+//                 map.put("press2",all.get(i).get("press2"));
+//                 map.put("time",all.get(i).get("time"));
+//                 mlistdata.add(map);
+//             }
+             mlistdata.clear();
+             mlistdata=all;
              myadpater.notifyDataSetChanged();
              semaphore.release();
              return;
@@ -701,7 +724,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                     +"'"+time1 +"'";
             try {
                 FrozendataFregment.this.semaphore.acquire();
-                Log.d("zl","获取成功");
+             //   Log.d("zl","获取成功");
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 FrozendataFregment.this.semaphore.release();
@@ -789,5 +812,31 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         }
     }
 
+   public class Onscallingimpl implements AbsListView.OnScrollListener {
+        int mscrollState=0;
+        int mfirstVisibleItem=0;
+        int mvisibleItemCount=0;
+        int mtotalItemCount=0;
+       @Override
+       public void onScrollStateChanged(AbsListView view, int scrollState) {
+            Log.d("zl","onScrollStateChanged: "+scrollState);
 
+           mscrollState=scrollState;
+           if(mtotalItemCount!=0)
+           {
+
+           }
+       }
+
+       @Override
+       public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+           Log.d("zl","onScroll firstVisibleItem  visibleItemCount totalItemCount : "+firstVisibleItem+"-"
+                   +visibleItemCount+"-"+totalItemCount);
+
+           mfirstVisibleItem=firstVisibleItem;
+           mvisibleItemCount=visibleItemCount;
+           mtotalItemCount=totalItemCount;
+
+       }
+   }
 }

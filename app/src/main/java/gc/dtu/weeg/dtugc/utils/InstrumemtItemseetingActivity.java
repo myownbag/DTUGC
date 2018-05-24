@@ -37,6 +37,7 @@ public class InstrumemtItemseetingActivity extends FragmentActivity implements V
     private instrumentComSetFragment fragment1;
     private instrumenttimegapFragment fragment2;
     private instrumentWorkModeSetFragment fragment3;
+    private instrumentWorkModeSetFragment fragment4;
     private Button mButwrite;
     private static Activity activity;
     public ArrayList<Map<String,String>> settings;
@@ -164,8 +165,17 @@ public class InstrumemtItemseetingActivity extends FragmentActivity implements V
                 Bundle bundle_3 = new Bundle();
                 String[] tempset=intent.getStringArrayExtra("listdata");
                 bundle_3.putStringArray("listdata",tempset);
+                bundle_3.putInt("regsetting",2000);
                 fragment3.setArguments(bundle_3);
                 transaction.replace(R.id.content_insitem, fragment3);
+                break;
+            case 2001:
+                Bundle bundle_4 = new Bundle();
+                String[] tempset1=intent.getStringArrayExtra("listdata");
+                bundle_4.putStringArray("listdata",tempset1);
+                bundle_4.putInt("regsetting",2001);
+                fragment4.setArguments(bundle_4);
+                transaction.replace(R.id.content_insitem, fragment4);
                 break;
         }
         transaction.commit();
@@ -180,6 +190,8 @@ public class InstrumemtItemseetingActivity extends FragmentActivity implements V
         fragments.add(fragment2);
         fragment3=new instrumentWorkModeSetFragment();
         fragments.add(fragment3);
+        fragment4=new instrumentWorkModeSetFragment();
+        fragments.add(fragment4);
     }
 
     private void initdata()
@@ -208,6 +220,7 @@ public class InstrumemtItemseetingActivity extends FragmentActivity implements V
         ByteBuffer buf1;
         buf1=ByteBuffer.allocateDirect(headbuf.length);
         buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+        Log.d("zl","InstrumemtItemseetingActivity onClick:"+reg);
         switch (reg)
         {
             case 1998:
@@ -223,6 +236,10 @@ public class InstrumemtItemseetingActivity extends FragmentActivity implements V
             case 2000:
                 headbuf[3]=0x27;
                 headbuf[14]= (byte) 0xD0;
+                sendbuf=new byte[44];
+            case 2001:
+                headbuf[3]=0x27;
+                headbuf[14]= (byte) 0xD1;
                 sendbuf=new byte[44];
                 break;
         }
