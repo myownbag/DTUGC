@@ -95,7 +95,7 @@ public class InstrumentInputFregment extends BaseFragment {
     private void initview() {
         mReg1998clickrecv.setOnClickListener(new OnMyclicklisternerImp());
         mReg1999clickrecv.setOnClickListener(new OnMyclicklisternerImp());
-        mReg2000clickrecv.setOnClickListener(new OnMyclicklisternerImp());
+       // mReg2000clickrecv.setOnClickListener(new OnMyclicklisternerImp());
         mbutread.setOnClickListener(new Onbutclicklisterner());
     }
 
@@ -381,6 +381,8 @@ public class InstrumentInputFregment extends BaseFragment {
         public void onClick(View v) {
             mIsatart=true;
             sendcmeindex=0;
+            mcurSelect=mCannelSpiner.getSelectedItemPosition();
+            mpreselect=mcurSelect;
             initsendbuf();
             String readOutMsg = DigitalTrans.byte2hex(bufofreadcmd[sendcmeindex]);
             verycutstatus(readOutMsg);

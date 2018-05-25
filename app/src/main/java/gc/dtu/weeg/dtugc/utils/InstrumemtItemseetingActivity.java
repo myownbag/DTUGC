@@ -237,6 +237,7 @@ public class InstrumemtItemseetingActivity extends FragmentActivity implements V
                 headbuf[3]=0x27;
                 headbuf[14]= (byte) 0xD0;
                 sendbuf=new byte[44];
+                break;
             case 2001:
                 headbuf[3]=0x27;
                 headbuf[14]= (byte) 0xD1;
