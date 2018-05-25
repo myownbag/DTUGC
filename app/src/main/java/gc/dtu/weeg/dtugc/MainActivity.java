@@ -34,6 +34,7 @@ import java.util.List;
 import gc.dtu.weeg.dtugc.bluetooth.BluetoothService;
 import gc.dtu.weeg.dtugc.bluetooth.BluetoothState;
 import gc.dtu.weeg.dtugc.bluetooth.DeviceListActivity;
+import gc.dtu.weeg.dtugc.fregment.AppVersioninfoFregment;
 import gc.dtu.weeg.dtugc.fregment.BaseFragment;
 import gc.dtu.weeg.dtugc.fregment.BasicinfoFregment;
 import gc.dtu.weeg.dtugc.fregment.CNKFixedPagerAdapter;
@@ -91,7 +92,8 @@ public class MainActivity extends FragmentActivity {
     private ViewGroup mClassContainer;
     int mScrollX = 0;
     private List<BaseFragment> fragments;
-    private String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置", "传感器设置", "仪表接入","压力传感器配置","NB业务注册"};
+    private String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置"
+            , "传感器设置", "仪表接入","压力传感器配置","NB业务注册","版本信息"};
     //蓝牙状态保存
     public Boolean mIsconnect = false;
     // Name of the connected device
@@ -117,6 +119,7 @@ public class MainActivity extends FragmentActivity {
     public InstrumentInputFregment fregment6;
     public PressSensoraddSetframent fregment7;
     public NBRegisiterfragment      fregment8;
+    public AppVersioninfoFregment   fregment9;
 
 
     //接口
@@ -368,6 +371,13 @@ public class MainActivity extends FragmentActivity {
         fregment8.setArguments(bundle7);
         fragments.add(fregment8);
 
+        fregment9 =new AppVersioninfoFregment();
+        Bundle bundle8= new Bundle();
+        bundle8.putInt("position",index);
+        bundle8.putString("extra",titles[index++]);
+        fregment9.setArguments(bundle8);
+        fragments.add(fregment9);
+
 //        sixthFragment = new Pressure2Fragment();
 //        Bundle bundle6 = new Bundle();
 //        bundle6.putString("extra",titles[index++]);
@@ -560,7 +570,7 @@ public class MainActivity extends FragmentActivity {
 
     public void sendData(String data, String strOwner,int timeout) {
 
-
+        Log.d("zl","MainActivity:"+data);
         // Check that we're actually connected before trying anything
         if (mBTService.getState() != BluetoothState.STATE_CONNECTED) {
 
@@ -580,7 +590,6 @@ public class MainActivity extends FragmentActivity {
             {
                 if(mThreedTimeout==null)
                 {
-                    mThreedTimeout=new BlueToothTimeOutMornitor(timeout);
                     mThreedTimeout=new BlueToothTimeOutMornitor(timeout);
                     mThreedTimeout.start();
                 }
@@ -709,14 +718,6 @@ public class MainActivity extends FragmentActivity {
         void datacometoparse(String readOutMsg1,byte[] readOutBuf1);
     }
 
-//    public interface OnPageSelectedinviewpager
-//    {
-//        void currentviewpager(int position);
-//    }
-//    public void SetonPageSelectedinviewpager(OnPageSelectedinviewpager onPageSelectedinviewpager )
-//    {
-//        myOnPageSelectedinviewpager=onPageSelectedinviewpager;
-//    }
     public void setOndataparse(Ondataparse ondataparse)
     {
         mydataparse=ondataparse;
