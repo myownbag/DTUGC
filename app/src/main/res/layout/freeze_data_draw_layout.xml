@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <lecho.lib.hellocharts.view.PreviewLineChartView
+    <lecho.lib.hellocharts.view.LineChartView
+        android:id="@+id/freese_data_draw_chat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />

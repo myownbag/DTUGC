@@ -24,6 +24,13 @@ public class NbServiceAddrInputActivity extends Activity {
         setContentView(R.layout.nb_service_addr_input_layout);
         but=findViewById(R.id.butnbaddrcommite);
         edtext=findViewById(R.id.edtextnbaddripput);
+        String addrurl;
+        SharedPreferences sp=null;
+        sp=getSharedPreferences("User", Context.MODE_PRIVATE);
+        addrurl=sp.getString(Constants.NB_SERVICE_KEY,"");
+        Log.d("zl","onActivityResult: "+addrurl);
+        edtext.setText(addrurl);
+
         but.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

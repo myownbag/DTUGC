@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -48,6 +49,7 @@ import gc.dtu.weeg.dtugc.sqltools.MytabOperate;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
+import gc.dtu.weeg.dtugc.utils.FreezeDataDrawChartActivit;
 import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
 /**
@@ -60,6 +62,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     private Button Btest;
     private Button Brd;
     private Button Btotle;
+    private Button Btdraw;
     public Spinner mSpiner;
     public boolean mIsTotleRDing=false;
     public ListView mlistview;
@@ -181,6 +184,15 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                         FrozendataFregment.this.helper.getReadableDatabase()) ;
              int temp=   cur.getcount("14010001");
              Log.d("zl","总数是:"+temp);
+            }
+        });
+
+        Btdraw=mView.findViewById(R.id.testdraw);
+        Btdraw.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.getInstance(), FreezeDataDrawChartActivit.class);
+                startActivity(intent);
             }
         });
 

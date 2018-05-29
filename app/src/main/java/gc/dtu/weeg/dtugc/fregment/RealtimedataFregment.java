@@ -54,7 +54,7 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
 
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
-       // Log.d("zl", "OndataCometoParse: "+readOutMsg1);
+       // Log.d("zl", "OndataCometoParse: "+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
         if(!mIsatart)
         {
             return;

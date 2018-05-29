@@ -86,6 +86,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="总数"/>
+        <Button
+            android:id="@+id/testdraw"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="画图"
+            />
     </LinearLayout>
 
 </LinearLayout>
