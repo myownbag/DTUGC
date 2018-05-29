@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 
 import android.view.WindowManager;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -129,6 +130,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
         mlistview=mView.findViewById(R.id.freeze_data_list_view);
         myadpater=new listviewadpater();
         mlistview.setAdapter(myadpater);
+        mlistview.setOnItemClickListener(new OnlistviewItemClickedimpl());
       //  mlistview.setOnScrollListener(new Onscallingimpl());
         setSpinneradpater(mSpiner,mylist);
         Btest=mView.findViewById(R.id.testdb);
@@ -192,6 +194,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(MainActivity.getInstance(), FreezeDataDrawChartActivit.class);
+                intent.putExtra(Constants.DEVICEID, "84710001"); //84710001  94710004
                 startActivity(intent);
             }
         });
@@ -849,6 +852,16 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
            mvisibleItemCount=visibleItemCount;
            mtotalItemCount=totalItemCount;
 
+       }
+   }
+   public class OnlistviewItemClickedimpl implements AdapterView.OnItemClickListener {
+
+       @Override
+       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+           Intent intent=new Intent(MainActivity.getInstance(), FreezeDataDrawChartActivit.class);
+           intent.putExtra(Constants.DEVICEID, MainActivity.getInstance().getmConnectedDeviceName());
+           Log.d("zl", "onItemClick: "+MainActivity.getInstance().getmConnectedDeviceName());
+           startActivity(intent);
        }
    }
 }

@@ -55,4 +55,9 @@ public class Constants {
     public static final int NB_FRESONDATA_KEY_TASKFINISHED_FINISHED=2;
 
     public static final int NUMOFGAGE=20;
+
+    //图表常量关键字
+    public static final String DEVICEID = "deviceid";
+    public static final String DEVICECHART1 = "press1";
+    public static final String DEVICECHART2 = "press2";
 }

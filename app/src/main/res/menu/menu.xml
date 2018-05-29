@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/munu_press1"
+        android:title="压力1"
+        android:visible="true" />
+    <item
+        android:id="@+id/munu_press2"
+        android:title="压力2"
+        android:visible="true" />
+</menu>
