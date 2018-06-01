@@ -20,6 +20,7 @@ import gc.dtu.weeg.dtugc.fregment.FrozendataFregment;
 import gc.dtu.weeg.dtugc.sqltools.FreezedataSqlHelper;
 import gc.dtu.weeg.dtugc.sqltools.MytabCursor;
 import gc.dtu.weeg.dtugc.sqltools.MytabOperate;
+import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.listener.LineChartOnValueSelectListener;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
@@ -30,6 +31,8 @@ import lecho.lib.hellocharts.model.ValueShape;
 import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.LineChartView;
+
+import static lecho.lib.hellocharts.gesture.ZoomType.HORIZONTAL;
 
 public class FreezeDataDrawChartActivit extends AppCompatActivity {
     public LineChartView mLinercharview;
@@ -74,9 +77,13 @@ public class FreezeDataDrawChartActivit extends AppCompatActivity {
         actionBar.setTitle("压力1");
 
         mLinercharview.setViewportCalculationEnabled(false);
+//        mLinercharview.setZoomType(ZoomType.HORIZONTAL);
+//        Log.d("zl","getMaxZoom"+mLinercharview.getMaxZoom());
+//        mLinercharview.getMaxZoom();
+        mLinercharview.setMaxZoom(100);
         intent=getIntent();
         mstraddr= intent.getStringExtra(Constants.DEVICEID);
-        Log.d("zl","FreezeDataDrawChartActivit onCreate: "+mstraddr);
+        //Log.d("zl","FreezeDataDrawChartActivit onCreate: "+mstraddr);
         getdata(mstraddr);
 
         generateData(all,Constants.DEVICECHART1);
@@ -86,21 +93,16 @@ public class FreezeDataDrawChartActivit extends AppCompatActivity {
     private void generateData(ArrayList<Map<String, String>> alldata,String key) {
         int len=alldata.size();
         String temp;
-        values = new ArrayList<PointValue>();
+        values = new ArrayList<>();
         mAxisXValues.clear();
-        List<Line> lines = new ArrayList<Line>();
+        List<Line> lines = new ArrayList<>();
         int index=0;
         for(int i=0;i<len;i++)
         {
             temp=alldata.get(i).get(key);
-            if(temp.equals(Constants.SENSOR_DISCONNECT)||temp.equals(Constants.SENSOR_ERROR))
-            {
-                continue;
-            }
-            else
-            {
+            if (!temp.equals(Constants.SENSOR_DISCONNECT) && !temp.equals(Constants.SENSOR_ERROR)) {
 
-                float tempfloat=Float.valueOf(temp).floatValue();
+                float tempfloat= Float.valueOf(temp);
                 if(tempfloat>mMaxValue)
                 {
                     mMaxValue=(int) tempfloat;
@@ -124,6 +126,8 @@ public class FreezeDataDrawChartActivit extends AppCompatActivity {
         line.setHasLines(hasLines);
         line.setHasPoints(hasPoints);
 
+        //line.setMaxLabelChars
+
 
 
 //        line.setHasGradientToTransparent(hasGradientToTransparent);
@@ -137,12 +141,12 @@ public class FreezeDataDrawChartActivit extends AppCompatActivity {
             Axis axisX = new Axis();
             Axis axisY = new Axis().setHasLines(true);
             if (hasAxesNames) {
-                axisX.setName("Axis X");
-                axisY.setName("Axis Y");
+                axisX.setName("采样时间");
+                axisY.setName("压力值");
 //                getAxisXLables();
                 axisX.setValues(mAxisXValues);
                // axisX.setHasTiltedLabels(true);  斜体
-                axisX.setMaxLabelChars(2); //最多几个X轴坐标，意思就是你的缩放让X轴上数据的个数7<=x<=mAxisXValues.length
+                axisX.setMaxLabelChars(5); //最多几个X轴坐标，意思就是你的缩放让X轴上数据的个数7<=x<=mAxisXValues.length
                 axisX.setHasLines(true); //x 轴分割线
             }
             data.setAxisXBottom(axisX);
@@ -174,17 +178,17 @@ public class FreezeDataDrawChartActivit extends AppCompatActivity {
             return;
         }
         int count=all.size();
-        int i;
-        for(i=0;i<count;i++)
-        {
-            Log.d("zl",""+i+":"
-                    +all.get(i).get("mac")+"  "
-                    +all.get(i).get("temp")+"  "
-                    +all.get(i).get("press1")+"  "
-                    +all.get(i).get("press2")+"  "
-                    +all.get(i).get("time")+"\r\n"
-            );
-        }
+//        int i;
+//        for(i=0;i<count;i++)
+//        {
+//            Log.d("zl",""+i+":"
+//                    +all.get(i).get("mac")+"  "
+//                    +all.get(i).get("temp")+"  "
+//                    +all.get(i).get("press1")+"  "
+//                    +all.get(i).get("press2")+"  "
+//                    +all.get(i).get("time")+"\r\n"
+//            );
+//        }
 
     }
 
@@ -229,13 +233,12 @@ public class FreezeDataDrawChartActivit extends AppCompatActivity {
         v.bottom = 0;
         v.top = temp+temp1;
         v.left = 0;
-        v.right = numberOfPoints;
+        v.right =  numberOfPoints;  //numberOfPoints;
         mLinercharview.setMaximumViewport(v);
         v.bottom = 0;
         v.top = temp+temp1;
         v.left = 0;
         v.right = 5;
-
         mLinercharview.setCurrentViewport(v);
     }
 
@@ -285,7 +288,9 @@ public class FreezeDataDrawChartActivit extends AppCompatActivity {
 
         @Override
         public void onValueSelected(int i, int i1, PointValue pointValue) {
-               String temp=new String(mAxisXValues.get(i).getLabelAsChars());
+
+                Log.d("zl","i="+i+"  "+"i1="+i1);
+               String temp=new String(mAxisXValues.get(i1).getLabelAsChars());
                 Toast.makeText(FreezeDataDrawChartActivit.this
                         ,"时间："+temp+"  "+"压力值:"+pointValue.getY(),Toast.LENGTH_SHORT).show();
         }

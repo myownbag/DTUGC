@@ -211,7 +211,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1)
     {
         //MainActivity.getInstance().mDialog.dismiss();
-   //     Log.d("zl","OndataCometoParse1:"+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
+//        Log.d("zl","OndataCometoParse1:"+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
         //Log.d("zl","name:"+MainActivity.getInstance().getmConnectedDeviceName());
 
         boolean need2stroe=false;
@@ -860,7 +860,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
            Intent intent=new Intent(MainActivity.getInstance(), FreezeDataDrawChartActivit.class);
            intent.putExtra(Constants.DEVICEID, MainActivity.getInstance().getmConnectedDeviceName());
-           Log.d("zl", "onItemClick: "+MainActivity.getInstance().getmConnectedDeviceName());
+   //        Log.d("zl", "onItemClick: "+MainActivity.getInstance().getmConnectedDeviceName());
            startActivity(intent);
        }
    }
