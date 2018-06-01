@@ -72,8 +72,10 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
     public SimpleDateFormat myFmt;
     public ParseallfrosendataThread parseallfrosendataThread;
     public detectTaskisFinishedThread detecttherad;
-//    public ByteArrayOutputStream mbout = new ByteArrayOutputStream();
-//    public BufferedOutputStream  mbufout=new BufferedOutputStream(mbout);
+
+    public byte[] mbufcut;
+    public int behindnum=0;
+
     public Handler handler=MainActivity.getInstance().mHandler;
     String [] mylist={"最新第一条","最新第二条","最新第三条","最新第四条","最新第五条","全部数据"};
     byte sendbufread[]={(byte) 0xFD, 0x00 ,0x00 ,0x11 ,        0x00 ,0x24 ,0x00 ,        0x00 ,0x00 ,0x00
@@ -87,7 +89,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
 
     //线程池
     private Semaphore semaphore = new Semaphore(1);
-    private final int CORE_POOL_SIZE = 5;//核心线程数
+    private final int CORE_POOL_SIZE = 10;//核心线程数
     private final int MAX_POOL_SIZE = 20;//最大线程数
     private final int BLOCK_SIZE = 5;//阻塞队列大小
     private final long KEEP_ALIVE_TIME = 2;//空闲线程超时时间
@@ -227,7 +229,54 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
                 parseallfrosendataThread.interrupt();
                 parseallfrosendataThread=null;
             }
-            executorPool.execute(new ParseBlockDataThread(readOutBuf1));
+            if(mbufcut==null)
+            {
+                executorPool.execute(new ParseBlockDataThread(readOutBuf1));
+
+                behindnum=readOutBuf1.length%32;
+                if(behindnum>0)
+                {
+                    mbufcut=new byte[behindnum];
+                    ByteBuffer buffer= ByteBuffer.allocateDirect(behindnum);
+                    buffer=buffer.order(ByteOrder.LITTLE_ENDIAN);
+                    buffer.put(readOutBuf1,readOutBuf1.length-behindnum,behindnum);
+                    buffer.rewind();
+                    buffer.get(mbufcut);
+                }
+            }
+            else
+            {
+                byte [] bytes;
+                bytes=new byte[mbufcut.length+readOutBuf1.length];
+
+                ByteBuffer buffer= ByteBuffer.allocateDirect(mbufcut.length);
+                buffer=buffer.order(ByteOrder.LITTLE_ENDIAN);
+                buffer.put(mbufcut);
+                buffer.rewind();
+                buffer.get(bytes,0,mbufcut.length);
+
+
+                buffer= ByteBuffer.allocateDirect(readOutBuf1.length);
+                buffer=buffer.order(ByteOrder.LITTLE_ENDIAN);
+                buffer.put(readOutBuf1);
+                buffer.rewind();
+                buffer.get(bytes,mbufcut.length,readOutBuf1.length);
+
+                mbufcut=null;
+
+                executorPool.execute(new ParseBlockDataThread(bytes));
+
+                behindnum=bytes.length%32;
+                if(behindnum>0)
+                {
+                    mbufcut=new byte[behindnum];
+                    buffer= ByteBuffer.allocateDirect(behindnum);
+                    buffer.put(bytes,bytes.length-behindnum,behindnum);
+                    buffer.rewind();
+                    buffer.get(mbufcut);
+                }
+            }
+//            executorPool.execute(new ParseBlockDataThread(readOutBuf1));
 //            Log.d("zl","队列长度"+executorPool.getQueue().size());
 //            Log.d("zl","getactivityTask"+executorPool.getActiveCount());
             parseallfrosendataThread = new ParseallfrosendataThread();

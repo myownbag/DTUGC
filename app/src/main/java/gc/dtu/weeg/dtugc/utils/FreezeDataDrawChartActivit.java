@@ -80,7 +80,7 @@ public class FreezeDataDrawChartActivit extends AppCompatActivity {
 //        mLinercharview.setZoomType(ZoomType.HORIZONTAL);
 //        Log.d("zl","getMaxZoom"+mLinercharview.getMaxZoom());
 //        mLinercharview.getMaxZoom();
-        mLinercharview.setMaxZoom(100);
+        mLinercharview.setMaxZoom(200);
         intent=getIntent();
         mstraddr= intent.getStringExtra(Constants.DEVICEID);
         //Log.d("zl","FreezeDataDrawChartActivit onCreate: "+mstraddr);
