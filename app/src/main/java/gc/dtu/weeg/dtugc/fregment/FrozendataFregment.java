@@ -89,8 +89,8 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
 
     //线程池
     private Semaphore semaphore = new Semaphore(1);
-    private final int CORE_POOL_SIZE = 10;//核心线程数
-    private final int MAX_POOL_SIZE = 20;//最大线程数
+    private final int CORE_POOL_SIZE = 50;//核心线程数
+    private final int MAX_POOL_SIZE = 50;//最大线程数
     private final int BLOCK_SIZE = 5;//阻塞队列大小
     private final long KEEP_ALIVE_TIME = 2;//空闲线程超时时间
     private ThreadPoolExecutor executorPool;
@@ -908,6 +908,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
        @Override
        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
            Intent intent=new Intent(MainActivity.getInstance(), FreezeDataDrawChartActivit.class);
+           Log.d("zl",""+MainActivity.getInstance().getmConnectedDeviceName());
            intent.putExtra(Constants.DEVICEID, MainActivity.getInstance().getmConnectedDeviceName());
    //        Log.d("zl", "onItemClick: "+MainActivity.getInstance().getmConnectedDeviceName());
            startActivity(intent);
