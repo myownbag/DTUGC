@@ -283,7 +283,7 @@ public class ItemSetingActivity extends Activity {
                 ipanport[0]="";
                 for(int ichar=0;ichar<mytestbyte.length;ichar++)
                 {
-                    if(mytestbyte[ichar]>=0x31&&mytestbyte[ichar]<=0x39)
+                    if(mytestbyte[ichar]>=0x30&&mytestbyte[ichar]<=0x39)
                     {
                         if(kjudge==0)
                         {
@@ -363,7 +363,8 @@ public class ItemSetingActivity extends Activity {
                     int l=temp.indexOf(";");
                     if(l==-1)
                           break;
-                    CStringFormatArray(temp.substring(0,l-1),daytime,transmit);
+                    CStringFormatArray(temp.substring(0,l),daytime,transmit);
+//                    Log.d("zl","daytime:"+daytime[0]+"-"+daytime[1]+"-"+daytime[2]);
                     if (transmit==0x01&&daytime[0]==0xff)
                     {
                         //AfxMessageBox("210—数据传输频率与设置不匹配<星期一,12:30>！");
@@ -380,11 +381,12 @@ public class ItemSetingActivity extends Activity {
                     }
                     for( i=0;i<3;i++)
                     {
-                        sendbuf[16+d*3]=daytime[i];
+                        sendbuf[16+d*3+i]=daytime[i];
                     }
                     temp=temp.substring(l+1,temp.length());
                 }
                 CodeFormat.crcencode(sendbuf);
+//                Log.d("zl","addrtemp.equals 210:"+CodeFormat.byteToHex(sendbuf,sendbuf.length));
             }
             else
             {
@@ -438,6 +440,7 @@ public class ItemSetingActivity extends Activity {
     }
 
     private void CStringFormatArray(String regstrbuf, byte [] daytime, int transmit) {
+//        Log.d("zl","CStringFormatArray regstrbuf:"+regstrbuf);
         int l=regstrbuf.indexOf(",");
         if (l!=-1&&transmit==1)
         {
@@ -474,10 +477,13 @@ public class ItemSetingActivity extends Activity {
         }
         l=regstrbuf.indexOf(":");
         byte [] byteteturn=new byte[2];
-        String temp1=regstrbuf.substring(0,l-1);
+        String temp1=regstrbuf.substring(0,l);
+
         daytime[1]= (byte) (Integer.valueOf(temp1)%0x100);
-        temp1=regstrbuf.substring(l+1,temp1.length());
+       // Log.d("zl","CStringFormatArray daytime[1]:"+daytime[1]);
+        temp1=regstrbuf.substring(l+1,regstrbuf.length());
         daytime[2]= (byte) (Integer.valueOf(temp1)%0x100);
+       // Log.d("zl","CStringFormatArray daytime[2]:"+daytime[2]);
     }
 
     private class MyEditTextChangeListener implements TextWatcher
