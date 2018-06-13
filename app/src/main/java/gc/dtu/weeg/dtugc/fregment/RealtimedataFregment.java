@@ -30,6 +30,15 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
     public Button mBut;
     public TextView mPress1view;
     public TextView mPress2view;
+    public TextView mWarnview;
+    public TextView mTempview;
+    public TextView mPressview;
+    public TextView mFluxview;
+    public TextView mRealFluxview;
+    public TextView mVolumeView;
+    public TextView mRealVolumeview;
+    public int step=0;
+
     byte sendbufread[]={(byte) 0xFD, 0x00 ,0x00 ,0x0D ,        0x00 ,0x19 ,0x00 ,        0x00 ,0x00 ,0x00
             ,0x00 ,0x00 ,0x00 ,0x00 , (byte) 0xD9 ,0x00 ,0x0C , (byte) 0xA0};
     @Nullable
@@ -47,14 +56,24 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
 
     private void initView() {
         mBut=mView.findViewById(R.id.realtime_but);
+        mWarnview=mView.findViewById(R.id.real_time_warn_addr);
         mPress1view=mView.findViewById(R.id.real_time_press1);
         mPress2view=mView.findViewById(R.id.real_time_press2);
+
+        mTempview=mView.findViewById(R.id.real_tem_timeinfo);
+        mPressview =mView.findViewById(R.id.real_press_timeinfo);
+        mFluxview =mView.findViewById(R.id.real_flux_timeinfo);
+        mRealFluxview=mView.findViewById(R.id.real_realflux_timeinfo);
+        mVolumeView =mView.findViewById(R.id.real_volume_timeinfo);
+        mRealVolumeview=mView.findViewById(R.id.real_realvolume_timeinfo);
+
+
         mBut.setOnClickListener(this);
     }
 
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
-       // Log.d("zl", "OndataCometoParse: "+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
+        Log.d("zl", "OndataCometoParse: "+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length)+"\r\nStep:"+step);
         if(!mIsatart)
         {
             return;
@@ -73,53 +92,64 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
                 return;
             }
         }
-        MainActivity.getInstance().mDialog.dismiss();
-        ByteBuffer buf1;
+        if(step==0)
+        {
+
+
+            parsecurrentdata(readOutBuf1,18,mWarnview,"");
+            parsecurrentdata(readOutBuf1,22,mPress1view,"Kpa");
+            parsecurrentdata(readOutBuf1,26,mPress2view,"Kpa");
+
+            ByteBuffer buf1;
+            buf1=ByteBuffer.allocateDirect(4);
+            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+            buf1.putInt(6130);
+            buf1.rewind();
+            buf1.get(sendbufread,14,2);
+            CodeFormat.crcencode(sendbufread);
+            String readOutMsg = DigitalTrans.byte2hex(sendbufread);
+            verycutstatus(readOutMsg);
+            step++;
+            return;
+        }
+
+        else if(step==1)
+        {
+            parsecurrentdata(readOutBuf1,18,mTempview,"℃");
+            parsecurrentdata(readOutBuf1,22,mPressview,"Kpa");
+            parsecurrentdata(readOutBuf1,26,mFluxview,"");
+            parsecurrentdata(readOutBuf1,30,mRealFluxview,"");
+            parsecurrentdata(readOutBuf1,34,mVolumeView,"");
+            parsecurrentdata(readOutBuf1,38,mRealVolumeview,"");
+            MainActivity.getInstance().mDialog.dismiss();
+        }
+
+    }
+
+    private void parsecurrentdata(byte[] readOutBuf1,int offset,TextView view,String unit) {
+        int temp;ByteBuffer buf1;
         buf1=ByteBuffer.allocateDirect(4);
         buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
-        buf1.put(readOutBuf1,22,4);
+        buf1.put(readOutBuf1,offset,4);
         buf1.rewind();
         temp=buf1.getInt();
         if(temp==0)
         {
-            mPress1view.setText("未连接");
+            view.setText("未连接");
         }
         else if(temp==0xffffffff)
         {
-            mPress1view.setText("传感器故障");
+            view.setText("传感器故障");
         }
         else
         {
 
             buf1=ByteBuffer.allocateDirect(4);
             buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
-            buf1.put(readOutBuf1,22,4);
+            buf1.put(readOutBuf1,offset,4);
             buf1.rewind();
             float pressflaot =buf1.getFloat();
-            mPress1view.setText(""+pressflaot+" kPa");
-
-        }
-        buf1=ByteBuffer.allocateDirect(4);
-        buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
-        buf1.put(readOutBuf1,26,4);
-        buf1.rewind();
-        temp=buf1.getInt();
-        if(temp==0)
-        {
-            mPress2view.setText("未连接");
-        }
-        else if(temp==0xffffffff)
-        {
-            mPress2view.setText("传感器故障");
-        }
-        else
-        {
-            buf1=ByteBuffer.allocateDirect(4);
-            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
-            buf1.put(readOutBuf1,26,4);
-            buf1.rewind();
-            float pressflaot =buf1.getFloat();
-            mPress2view.setText(""+pressflaot+" kPa");
+            view.setText(""+pressflaot+unit);
         }
     }
 
@@ -140,9 +170,23 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
         String readOutMsg = DigitalTrans.byte2hex(sendbufread);
         verycutstatus(readOutMsg);
         mIsatart=true;
+        clearshow();
+        step=0;
+    }
+
+    private void clearshow() {
+        mWarnview.setText("");
         mPress1view.setText("");
         mPress2view.setText("");
+
+        mTempview.setText("");
+        mPressview.setText("");
+        mFluxview.setText("");
+        mRealFluxview.setText("");
+        mVolumeView.setText("");
+        mRealVolumeview.setText("");
     }
+
     private void verycutstatus(String readOutMsg) {
         MainActivity parentActivity1 = (MainActivity) getActivity();
         String strState1 = parentActivity1.GetStateConnect();
