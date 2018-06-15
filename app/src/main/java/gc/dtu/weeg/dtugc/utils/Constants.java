@@ -60,4 +60,9 @@ public class Constants {
     public static final String DEVICEID = "deviceid";
     public static final String DEVICECHART1 = "press1";
     public static final String DEVICECHART2 = "press2";
+
+    //数据解析类型
+    public static final int PARSE_FLOAT1=0;
+    public static final int PARSE_FLOAT2=1;
+    public static final int PARSE_INT=2;
 }

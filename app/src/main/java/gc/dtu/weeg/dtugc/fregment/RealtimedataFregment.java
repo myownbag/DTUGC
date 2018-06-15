@@ -17,6 +17,7 @@ import java.nio.ByteOrder;
 import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
+import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
 import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
@@ -36,7 +37,14 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
     public TextView mFluxview;
     public TextView mRealFluxview;
     public TextView mVolumeView;
-    public TextView mRealVolumeview;
+    //public TextView mRealVolumeview;
+
+    public TextView mTempview1;
+    public TextView mPressview1;
+    public TextView mFluxview1;
+    public TextView mRealFluxview1;
+    public TextView mVolumeView1;
+
     public int step=0;
 
     byte sendbufread[]={(byte) 0xFD, 0x00 ,0x00 ,0x0D ,        0x00 ,0x19 ,0x00 ,        0x00 ,0x00 ,0x00
@@ -65,7 +73,12 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
         mFluxview =mView.findViewById(R.id.real_flux_timeinfo);
         mRealFluxview=mView.findViewById(R.id.real_realflux_timeinfo);
         mVolumeView =mView.findViewById(R.id.real_volume_timeinfo);
-        mRealVolumeview=mView.findViewById(R.id.real_realvolume_timeinfo);
+//        mRealVolumeview=mView.findViewById(R.id.real_realvolume_timeinfo);
+        mTempview1=mView.findViewById(R.id.real_tem1_timeinfo);
+        mPressview1 =mView.findViewById(R.id.real_press1_timeinfo);
+        mFluxview1 =mView.findViewById(R.id.real_flux1_timeinfo);
+        mRealFluxview1=mView.findViewById(R.id.real_realflux1_timeinfo);
+        mVolumeView1 =mView.findViewById(R.id.real_volume1_timeinfo);
 
 
         mBut.setOnClickListener(this);
@@ -74,6 +87,7 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
         Log.d("zl", "OndataCometoParse: "+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length)+"\r\nStep:"+step);
+        ByteBuffer buf1;
         if(!mIsatart)
         {
             return;
@@ -96,11 +110,11 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
         {
 
 
-            parsecurrentdata(readOutBuf1,18,mWarnview,"");
-            parsecurrentdata(readOutBuf1,22,mPress1view,"Kpa");
-            parsecurrentdata(readOutBuf1,26,mPress2view,"Kpa");
+            parsecurrentdata(readOutBuf1,18,mWarnview,"",Constants.PARSE_FLOAT1);
+            parsecurrentdata(readOutBuf1,22,mPress1view,"Kpa",Constants.PARSE_FLOAT1);
+            parsecurrentdata(readOutBuf1,26,mPress2view,"Kpa",Constants.PARSE_FLOAT1);
 
-            ByteBuffer buf1;
+
             buf1=ByteBuffer.allocateDirect(4);
             buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
             buf1.putInt(6130);
@@ -115,42 +129,73 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
 
         else if(step==1)
         {
-            parsecurrentdata(readOutBuf1,18,mTempview,"℃");
-            parsecurrentdata(readOutBuf1,22,mPressview,"Kpa");
-            parsecurrentdata(readOutBuf1,26,mFluxview,"");
-            parsecurrentdata(readOutBuf1,30,mRealFluxview,"");
-            parsecurrentdata(readOutBuf1,34,mVolumeView,"");
-            parsecurrentdata(readOutBuf1,38,mRealVolumeview,"");
+            parsecurrentdata(readOutBuf1,18,mTempview,"",Constants.PARSE_FLOAT2);
+            parsecurrentdata(readOutBuf1,22,mPressview,"",Constants.PARSE_FLOAT2);
+            parsecurrentdata(readOutBuf1,26,mFluxview,"",Constants.PARSE_FLOAT2);
+            parsecurrentdata(readOutBuf1,30,mRealFluxview,"",Constants.PARSE_FLOAT2);
+            parsecurrentdata(readOutBuf1,34,mVolumeView,"",Constants.PARSE_INT);
+//            parsecurrentdata(readOutBuf1,38,mRealVolumeview,"",Constants.PARSE_FLOAT2);
+
+
+            buf1=ByteBuffer.allocateDirect(4);
+            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+            buf1.putInt(6131);
+            buf1.rewind();
+            buf1.get(sendbufread,14,2);
+            CodeFormat.crcencode(sendbufread);
+            String readOutMsg = DigitalTrans.byte2hex(sendbufread);
+            verycutstatus(readOutMsg);
+            step++;
+            return;
+        }
+        else if(step==2)
+        {
+            parsecurrentdata(readOutBuf1,18,mTempview1,"",Constants.PARSE_FLOAT2);
+            parsecurrentdata(readOutBuf1,22,mPressview1,"",Constants.PARSE_FLOAT2);
+            parsecurrentdata(readOutBuf1,26,mFluxview1,"",Constants.PARSE_FLOAT2);
+            parsecurrentdata(readOutBuf1,30,mRealFluxview1,"",Constants.PARSE_FLOAT2);
+            parsecurrentdata(readOutBuf1,34,mVolumeView1,"",Constants.PARSE_INT);
+
             MainActivity.getInstance().mDialog.dismiss();
         }
-
     }
 
-    private void parsecurrentdata(byte[] readOutBuf1,int offset,TextView view,String unit) {
+    private void parsecurrentdata(byte[] readOutBuf1,int offset,TextView view,String unit,int parsetype) {
         int temp;ByteBuffer buf1;
         buf1=ByteBuffer.allocateDirect(4);
         buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
         buf1.put(readOutBuf1,offset,4);
         buf1.rewind();
         temp=buf1.getInt();
-        if(temp==0)
+        if(parsetype== Constants.PARSE_INT)
         {
-            view.setText("未连接");
-        }
-        else if(temp==0xffffffff)
-        {
-            view.setText("传感器故障");
+            view.setText(""+temp+unit);
+            return;
         }
         else
         {
-
             buf1=ByteBuffer.allocateDirect(4);
             buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
             buf1.put(readOutBuf1,offset,4);
             buf1.rewind();
             float pressflaot =buf1.getFloat();
-            view.setText(""+pressflaot+unit);
+            if(parsetype==Constants.PARSE_FLOAT1)
+            {
+                if(temp==0xffffffff)
+                {
+                    view.setText("传感器故障");
+                }
+                else
+                {
+                    view.setText(""+pressflaot+unit);
+                }
+            }
+            else if (parsetype==Constants.PARSE_FLOAT2)
+            {
+                view.setText(""+pressflaot+unit);
+            }
         }
+
     }
 
     @Override
@@ -184,7 +229,13 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
         mFluxview.setText("");
         mRealFluxview.setText("");
         mVolumeView.setText("");
-        mRealVolumeview.setText("");
+//        mRealVolumeview.setText("");
+
+        mTempview1.setText("");
+        mPressview1.setText("");
+        mFluxview1.setText("");
+        mRealFluxview1.setText("");
+        mVolumeView1.setText("");
     }
 
     private void verycutstatus(String readOutMsg) {
