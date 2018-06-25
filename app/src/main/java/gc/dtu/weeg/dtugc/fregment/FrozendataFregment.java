@@ -399,7 +399,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
             {
                 buf1=ByteBuffer.allocateDirect(4);
                 buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
-                buf1.put(buf,15,4);
+                buf1.put(buf,19,4);
                 buf1.rewind();
                 tempfloat=buf1.getFloat();
                 press2=""+tempfloat;
@@ -856,7 +856,7 @@ public class FrozendataFregment extends BaseFragment implements View.OnClickList
             {
                 buf1=ByteBuffer.allocateDirect(4);
                 buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
-                buf1.put(buf,15,4);
+                buf1.put(buf,19,4);
                 buf1.rewind();
                 tempfloat=buf1.getFloat();
                 press2=""+tempfloat;
