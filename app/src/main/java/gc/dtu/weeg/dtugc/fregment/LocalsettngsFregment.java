@@ -42,7 +42,7 @@ public class LocalsettngsFregment extends BaseFragment {
     int mIndexcmd=0;
     public String[][] baseinfo=
     {
-            {"100","连接设备属性","1","L"},
+            {"100","连接设备属性","1","L",},
             {"101","设备供电方式","1","L"},
             {"103","二级地址","8","T"},
             {"110","阀门选择","10","L"},
@@ -53,7 +53,7 @@ public class LocalsettngsFregment extends BaseFragment {
             {"206","数据传输协议","1","L"},
             {"207","数据传输方式","1","L"},
             {"208","频率方式","1","L"},
-            {"209","传输频率","2","T"},
+            {"209","传输频率(分)","2","T"},
             {"210","数据传输固定时刻","12","T"},
     };
     public String[][] registerinfosel=

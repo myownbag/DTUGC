@@ -127,8 +127,8 @@ public class SensoritemsettingActivity extends Activity {
                 case 3:
                     selectlayout.setVisibility(View.VISIBLE);
                     anologinputlayout.setVisibility(View.VISIBLE);
-                    text1.setText("高报警");
-                    text2.setText("低报警");
+                    text1.setText("高报警(KPa)");
+                    text2.setText("低报警(KPa)");
                     m_range.setText(tempcontent);
                     editText1.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_CLASS_NUMBER);
                     editText2.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_CLASS_NUMBER);
@@ -136,8 +136,8 @@ public class SensoritemsettingActivity extends Activity {
                 case 4:
                     selectlayout.setVisibility(View.GONE);
                     anologinputlayout.setVisibility(View.GONE);
-                    text1.setText("扫描时间");
-                    text2.setText("记录时间");
+                    text1.setText("扫描时间(秒)");
+                    text2.setText("记录时间(分)");
                     editText1.setInputType(InputType.TYPE_CLASS_NUMBER);
                     editText2.setInputType(InputType.TYPE_CLASS_NUMBER);
                     break;
@@ -245,7 +245,7 @@ public class SensoritemsettingActivity extends Activity {
                     {
                         temp.put("text",m_range.getText().toString());
                         temp.put("settings",m_range.getText().toString());
-                        temp.put("unit","Kp");
+                        temp.put("unit","KPa");
                         itemdata.add(temp);
                     }
                 }
