@@ -54,6 +54,12 @@ public class Constants {
     public static final int NB_FRESONDATA_KEY_BLOCK_FINISHED=1;
     public static final int NB_FRESONDATA_KEY_TASKFINISHED_FINISHED=2;
 
+    //固件升级业务
+    public static final int FIRMWARE_CONVERT_SUCCESS=1;
+    public static final int FIRMWARE_CONVERT_FAIL=2;
+    public static final int FIRMWARE_CONVERT_BUSING=3;
+
+
     public static final int NUMOFGAGE=20;
 
     //图表常量关键字

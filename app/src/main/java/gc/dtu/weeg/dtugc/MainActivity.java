@@ -39,6 +39,7 @@ import gc.dtu.weeg.dtugc.fregment.BaseFragment;
 import gc.dtu.weeg.dtugc.fregment.BasicinfoFregment;
 import gc.dtu.weeg.dtugc.fregment.CNKFixedPagerAdapter;
 import gc.dtu.weeg.dtugc.fregment.FrozendataFregment;
+import gc.dtu.weeg.dtugc.fregment.Hex2BinConvertFragment;
 import gc.dtu.weeg.dtugc.fregment.InstrumentInputFregment;
 import gc.dtu.weeg.dtugc.fregment.LocalsettngsFregment;
 import gc.dtu.weeg.dtugc.fregment.NBRegisiterfragment;
@@ -93,7 +94,7 @@ public class MainActivity extends FragmentActivity {
     int mScrollX = 0;
     private List<BaseFragment> fragments;
     private String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置"
-            , "传感器设置", "仪表接入","压力传感器配置","NB业务注册","版本信息"};
+            , "传感器设置", "仪表接入","压力传感器配置","NB业务注册","版本信息","固件升级"};
     //蓝牙状态保存
     public Boolean mIsconnect = false;
     // Name of the connected device
@@ -120,7 +121,7 @@ public class MainActivity extends FragmentActivity {
     public PressSensoraddSetframent fregment7;
     public NBRegisiterfragment      fregment8;
     public AppVersioninfoFregment   fregment9;
-
+    public Hex2BinConvertFragment   fragment10;
 
     //接口
     Ondataparse mydataparse=null;
@@ -298,6 +299,12 @@ public class MainActivity extends FragmentActivity {
                         }
                     }
                     break;
+                case BluetoothState.MESSAGE_CONVERT_INFO:
+                    if(mCurrentpage==fragment10)
+                    {
+                        fragment10.OnFileConvertResult(msg.arg1);
+                    }
+                    break;
             }
         }
     };
@@ -383,6 +390,12 @@ public class MainActivity extends FragmentActivity {
 //        bundle6.putString("extra",titles[index++]);
 //        sixthFragment.setArguments(bundle6);
 //        fragments.add(sixthFragment);
+        fragment10 = new Hex2BinConvertFragment();
+        Bundle bundle9= new Bundle();
+        bundle9.putInt("position",index);
+        bundle9.putString("extra",titles[index++]);
+        fragment10.setArguments(bundle9);
+        fragments.add(fragment10);
 
         mPagerAdater=new CNKFixedPagerAdapter(getSupportFragmentManager());
         mPagerAdater.setTitles(titles);

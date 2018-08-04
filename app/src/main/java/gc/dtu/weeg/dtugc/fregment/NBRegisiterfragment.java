@@ -130,8 +130,8 @@ public class NBRegisiterfragment  extends BaseFragment {
 
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
-       // MainActivity.getInstance().mDialog.dismiss();
-       // Log.d("zl", "OndataCometoParse: "+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
+//        MainActivity.getInstance().mDialog.dismiss();
+//        Log.d("zl", "OndataCometoParse: "+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
         int i=0;
         if(!mIsatart)
         {
