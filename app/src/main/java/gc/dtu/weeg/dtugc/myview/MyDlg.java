@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
@@ -52,6 +53,7 @@ public class MyDlg extends Dialog {
             }
         });
         setTitle("请选择");
+//        Log.d("zl","MyDlg onCreate");
     }
     public  interface Onbutclicked
     {

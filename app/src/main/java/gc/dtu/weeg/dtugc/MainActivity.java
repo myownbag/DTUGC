@@ -580,7 +580,7 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
-
+    //当timeout设置为0时 ，不会做超时计算
     public void sendData(String data, String strOwner,int timeout) {
 
         Log.d("zl","MainActivity:"+data);
@@ -610,7 +610,18 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
-
+    public void sendData(byte[] databuf,int timeout)
+    {
+        mBTService.write(databuf);
+        if(timeout>0)
+        {
+            if(mThreedTimeout==null)
+            {
+                mThreedTimeout=new BlueToothTimeOutMornitor(timeout);
+                mThreedTimeout.start();
+            }
+        }
+    }
     // 双击退出-----------------------------------------------
     public boolean dispatchKeyEvent(KeyEvent event) {
 

@@ -129,7 +129,7 @@ public class FileBrowserActivity extends ListActivity implements EasyPermissions
 
         try {
             String rootPath;
-            Log.d("zl","pathFlag: "+pathFlag);
+//            Log.d("zl","pathFlag: "+pathFlag);
                 if (pathFlag==0) {
                     Log.d("zl", "getRootPath: 正在获取内置SD卡根目录");
                     rootPath = Environment.getExternalStorageDirectory()

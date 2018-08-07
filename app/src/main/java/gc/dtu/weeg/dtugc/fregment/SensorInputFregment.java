@@ -167,6 +167,7 @@ public class SensorInputFregment extends BaseFragment {
                         }
                     }
                 });
+//                Log.d("zl","dlg.show()");
                 dlg.show();
             }
 

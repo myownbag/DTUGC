@@ -5,6 +5,7 @@ package gc.dtu.weeg.dtugc.utils;
  */
 
 public class Constants {
+    //快捷键：大小写转换 Ctrl+Shift+U
     //超时秒数默认60秒
     public static final int  TimeOutSecond = 18000000;
 
@@ -58,6 +59,10 @@ public class Constants {
     public static final int FIRMWARE_CONVERT_SUCCESS=1;
     public static final int FIRMWARE_CONVERT_FAIL=2;
     public static final int FIRMWARE_CONVERT_BUSING=3;
+
+    public static final int FIRMWARE_DATAWRITE_TIMEOUT=6;
+
+    public static final int FIRM_WRITE_FRAMELEN=448;
 
 
     public static final int NUMOFGAGE=20;
