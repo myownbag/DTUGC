@@ -61,6 +61,8 @@ public class Constants {
     public static final int FIRMWARE_CONVERT_BUSING=3;
 
     public static final int FIRMWARE_DATAWRITE_TIMEOUT=6;
+    public static final int FIRMWARE_DATAERROR_TIMEOUT=7;
+    public static final int FIRMWARE_DATAFINISH_TIMEOUT=8;
 
     public static final int FIRM_WRITE_FRAMELEN=448;
 

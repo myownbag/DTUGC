@@ -199,7 +199,7 @@ public class Hex2Bin {
 //            }
         }
         Log.d("zl","While end");
-        fileOutputStream = new FileOutputStream(mUrl.substring(0,mUrl.length()-4)+"1"+".bin");
+        fileOutputStream = new FileOutputStream(mUrl.substring(0,mUrl.length()-4)+".bin");
         if (type == 1) {
             fileOutputStream.write(bytes2);
         } else {

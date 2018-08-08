@@ -56,15 +56,23 @@ public class Hex2BinConvertFragment extends BaseFragment {
     private Handler mHander;
     private byte[] byte_firmware;
     private Semaphore semaphore = new Semaphore(1);
+    private Semaphore semaphore2 = new Semaphore(1);
 
     private String buftextshow;
 
     private int updatestep=0;
-    private int checksum=0;
+
+    private  long checksum=0;
+
+//    private int checksum=0;
     private int databytelen=0;
 
     private Procseedlg mprodlg;
     private Thread cv=null;
+    private Thread ErrorTimesTh=null;
+
+    private int ErrorTimesCounter=0;
+
 
     //    CountDownTimer mcountDownTimer;
     @Nullable
@@ -173,21 +181,24 @@ public class Hex2BinConvertFragment extends BaseFragment {
                     else
                     {
                         updatestep=1;
-                        int[] tempbuf=new int[2];
-                        tempbuf[0]=byte_firmware.length;
-                        tempbuf[1]=checksum;
-                        Log.d("zl","lenth/checksum: "+tempbuf[0]+" / "+tempbuf[1]);
                         byte [] sendbuf=new byte[10];
                         ByteBuffer buf;
-                        for(int i=0;i<2;i++)
-                        {
-                            buf=ByteBuffer.allocateDirect(4);
-                            buf=buf.order(ByteOrder.LITTLE_ENDIAN);
-                            buf.putInt(tempbuf[i]);
-                            buf.rewind();
-                            buf.get(sendbuf,i*4,4);
-                        }
+
+                        buf=ByteBuffer.allocateDirect(4);
+                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);
+                        buf.putInt(byte_firmware.length);
+                        buf.rewind();
+                        buf.get(sendbuf,0,4);
+
+                        buf=ByteBuffer.allocateDirect(8);
+                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);
+                        buf.putLong(checksum);
+                        buf.rewind();
+                        buf.get(sendbuf,4,4);
+                        Log.d("zl","lenth/checksum: "+byte_firmware.length+" / "+checksum);
+
                         CodeFormat.crcencode(sendbuf);
+                        Log.d("zl","checksum"+CodeFormat.byteToHex(sendbuf,sendbuf.length).toLowerCase());
                         databytelen=0;
                         verycutstatus(sendbuf,2000);
                     }
@@ -196,7 +207,8 @@ public class Hex2BinConvertFragment extends BaseFragment {
 
                     if(readOutBuf1[0]!=0x06)
                     {
-                        mprodlg.showresult("文件属性失败",R.drawable.update_fail,true);
+                        if(mprodlg.isShowing())
+                            mprodlg.showresult("文件属性失败",R.drawable.update_fail,true);
                     }
                     else
                     {
@@ -211,12 +223,22 @@ public class Hex2BinConvertFragment extends BaseFragment {
                     }
                     break;
                 case 2:
+                    if(ErrorTimesTh!=null)
+                    {
+                        ErrorTimesTh.interrupt();
+                        ErrorTimesTh=null;
+
+                    }
                     if(readOutBuf1[0]!=0x06)
                     {
-                        mprodlg.showresult("文件写入失败",R.drawable.update_fail,true);
+                       // mprodlg.showresult("文件写入失败",R.drawable.update_fail,true);
+
+                        ErrorTimesTh = new Thread(new ErrortiemsSupercisor() );
+                        ErrorTimesTh.start();
                     }
                     else
                     {
+                        ErrorTimesCounter=0;
                         byte[] sendbuf;
                         databytelen+=Constants.FIRM_WRITE_FRAMELEN;
                         if((byte_firmware.length-databytelen)>Constants.FIRM_WRITE_FRAMELEN)
@@ -234,20 +256,52 @@ public class Hex2BinConvertFragment extends BaseFragment {
                         CodeFormat.crcencode(sendbuf);
                         verycutstatus(sendbuf,2000);
                         int process=databytelen*100/byte_firmware.length;
-                        mprodlg.setCurProcess(process);
+                        if(mprodlg.isShowing())
+                            mprodlg.setCurProcess(process);
                     }
                     break;
                 case 3:
+                    if(ErrorTimesTh!=null)
+                    {
+                        ErrorTimesTh.interrupt();
+                        ErrorTimesTh=null;
+
+                    }
                     if(readOutBuf1[0]!=0x06)
                     {
 //                        mprodlg.dismiss("文件写入失败",R.drawable.update_fail);
-                        mprodlg.showresult("文件写入失败",R.drawable.update_fail,true);
+                        ErrorTimesTh = new Thread(new ErrortiemsSupercisor() );
+                        ErrorTimesTh.start();
+//                        mprodlg.showresult("文件写入失败",R.drawable.update_fail,true);
                     }
                     else
                     {
 //                        mprodlg.dismiss("文件写入成功",R.drawable.update_success);
-                        mprodlg.showresult("文件写入成功",R.drawable.update_success,true);
-                        mprodlg.setCurProcess(100);
+//                        mprodlg.showresult("文件写入成功",R.drawable.update_success,true);
+                        ErrorTimesCounter=0;
+                        updatestep=4;
+                        if(mprodlg.isShowing())
+                            mprodlg.setCurProcess(100);
+                        ErrorTimesTh = new Thread(new ErrortiemsSupercisor(Constants.FIRMWARE_DATAFINISH_TIMEOUT) );
+                    }
+                    break;
+                case 4:
+                    if(ErrorTimesTh!=null)
+                    {
+                        ErrorTimesTh.interrupt();
+                        ErrorTimesTh=null;
+
+                    }
+                    //String readOutMsg = DigitalTrans.byte2hex(sendbuf);
+                    if(readOutMsg1.equals("0406"))
+                    {
+                        if(mprodlg.isShowing())
+                            mprodlg.showresult("文件写入成功",R.drawable.update_success,true);
+                    }
+                    else
+                    {
+                        if(mprodlg.isShowing())
+                            mprodlg.showresult("校验值出错",R.drawable.update_fail,true);
                     }
                     break;
                     default:
@@ -331,6 +385,45 @@ public class Hex2BinConvertFragment extends BaseFragment {
         {
             data_write_timeout();
         }
+        else if(code==Constants.FIRMWARE_DATAERROR_TIMEOUT)
+        {
+            int temp=0;
+            ErrorTimesTh=null;
+            try {
+                semaphore2.acquire();
+                temp=ErrorTimesCounter;
+                semaphore2.release();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if(temp<3)
+            {
+                byte sendbuf[]=new byte[Constants.FIRM_WRITE_FRAMELEN+2];
+                memcry(sendbuf,byte_firmware,0,Constants.FIRM_WRITE_FRAMELEN);
+                CodeFormat.crcencode(sendbuf);
+                verycutstatus(sendbuf,2000);
+//                        mprodlg.show();
+                mprodlg.show("正在写入...");
+                int process=databytelen*100/byte_firmware.length;
+                mprodlg.setCurProcess(process);
+            }
+            else
+            {
+                mprodlg.showresult("写入失败",R.drawable.update_fail,true);
+                try {
+                    semaphore2.acquire();
+                    ErrorTimesCounter=0;
+                    semaphore2.release();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        else if(code==Constants.FIRMWARE_DATAFINISH_TIMEOUT)
+        {
+            mprodlg.showresult("获取校验值超时",R.drawable.update_fail,true);
+        }
     }
 
     class readfilesthread implements Runnable
@@ -388,6 +481,7 @@ public class Hex2BinConvertFragment extends BaseFragment {
     }
 
     private void FirmwareDataProsess(byte [] buf,int lenth) {
+        //线程中在执行可以处理耗时工作，但不可以操控界面
         byte_firmware=new byte[lenth];
         ByteBuffer buf1;
         buf1=ByteBuffer.allocateDirect(buf.length);
@@ -400,7 +494,7 @@ public class Hex2BinConvertFragment extends BaseFragment {
         checksum=0;
         for(int i=0;i<lenth;i++)
         {
-            checksum+=byte_firmware[i];
+            checksum+=byte_firmware[i]&0xff;
         }
         mHander.obtainMessage(BluetoothState.MESSAGE_CONVERT_INFO, Constants.FIRMWARE_CONVERT_SUCCESS,0) //FIRMWARE_CONVERT_SUCCESS
                 .sendToTarget();
@@ -481,15 +575,16 @@ public class Hex2BinConvertFragment extends BaseFragment {
                         sendbuf[0]= (byte) 0xFD;
                         sendbuf[3]= (byte) ((datalen+13)%0x100);
                         sendbuf[5]=0x15;
-                        sendbuf[14]= (byte) (0xff&4);
-                        String ver = url.substring(url.length()-8,url.length()-4);
+                        sendbuf[14]= (byte) (0xff&3);
+                        sendbuf[16]=(byte) 'V';
+                        String ver = url.substring(url.length()-7,url.length()-4);
                         Log.d("zl",ver);
                         ByteBuffer buf1;
-                        buf1=ByteBuffer.allocateDirect(4);
+                        buf1=ByteBuffer.allocateDirect(3);
                         buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
                         buf1.put(ver.getBytes());
                         buf1.rewind();
-                        buf1.get(sendbuf,16,4);
+                        buf1.get(sendbuf,17,3);
                         CodeFormat.crcencode(sendbuf);
                         String readOutMsg = DigitalTrans.byte2hex(sendbuf);
                         Log.d("zl",CodeFormat.byteToHex(sendbuf,sendbuf.length).toLowerCase());
@@ -569,6 +664,35 @@ public class Hex2BinConvertFragment extends BaseFragment {
            try {
                Thread.sleep(mtimeout);
                mHander.obtainMessage(BluetoothState.MESSAGE_CONVERT_INFO,Constants.FIRMWARE_DATAWRITE_TIMEOUT,1)
+                       .sendToTarget();
+           } catch (InterruptedException e) {
+               e.printStackTrace();
+           }
+       }
+   }
+
+   private class ErrortiemsSupercisor implements Runnable
+   {
+       int mtype=0;
+       public ErrortiemsSupercisor(int requesttype)
+       {
+           mtype=requesttype;
+       }
+       public ErrortiemsSupercisor()
+       {
+           mtype=Constants.FIRMWARE_DATAERROR_TIMEOUT;
+       }
+       @Override
+       public void run() {
+           try {
+               Thread.sleep(1000);
+               if(mtype==Constants.FIRMWARE_DATAERROR_TIMEOUT)
+               {
+                   semaphore2.acquire();
+                   ErrorTimesCounter++;
+                   semaphore2.release();
+               }
+               mHander.obtainMessage(BluetoothState.MESSAGE_CONVERT_INFO,mtype,1)
                        .sendToTarget();
            } catch (InterruptedException e) {
                e.printStackTrace();
