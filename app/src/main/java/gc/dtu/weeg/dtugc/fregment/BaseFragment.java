@@ -7,11 +7,15 @@ import android.util.Log;
 
 import java.text.ParseException;
 
+import gc.dtu.weeg.dtugc.MainActivity;
+import gc.dtu.weeg.dtugc.bluetooth.BluetoothService;
+
 public abstract class BaseFragment extends Fragment {
     public Boolean mIsatart=false;
     public boolean m_dlgcancled=false;
     Bundle bundle;
     public int position=0;
+    String str;
     abstract public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) ;
 
     @Override
@@ -20,7 +24,7 @@ public abstract class BaseFragment extends Fragment {
         bundle = getArguments();
         if (bundle != null) {
             position=bundle.getInt("position");
-            String str=bundle.getString("extra");
+            str=bundle.getString("extra");
 //            Log.d("zl","position:"+position);
 //            Log.d("zl","title:"+str);
         }
@@ -35,6 +39,14 @@ public abstract class BaseFragment extends Fragment {
         if(position!=index)
         {
             mIsatart=false;
+        }
+        if(str.equals("固件升级"))
+        {
+            MainActivity.getInstance().getcurblueservice().ChangetimeoutofPackage(50);
+        }
+        else
+        {
+            MainActivity.getInstance().getcurblueservice().ChangetimeoutofPackage(200);
         }
     }
     public void Ondlgcancled()

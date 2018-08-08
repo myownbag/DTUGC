@@ -64,7 +64,7 @@ public class Constants {
     public static final int FIRMWARE_DATAERROR_TIMEOUT=7;
     public static final int FIRMWARE_DATAFINISH_TIMEOUT=8;
 
-    public static final int FIRM_WRITE_FRAMELEN=448;
+    public static final int FIRM_WRITE_FRAMELEN=512;
 
 
     public static final int NUMOFGAGE=20;

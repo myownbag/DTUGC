@@ -3,20 +3,23 @@ package gc.dtu.weeg.dtugc.fregment;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,7 +32,6 @@ import java.util.concurrent.Semaphore;
 
 import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
-import gc.dtu.weeg.dtugc.bluetooth.BluetoothService;
 import gc.dtu.weeg.dtugc.bluetooth.BluetoothState;
 import gc.dtu.weeg.dtugc.hexfile2bin.FileBrowserActivity;
 import gc.dtu.weeg.dtugc.hexfile2bin.Hex2Bin;
@@ -38,7 +40,6 @@ import gc.dtu.weeg.dtugc.myview.Procseedlg;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
-import gc.dtu.weeg.dtugc.utils.ItemSetingActivity;
 import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
 public class Hex2BinConvertFragment extends BaseFragment {
@@ -49,6 +50,8 @@ public class Hex2BinConvertFragment extends BaseFragment {
     private ImageView btn_open;
     private TextView changePath;
     private TextView textshow;
+    private CardView textcontainerView;
+//    private ViewFlipper viewFlipper;
 
     private Button btn_Convert;
     private String url;
@@ -64,8 +67,11 @@ public class Hex2BinConvertFragment extends BaseFragment {
 
     private  long checksum=0;
 
+    private int mpackageIndex=0;
 //    private int checksum=0;
     private int databytelen=0;
+
+    private int mpackagelen=0;
 
     private Procseedlg mprodlg;
     private Thread cv=null;
@@ -91,7 +97,42 @@ public class Hex2BinConvertFragment extends BaseFragment {
         btn_open =  mView.findViewById(R.id.btn_openfile);
         btn_Convert= mView.findViewById(R.id.btn_firmupdate);
         changePath =  mView.findViewById(R.id.hex2binfilepath);
-        textshow = mView.findViewById(R.id.firmware_show);
+        textcontainerView = mView.findViewById(R.id.textcontainer);
+        int currentapiVersion=android.os.Build.VERSION.SDK_INT;
+        if(currentapiVersion>=26)
+        {
+//            viewFlipper = new ViewFlipper(MainActivity.getInstance());
+            ViewGroup.LayoutParams layoutParams =new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
+                    , ViewGroup.LayoutParams.MATCH_PARENT);
+//            viewFlipper.setLayoutParams(layoutParams);
+
+            textshow = new TextView(MainActivity.getInstance());
+            textshow.setLayoutParams(new WindowManager
+                    .LayoutParams(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.MATCH_PARENT));
+            textcontainerView.addView(textshow);
+            textshow.setMovementMethod(ScrollingMovementMethod.getInstance());
+
+//            viewFlipper.addView(textshow);
+//            textcontainerView.addView(viewFlipper);
+//            viewFlipper.canScrollVertically(1);
+//            viewFlipper.setFlipInterval(2000);
+//            viewFlipper.startFlipping();
+//            textshow.setMovementMethod(ScrollingMovementMethod.getInstance());
+        }
+        else
+        {
+            ScrollView scrollView  = new ScrollView(MainActivity.getInstance());
+            ViewGroup.LayoutParams layoutParams =new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
+                    , ViewGroup.LayoutParams.MATCH_PARENT);
+            scrollView.setLayoutParams(new ViewGroup.LayoutParams(layoutParams));
+            textshow = new TextView(MainActivity.getInstance());
+            textshow.setLayoutParams(new WindowManager
+                    .LayoutParams(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.MATCH_PARENT));
+            scrollView.addView(textshow);
+            textcontainerView.addView(scrollView);
+        }
+//        textshow = mView.findViewById(R.id.firmware_show);
+//        textshow.setMovementMethod(ScrollingMovementMethod.getInstance());
         mDialog1 = CustomDialog.createProgressDialog(MainActivity.getInstance(), Constants.TimeOutSecond, new CustomDialog.OnTimeOutListener() {
             @Override
             public void onTimeOut(CustomDialog dialog) {
@@ -201,6 +242,7 @@ public class Hex2BinConvertFragment extends BaseFragment {
                         Log.d("zl","checksum"+CodeFormat.byteToHex(sendbuf,sendbuf.length).toLowerCase());
                         databytelen=0;
                         verycutstatus(sendbuf,2000);
+                        Log.d("zl","OndataCometoParse: 开始");
                     }
                     break;
                 case 1:
@@ -213,13 +255,22 @@ public class Hex2BinConvertFragment extends BaseFragment {
                     else
                     {
                         updatestep=2;
-                        byte sendbuf[]=new byte[Constants.FIRM_WRITE_FRAMELEN+2];
-                        memcry(sendbuf,byte_firmware,0,Constants.FIRM_WRITE_FRAMELEN);
+                        mpackageIndex=0;
+                        byte sendbuf[]=new byte[Constants.FIRM_WRITE_FRAMELEN+4];
+                        ByteBuffer buf;
+                        buf = ByteBuffer.allocateDirect(4);
+                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);
+                        buf.putInt(mpackageIndex);
+                        buf.rewind();
+                        buf.get(sendbuf,0,2);
+
+                        memcry(sendbuf,byte_firmware,2,0,Constants.FIRM_WRITE_FRAMELEN);
                         CodeFormat.crcencode(sendbuf);
                         verycutstatus(sendbuf,2000);
 //                        mprodlg.show();
                         mprodlg.show("正在写入...");
                         mprodlg.setCurProcess(0);
+                        mpackagelen=Constants.FIRM_WRITE_FRAMELEN;
                     }
                     break;
                 case 2:
@@ -239,18 +290,28 @@ public class Hex2BinConvertFragment extends BaseFragment {
                     else
                     {
                         ErrorTimesCounter=0;
+                        mpackageIndex++;
                         byte[] sendbuf;
                         databytelen+=Constants.FIRM_WRITE_FRAMELEN;
+                        ByteBuffer buf;
+                        buf = ByteBuffer.allocateDirect(4);
+                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);
+                        buf.putInt(mpackageIndex);
+                        buf.rewind();
                         if((byte_firmware.length-databytelen)>Constants.FIRM_WRITE_FRAMELEN)
                         {
-                            sendbuf=new byte[Constants.FIRM_WRITE_FRAMELEN+2];
-                            memcry(sendbuf,byte_firmware,databytelen,Constants.FIRM_WRITE_FRAMELEN);
+                            mpackagelen=Constants.FIRM_WRITE_FRAMELEN;
+                            sendbuf=new byte[Constants.FIRM_WRITE_FRAMELEN+4];
+                            buf.get(sendbuf,0,2);
+                            memcry(sendbuf,byte_firmware,2,databytelen,Constants.FIRM_WRITE_FRAMELEN);
                         }
                         else
                         {
                             int lenleft= byte_firmware.length-databytelen;
-                            sendbuf=new byte[lenleft+2];
-                            memcry(sendbuf,byte_firmware,databytelen,lenleft);
+                            mpackagelen=lenleft;
+                            sendbuf=new byte[lenleft+4];
+                            buf.get(sendbuf,0,2);
+                            memcry(sendbuf,byte_firmware,2,databytelen,lenleft);
                             updatestep=3;
                         }
                         CodeFormat.crcencode(sendbuf);
@@ -277,12 +338,14 @@ public class Hex2BinConvertFragment extends BaseFragment {
                     else
                     {
 //                        mprodlg.dismiss("文件写入成功",R.drawable.update_success);
-//                        mprodlg.showresult("文件写入成功",R.drawable.update_success,true);
+                        if(mprodlg.isShowing())
+                             mprodlg.show("文件写入完成");
                         ErrorTimesCounter=0;
                         updatestep=4;
                         if(mprodlg.isShowing())
                             mprodlg.setCurProcess(100);
                         ErrorTimesTh = new Thread(new ErrortiemsSupercisor(Constants.FIRMWARE_DATAFINISH_TIMEOUT) );
+                        ErrorTimesTh.start();
                     }
                     break;
                 case 4:
@@ -293,6 +356,8 @@ public class Hex2BinConvertFragment extends BaseFragment {
 
                     }
                     //String readOutMsg = DigitalTrans.byte2hex(sendbuf);
+                    Log.d("zl","OndataCometoParse: 结束");
+                    Log.d("zl","OndataCometoParse step: "+4+"  "+readOutMsg1);
                     if(readOutMsg1.equals("0406"))
                     {
                         if(mprodlg.isShowing())
@@ -309,10 +374,10 @@ public class Hex2BinConvertFragment extends BaseFragment {
             }
     }
 
-    private void memcry(byte[] des, byte[] src, int offset, int len) {
+    private void memcry(byte[] des, byte[] src,int offset_des, int offset, int len) {
         for(int i=0;i<len;i++)
         {
-            des[i]=src[i+offset];
+            des[i+offset_des]=src[i+offset];
         }
     }
 
@@ -399,8 +464,14 @@ public class Hex2BinConvertFragment extends BaseFragment {
 
             if(temp<3)
             {
-                byte sendbuf[]=new byte[Constants.FIRM_WRITE_FRAMELEN+2];
-                memcry(sendbuf,byte_firmware,0,Constants.FIRM_WRITE_FRAMELEN);
+                byte sendbuf[]=new byte[mpackagelen+4];
+                ByteBuffer buf;
+                buf = ByteBuffer.allocateDirect(4);
+                buf.order(ByteOrder.LITTLE_ENDIAN);
+                buf.putInt(mpackageIndex);
+                buf.rewind();
+                buf.get(sendbuf,0,2);
+                memcry(sendbuf,byte_firmware,2,databytelen,Constants.FIRM_WRITE_FRAMELEN);
                 CodeFormat.crcencode(sendbuf);
                 verycutstatus(sendbuf,2000);
 //                        mprodlg.show();
@@ -410,7 +481,8 @@ public class Hex2BinConvertFragment extends BaseFragment {
             }
             else
             {
-                mprodlg.showresult("写入失败",R.drawable.update_fail,true);
+                if(mprodlg.isShowing())
+                    mprodlg.showresult("写入失败",R.drawable.update_fail,true);
                 try {
                     semaphore2.acquire();
                     ErrorTimesCounter=0;
@@ -422,7 +494,8 @@ public class Hex2BinConvertFragment extends BaseFragment {
         }
         else if(code==Constants.FIRMWARE_DATAFINISH_TIMEOUT)
         {
-            mprodlg.showresult("获取校验值超时",R.drawable.update_fail,true);
+            if(mprodlg.isShowing())
+                mprodlg.showresult("获取校验值超时",R.drawable.update_fail,true);
         }
     }
 

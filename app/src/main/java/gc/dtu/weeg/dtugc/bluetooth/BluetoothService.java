@@ -46,6 +46,8 @@ public class BluetoothService {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private int mState;
+
+    private int mWaittimeout=200;
 //    public Semaphore mSemaphore;
 //    public boolean mIsblock=false;
 
@@ -346,6 +348,12 @@ public class BluetoothService {
         }
     }
 
+    public void ChangetimeoutofPackage(int timeout)
+    {
+        mWaittimeout=timeout;
+    }
+
+
     /**
      * This thread runs during a connection with a remote device.
      * It handles all incoming and outgoing transmissions.
@@ -404,7 +412,7 @@ public class BluetoothService {
                     }
                     else
                     {
-                        Thread.sleep(200);
+                        Thread.sleep(mWaittimeout);
                     }
                     // eRead from the InputStream
                     bytes = mmInStream.read(buffer);
