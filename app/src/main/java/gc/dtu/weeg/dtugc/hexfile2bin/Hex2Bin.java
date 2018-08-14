@@ -1,8 +1,10 @@
 package gc.dtu.weeg.dtugc.hexfile2bin;
 
 import android.util.Log;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,6 +14,7 @@ import java.io.InputStreamReader;
 import java.util.concurrent.Semaphore;
 
 import gc.dtu.weeg.dtugc.MainActivity;
+import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
 public class Hex2Bin {
 
@@ -29,14 +32,6 @@ public class Hex2Bin {
     public Hex2Bin(String url) {
         mUrl=url;
     }
-
-
-//    public Hex2Bin(String url, Handler Handler) {
-//        mUrl=url;
-//        mHandler=Handler;
-//    }
-
-
     public void converhex ()
     {
         convernow cv= new convernow();
@@ -85,7 +80,15 @@ public class Hex2Bin {
 //                System.out.println("文件为空");
                 Log.d("zl","文件为空");
             }
-        inputStream = new FileInputStream(mfile); //转成 reader 以 行 为单位读取文件
+            if(mfile!=null)
+            {
+                inputStream = new FileInputStream(mfile); //转成 reader 以 行 为单位读取文件
+            }
+            else
+            {
+                ToastUtils.showToast(MainActivity.getInstance(),"参数错误");
+                return 5;
+            }
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream)); //当前行字符串
         String hexLineStr = null; //当前行数
         int hexLineNum = 0; //当前行的地址位

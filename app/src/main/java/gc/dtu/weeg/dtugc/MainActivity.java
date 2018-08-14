@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -802,4 +803,14 @@ public class MainActivity extends FragmentActivity {
 //        mBTService.emptyalldata();
 //        mBTService.getcurSemaphore().release();
     }
+
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+////        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        Log.d("zl","Main onRequestPermissionsResult");
+//        if(mCurrentpage==fragment10)
+//        {
+//            fragment10.onRequestPermissionsResult(requestCode,permissions,grantResults);
+//        }
+//    }
 }

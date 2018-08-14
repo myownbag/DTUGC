@@ -1,12 +1,16 @@
 package gc.dtu.weeg.dtugc.fregment;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.text.method.ScrollingMovementMethod;
@@ -19,7 +23,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.ViewFlipper;
+import android.widget.Toast;
+
+import org.xutils.common.Callback;
+import org.xutils.common.task.PriorityExecutor;
+import org.xutils.http.RequestParams;
+import org.xutils.x;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import gc.dtu.weeg.dtugc.MainActivity;
@@ -36,13 +46,16 @@ import gc.dtu.weeg.dtugc.bluetooth.BluetoothState;
 import gc.dtu.weeg.dtugc.hexfile2bin.FileBrowserActivity;
 import gc.dtu.weeg.dtugc.hexfile2bin.Hex2Bin;
 import gc.dtu.weeg.dtugc.myview.CustomDialog;
+import gc.dtu.weeg.dtugc.myview.MyDlg;
 import gc.dtu.weeg.dtugc.myview.Procseedlg;
+import gc.dtu.weeg.dtugc.myview.ScrollTextView;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
 import gc.dtu.weeg.dtugc.utils.ToastUtils;
+import pub.devrel.easypermissions.EasyPermissions;
 
-public class Hex2BinConvertFragment extends BaseFragment {
+public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermissions.PermissionCallbacks {
     private View mView=null;
     private static final int ByteSize = 200 * 1024; //读取的字节数
     private static final String TAG = "zl";
@@ -79,7 +92,10 @@ public class Hex2BinConvertFragment extends BaseFragment {
 
     private int ErrorTimesCounter=0;
 
-
+    //Http 请求
+    Callback.Cancelable httpget;
+    String mfileName ;
+    String mHttpupdatefile;
     //    CountDownTimer mcountDownTimer;
     @Nullable
     @Override
@@ -91,32 +107,49 @@ public class Hex2BinConvertFragment extends BaseFragment {
         return mView;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
+//        Intent intent = new Intent();  intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+//        Uri uri = Uri.fromParts("package", getPackageName(), null);
+//        intent.setData(uri);
+//        startActivity(intent);
+        //把申请权限的回调交由EasyPermissions处理
+        Log.d("zl","onRequestPermissionsResult");
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
 
     private void initView() {
         btn_open =  mView.findViewById(R.id.btn_openfile);
         btn_Convert= mView.findViewById(R.id.btn_firmupdate);
         changePath =  mView.findViewById(R.id.hex2binfilepath);
         textcontainerView = mView.findViewById(R.id.textcontainer);
+//        textcontainerView.setScrollContainer(true);
+//        textcontainerView.setVerticalScrollBarEnabled(true);
         int currentapiVersion=android.os.Build.VERSION.SDK_INT;
         if(currentapiVersion>=26)
         {
 //            viewFlipper = new ViewFlipper(MainActivity.getInstance());
             ViewGroup.LayoutParams layoutParams =new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
                     , ViewGroup.LayoutParams.MATCH_PARENT);
-//            viewFlipper.setLayoutParams(layoutParams);
-
             textshow = new TextView(MainActivity.getInstance());
             textshow.setLayoutParams(new WindowManager
                     .LayoutParams(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.MATCH_PARENT));
+
             textcontainerView.addView(textshow);
             textshow.setMovementMethod(ScrollingMovementMethod.getInstance());
+//
 
+//            WebView scrollView  = new WebView(MainActivity.getInstance());
+//            ViewGroup.LayoutParams sclayoutParams =new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
+//                    , ViewGroup.LayoutParams.MATCH_PARENT);
+//            scrollView.setLayoutParams(new ViewGroup.LayoutParams(sclayoutParams));
+//            scrollView.addView(textshow);
+//            textcontainerView.addView(scrollView);
+//            scrollView.setScrollContainer(true);
+//            scrollView.setVerticalScrollBarEnabled(true);
 //            viewFlipper.addView(textshow);
-//            textcontainerView.addView(viewFlipper);
-//            viewFlipper.canScrollVertically(1);
-//            viewFlipper.setFlipInterval(2000);
-//            viewFlipper.startFlipping();
 //            textshow.setMovementMethod(ScrollingMovementMethod.getInstance());
         }
         else
@@ -161,7 +194,47 @@ public class Hex2BinConvertFragment extends BaseFragment {
         btn_open.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openBrowser();
+//                openBrowser();
+                HttpGetfile();
+            }
+
+            private void HttpGetfile() {
+                MainActivity.getInstance().mDialog.show();
+                MainActivity.getInstance().mDialog.setDlgMsg("正在下载");
+                RequestParams params = new RequestParams(Constants.FIRM_BASEUPDATESERVICER+Constants.FIRM_UPDATESERVER_INFO);
+                httpget =  x.http().get(params, new Callback.CommonCallback<String>() {
+                    @Override
+                    public void onSuccess(String result) {
+                        Log.d("zl","Http GET:"+result);
+                        mfileName=result;
+                        String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE };  //, Manifest.permission.CALL_PHONE
+                        if (EasyPermissions.hasPermissions(MainActivity.getInstance(), perms)) {//检查是否获取该权限
+                            Log.i(TAG, "已获取权限");
+                            httpgetfile2stored();
+                        } else {
+                            //第二个参数是被拒绝后再次申请该权限的解释
+                            //第三个参数是请求码
+                            //第四个参数是要申请的权限
+                            EasyPermissions.requestPermissions(Hex2BinConvertFragment.this,"必要的权限", 0, perms);
+                            Log.i(TAG, "申请权限");
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable ex, boolean isOnCallback) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(CancelledException cex) {
+
+                    }
+
+                    @Override
+                    public void onFinished() {
+
+                    }
+                });
             }
         });
         btn_Convert.setOnClickListener(new firmwareupdatbutlisterner());
@@ -427,6 +500,7 @@ public class Hex2BinConvertFragment extends BaseFragment {
     }
     public void OnFileConvertResult(int code)
     {
+//        Log.d("zl","OnFileConvertResult: "+code);
         if(code==Constants.FIRMWARE_CONVERT_SUCCESS)
         {
             if(mDialog1.isShowing())
@@ -496,6 +570,77 @@ public class Hex2BinConvertFragment extends BaseFragment {
         {
             if(mprodlg.isShowing())
                 mprodlg.showresult("获取校验值超时",R.drawable.update_fail,true);
+        }
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+        Boolean ishaveperms=false;
+        for(int i=0;i<perms.size();i++)
+        {
+            if(perms.get(i).equals(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            {
+                ishaveperms=true;
+                break;
+            }
+        }
+        if(!ishaveperms)
+        {
+            ToastUtils.showToast(MainActivity.getInstance(),"未获取权限");
+            return;
+        }
+        httpgetfile2stored();
+    }
+
+    private void httpgetfile2stored() {
+        String rootPath  = Environment.getExternalStorageDirectory()
+                .toString();
+        Log.d("zl","onPermissionsGranted+URL: "+rootPath);
+        if (rootPath == null) {
+            Toast.makeText(MainActivity.getInstance(), "无法获取存储路径！", Toast.LENGTH_SHORT).show();
+        } else {
+            rootPath+="/GC2018";
+            File file = new File(rootPath);
+            if(!file.exists())
+            {
+                file.mkdirs();
+            }
+            else
+            {
+                if(mfileName!=null)
+                {
+                    String Httpurl= Constants.FIRM_BASEUPDATESERVICER+mfileName;
+                    //设置请求参数
+                    RequestParams params = new RequestParams(Httpurl);
+                    params.setAutoResume(true);//设置是否在下载是自动断点续传
+                    params.setAutoRename(false);//设置是否根据头信息自动命名文件
+                    url=rootPath+"/"+mfileName;
+                    params.setSaveFilePath(url);
+                    Log.d("zl","缓存文件路径: "+url);
+
+                    params.setExecutor(new PriorityExecutor(2, true));//自定义线程池,有效的值范围[1, 3], 设置为3时, 可能阻塞图片加载.
+                    params.setCancelFast(true);//是否可以被立即停止
+
+                    Log.d("zl","recallHttpgetrequest: 开始下载");
+
+                    Log.d("zl","recallHttpgetrequest URL:"+Constants.FIRM_BASEUPDATESERVICER+mfileName);
+                    httpget = x.http().get(params,new recallHttpgetrequest(url) );
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+        for(int i=0;i<perms.size();i++)
+        {
+            Log.d("zl","onPermissionsDenied: "+perms.get(i));
+            if(perms.get(i).equals(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            {
+                if(MainActivity.getInstance().mDialog.isShowing())
+                    MainActivity.getInstance().mDialog.dismiss();
+                ToastUtils.showToast(MainActivity.getInstance(),"未获取存储权限");
+            }
         }
     }
 
@@ -778,6 +923,67 @@ public class Hex2BinConvertFragment extends BaseFragment {
         {
             mprodlg.showresult("写入超时",R.drawable.update_fail,true);
             updatestep=-1;
+        }
+    }
+
+    @Override
+    public void Ondlgcancled() {
+        super.Ondlgcancled();
+        if(httpget!=null)
+        {
+            httpget.cancel();
+            Log.d("zl","httpget cancle");
+        }
+    }
+    class recallHttpgetrequest implements Callback.CommonCallback<File>
+    {
+        String murl;
+        Boolean Httpresult=false;
+        public  recallHttpgetrequest(String url)
+        {
+            murl = url;
+        }
+
+        @Override
+        public void onSuccess(File result) {
+            Log.d("zl","onSuccess");
+            Httpresult=true;
+            if(MainActivity.getInstance().mDialog.isShowing())
+                MainActivity.getInstance().mDialog.dismiss();
+            mDialog1.show();
+            mDialog1.setDlgMsg("文件格式转换...");
+            Hex2Bin hex2Bin;
+            hex2Bin=new Hex2Bin(murl);
+            hex2Bin.SetOnConverterListerner(new ConvertStatusImpl());
+            hex2Bin.converhex();
+        }
+
+        @Override
+        public void onError(Throwable ex, boolean isOnCallback) {
+            Log.d("zl","onError:\n"+ex.toString());
+            Httpresult=false;
+            if(MainActivity.getInstance().mDialog.isShowing())
+                MainActivity.getInstance().mDialog.dismiss();
+            ToastUtils.showToast(MainActivity.getInstance(),"文件下载失败");
+        }
+
+        @Override
+        public void onCancelled(CancelledException cex) {
+            Log.d("zl","onCancelled");
+            Httpresult=false;
+            if(MainActivity.getInstance().mDialog.isShowing())
+                MainActivity.getInstance().mDialog.dismiss();
+            ToastUtils.showToast(MainActivity.getInstance(),"文件下载任务被取消");
+        }
+
+        @Override
+        public void onFinished() {
+            Log.d("zl","onFinished");
+            if(Httpresult==false)
+            {
+                if(MainActivity.getInstance().mDialog.isShowing())
+                    MainActivity.getInstance().mDialog.dismiss();
+            }
         }
     }
 }
