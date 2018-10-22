@@ -76,7 +76,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
 
-            android:text="请输入:(单位:KPa)"
+            android:text="请输入量程:(单位:KPa)"
             android:textColor="#444"
             android:textSize="14sp" />
 
