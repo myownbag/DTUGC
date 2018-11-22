@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#fff"
+    >
+<LinearLayout
+    android:id="@+id/addr201_APN_Container"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:orientation="horizontal"
+    >
+
+    <TextView
+        android:layout_gravity="center_vertical"
+        android:layout_width="80sp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="APN:"
+        android:textColor="#444"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/addr202_APN"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:textColor="#444"
+        android:textSize="14sp" />
+</LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+    <LinearLayout
+        android:id="@+id/addr201_USER_Container"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:layout_gravity="center_vertical"
+            android:layout_width="80sp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="USERS:"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/addr202_USERS"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:textColor="#444"
+            android:textSize="14sp" />
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+    <LinearLayout
+        android:id="@+id/addr201_PSWD_Container"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:layout_gravity="center_vertical"
+            android:layout_width="80sp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="PASSWORD:"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/addr202_PASSWORDS"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:textColor="#444"
+            android:textSize="14sp" />
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+</LinearLayout>

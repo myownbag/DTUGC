@@ -9,14 +9,13 @@ import android.text.TextWatcher;
 import android.text.method.KeyListener;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -28,6 +27,8 @@ import java.util.List;
 import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
 import gc.dtu.weeg.dtugc.myview.CustomDialog;
+import gc.dtu.weeg.dtugc.myview.LocalSetaddr201ExtrainfoView;
+
 
 /**
  * Created by Administrator on 2018-03-27.
@@ -42,6 +43,7 @@ public class ItemSetingActivity extends Activity {
     TextView mtextaddrname;
     Spinner spinner;
     ImageView backbut;
+    LinearLayout ExtraSetView;
     MainActivity mainActivity;
     private List<String> data_list;
     private int [] currsetvaluesettings;
@@ -53,7 +55,7 @@ public class ItemSetingActivity extends Activity {
     int datalen=0;
     public CustomDialog mDialog;
     String setcontent;
-
+    String mMdoulset="";//为联网参数保存输入数据
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,12 +67,15 @@ public class ItemSetingActivity extends Activity {
         mtextaddr=findViewById(R.id.currentset_item_addr);
         mtextaddrname=findViewById(R.id.currentset_item_addrname);
         mybutton.setOnClickListener(new buttonclickimp());
+        ExtraSetView = findViewById(R.id.local_extraitem_set);
         intent=getIntent();
         temp=intent.getStringExtra("addrs");
         mtextaddr.setText(temp);
         temp=intent.getStringExtra("name");
         mtextaddrname.setText(temp);
         setcontent=intent.getStringExtra("settings");
+
+        mMdoulset = intent.getStringExtra("addr198setting");
         if(temp!=null)
         {
             currentshow.setText(setcontent);
@@ -131,6 +136,26 @@ public class ItemSetingActivity extends Activity {
                 else if("T".equals(mainActivity.fregment4.baseinfo[i][3]))
                 {
                     spinerconter.setVisibility(View.GONE);
+                }
+                else if("E".equals(mainActivity.fregment4.baseinfo[i][3]))
+                {
+                    String tempaddr= mainActivity.fregment4.baseinfo[i][0];
+                    spinerconter.setVisibility(View.GONE);
+                    currentshow.setFocusable(false);
+                    currentshow.setFocusableInTouchMode(false);
+                    if(tempaddr.equals("201"))
+                    {
+                        LocalSetaddr201ExtrainfoView view;
+                        view = new LocalSetaddr201ExtrainfoView(this,mMdoulset);
+                        ExtraSetView.addView(view);
+                        view.setOncursettingChanged(new OnExtrasettingchange());
+                    }
+                    else if (tempaddr.equals("219"))
+                    {
+                        LocalSetaddr219ExtraInfoView view;
+                        view =new LocalSetaddr219ExtraInfoView(this);
+                        ExtraSetView.addView(view);
+                    }
                 }
                 else
                 {
@@ -521,5 +546,14 @@ public class ItemSetingActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         mainActivity.setOndataparse(null);
+    }
+
+    class OnExtrasettingchange implements LocalSetaddr201ExtrainfoView.SettingInterface
+    {
+
+        @Override
+        public void OncurSetting(String set) {
+            currentshow.setText(set);
+        }
     }
 }

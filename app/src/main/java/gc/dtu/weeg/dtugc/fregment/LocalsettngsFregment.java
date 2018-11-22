@@ -40,6 +40,9 @@ public class LocalsettngsFregment extends BaseFragment {
     Button mybut;
     thislistviewadpater myadpater;
     int mIndexcmd=0;
+
+    //把当前的模块选择项进行保存
+    String mModuleType="";
     public String[][] baseinfo=
     {
             {"100","连接设备属性","1","L",},
@@ -47,7 +50,7 @@ public class LocalsettngsFregment extends BaseFragment {
             {"103","二级地址","8","T"},
             {"110","阀门选择","10","L"},
             {"198","无线模块","1","L"},
-            {"201","联网参数","40","T"},
+            {"201","联网参数","40","E"},
             {"202","主站IP及端口","6","T"},
             {"205","校时IP及端口","6","T"},
             {"206","数据传输协议","1","L"},
@@ -55,6 +58,7 @@ public class LocalsettngsFregment extends BaseFragment {
             {"208","频率方式","1","L"},
             {"209","传输频率(分)","2","T"},
             {"210","数据传输固定时刻","12","T"},
+            {"219","时间段传输设置","14","E"},
     };
     public String[][] registerinfosel=
             {
@@ -191,6 +195,10 @@ public class LocalsettngsFregment extends BaseFragment {
                         if(Integer.valueOf(baseinfo[mIndexcmd][0])==208)
                         {
                             transtrit=tempint;
+                        }
+                        else if(Integer.valueOf(baseinfo[mIndexcmd][0])==198)
+                        {
+                            mModuleType = settingscontent[mIndexcmd];
                         }
                         break;
                     }
@@ -431,6 +439,7 @@ public class LocalsettngsFregment extends BaseFragment {
             serverIntent.putExtra("name",registersetting);
             serverIntent.putExtra("settings",registerconnet);
             serverIntent.putExtra("datalen",registerlen);
+            serverIntent.putExtra("addr198setting",mModuleType);
             startActivityForResult(serverIntent, Constants.LocalsetingFlag);
            // Log.d("zl","position:"+position+"id:"+id);
 

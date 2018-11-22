@@ -174,6 +174,7 @@ public class NBRegisiterfragment  extends BaseFragment {
                     {
                         String readOutMsg = DigitalTrans.byte2hex(mComd[mIndexCMD]);
                         verycutstatus(readOutMsg);
+                     //   Log.d("zl", "onClick: "+CodeFormat.byteToHex(mComd[mIndexCMD],mComd[mIndexCMD].length));
                     }
                     else
                     {
@@ -236,6 +237,7 @@ public class NBRegisiterfragment  extends BaseFragment {
         {
             String readOutMsg = DigitalTrans.byte2hex(mComd[mIndexCMD]);
             verycutstatus(readOutMsg);
+         //   Log.d("zl", "onClick: "+CodeFormat.byteToHex(mComd[mIndexCMD],mComd[mIndexCMD].length));
             Log.d("zl",""+mIndexCMD);
         }
         else if(mIndexCMD==mComd.length)

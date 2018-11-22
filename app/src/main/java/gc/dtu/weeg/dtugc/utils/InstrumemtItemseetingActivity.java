@@ -101,6 +101,9 @@ public class InstrumemtItemseetingActivity extends FragmentActivity implements V
             {"2000","2","PTZ_BOX CV","1019"},
             {"2000","2","AS Ultrasonic_80","1020"},
             {"2000","2","Trancy cpuCard","1021"},
+
+            {"2000","2","Control Valve","10500"},
+            {"2000","2","电压读取","10501"},
     };
 
     int reg;
