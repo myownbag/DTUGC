@@ -1,6 +1,7 @@
 package gc.dtu.weeg.dtugc.utils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -28,6 +29,7 @@ import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
 import gc.dtu.weeg.dtugc.myview.CustomDialog;
 import gc.dtu.weeg.dtugc.myview.LocalSetaddr201ExtrainfoView;
+import gc.dtu.weeg.dtugc.myview.LocalSetaddr219ExtraInfoView;
 
 
 /**
@@ -153,8 +155,9 @@ public class ItemSetingActivity extends Activity {
                     else if (tempaddr.equals("219"))
                     {
                         LocalSetaddr219ExtraInfoView view;
-                        view =new LocalSetaddr219ExtraInfoView(this);
+                        view =new LocalSetaddr219ExtraInfoView(this,setcontent);
                         ExtraSetView.addView(view);
+                        view.setOncursettingChanged(new OnExteasettingchange219());
                     }
                 }
                 else
@@ -413,6 +416,38 @@ public class ItemSetingActivity extends Activity {
                 CodeFormat.crcencode(sendbuf);
 //                Log.d("zl","addrtemp.equals 210:"+CodeFormat.byteToHex(sendbuf,sendbuf.length));
             }
+            else if(addrtemp.equals("219"))
+            {
+                boolean result;
+                byte crusetbyte[] = new byte[14]; // =temp.getBytes();
+                result=LocalSetaddr219ExtraInfoView.parsetimestr(temp,crusetbyte);
+                if(result==false)
+                {
+                    ToastUtils.showToast(ItemSetingActivity.this,"参数设置错误");
+                    return;
+                }
+                sendbuf=new byte[datalen+18];
+                sendbuf[0]= (byte) 0xFD;
+                sendbuf[3]= (byte) ((datalen+13)%0x100);
+                sendbuf[5]=0x15;
+                sendbuf[14]= (byte) (Integer.valueOf(mainActivity.fregment4.baseinfo[mposition][0])%0x100);
+
+                if(crusetbyte.length>datalen)
+                {
+                    Toast.makeText(ItemSetingActivity.this,"输入字节超出长度",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                for( i=0;i<datalen;i++)
+                {
+                    if(i<crusetbyte.length)
+                    {
+                        sendbuf[16+i]=crusetbyte[i];
+                    }
+                    else
+                        sendbuf[16+i]=(byte)0x00;
+                }
+                CodeFormat.crcencode(sendbuf);
+            }
             else
             {
                 byte crusetbyte[]=temp.getBytes();
@@ -553,6 +588,13 @@ public class ItemSetingActivity extends Activity {
 
         @Override
         public void OncurSetting(String set) {
+            currentshow.setText(set);
+        }
+    }
+    class OnExteasettingchange219 implements LocalSetaddr219ExtraInfoView.SettingInterface
+    {
+        @Override
+        public void OncurSetting(String set, byte[] setbyte) {
             currentshow.setText(set);
         }
     }

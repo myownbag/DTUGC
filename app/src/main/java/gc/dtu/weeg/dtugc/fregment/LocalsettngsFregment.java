@@ -302,6 +302,10 @@ public class LocalsettngsFregment extends BaseFragment {
                 }
                 settingscontent[mIndexcmd]=daytime;
             }
+            else if(tempint2==219)
+            {
+                //解析219
+            }
             else
             {
                 temp="";

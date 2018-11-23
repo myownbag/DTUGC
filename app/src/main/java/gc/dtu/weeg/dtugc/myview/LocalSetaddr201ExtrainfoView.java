@@ -128,27 +128,23 @@ public class LocalSetaddr201ExtrainfoView extends LinearLayout {
         {
             return;
         }
-        if(m198Modul.equals("BC95")||m198Modul.equals("M72"))
-        {
-            settingInterface.OncurSetting(mAPN);
-        }
-        else if(m198Modul.equals("MC323"))
-        {
-            settingInterface.OncurSetting(mUSERS+","+mPWSD);
-        }
-        else if(m198Modul.equals("EC20"))
-        {
-            settingInterface.OncurSetting(mAPN+","+mUSERS+","+mPWSD);
-        }
-        else
-        {
-
+        switch (m198Modul) {
+            case "BC95":
+            case "M72":
+                settingInterface.OncurSetting(mAPN);
+                break;
+            case "MC323":
+                settingInterface.OncurSetting(mUSERS + "," + mPWSD);
+                break;
+            case "EC20":
+                settingInterface.OncurSetting(mAPN + "," + mUSERS + "," + mPWSD);
+                break;
         }
     }
 
     public interface SettingInterface
     {
-        public void OncurSetting(String set);
+         void OncurSetting(String set);
     }
 
     public void setOncursettingChanged(SettingInterface si)
