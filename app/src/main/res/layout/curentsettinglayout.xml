@@ -130,6 +130,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
+            android:maxLines="10"
             android:layout_toEndOf="@+id/currentset_item_addrsettings_lable"
             android:layout_toRightOf="@+id/currentset_item_addrsettings_lable"
             android:textColor="#444"

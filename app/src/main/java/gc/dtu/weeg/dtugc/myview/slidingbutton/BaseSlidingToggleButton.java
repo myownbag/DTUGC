@@ -129,7 +129,7 @@ public abstract class BaseSlidingToggleButton extends View implements OnGestureL
             if(pendingSetState){  
                 pendingSetState = false;  
                 setChecked(pendingChecked, 0);  
-                Log.d("slidebut","the checkedleft at onDraw init= "+checkedLeft);
+//                Log.d("slidebut","the checkedleft at onDraw init= "+checkedLeft);
             }  
         }
 
@@ -213,7 +213,7 @@ public abstract class BaseSlidingToggleButton extends View implements OnGestureL
         //��������ڹ�������ô�͸���X���겢ˢ��  
         if(scroller.computeScrollOffset()){  
             currentLeft = scroller.getCurrX();  
-            Log.d("slidebut", "currentleft at on computeScorll = "+currentLeft);
+//            Log.d("slidebut", "currentleft at on computeScorll = "+currentLeft);
             invalidate();  
         }  
     }  
@@ -273,8 +273,8 @@ public abstract class BaseSlidingToggleButton extends View implements OnGestureL
         needHandle = true;//����ڵ����ȡ����ʱ����Ҫ����  
         scrollDistanceCount += distanceX;//��¼�����ܵĻ����ľ���  
         currentLeft -= distanceX;//���������״̬���Լ���������X����  
-        Log.d("slidebut", "scrollDistanceCount at onScroll = "+scrollDistanceCount);
-        Log.d("slidebut", "currentLeft at onScroll = "+currentLeft);
+//        Log.d("slidebut", "scrollDistanceCount at onScroll = "+scrollDistanceCount);
+//        Log.d("slidebut", "currentLeft at onScroll = "+currentLeft);
         //��ֹ�����Ĺ����г�����Χ  
         if(currentLeft >= uncheckedLeft){  
             currentLeft = uncheckedLeft;  

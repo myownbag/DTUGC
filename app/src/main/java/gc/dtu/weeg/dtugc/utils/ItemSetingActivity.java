@@ -1,7 +1,6 @@
 package gc.dtu.weeg.dtugc.utils;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -58,6 +57,10 @@ public class ItemSetingActivity extends Activity {
     public CustomDialog mDialog;
     String setcontent;
     String mMdoulset="";//为联网参数保存输入数据
+    byte[] addr220setcmd = new byte[40+18];//保存220的设置指令与201相互关联
+    String str220setting;
+    String str201setting;
+    boolean str220enable = false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +81,7 @@ public class ItemSetingActivity extends Activity {
         setcontent=intent.getStringExtra("settings");
 
         mMdoulset = intent.getStringExtra("addr198setting");
+        str220setting = intent.getStringExtra("220addrset");
         if(temp!=null)
         {
             currentshow.setText(setcontent);
@@ -148,7 +152,7 @@ public class ItemSetingActivity extends Activity {
                     if(tempaddr.equals("201"))
                     {
                         LocalSetaddr201ExtrainfoView view;
-                        view = new LocalSetaddr201ExtrainfoView(this,mMdoulset);
+                        view = new LocalSetaddr201ExtrainfoView(this,setcontent,str220setting,mMdoulset);
                         ExtraSetView.addView(view);
                         view.setOncursettingChanged(new OnExtrasettingchange());
                     }
@@ -450,22 +454,63 @@ public class ItemSetingActivity extends Activity {
             }
             else
             {
+                int index201=0;
+                int strlen=0;
+                String Setstr201="";
                 byte crusetbyte[]=temp.getBytes();
+                strlen=findstrlen(crusetbyte);
+                Log.d("zl","len:"+strlen);
+                if(addrtemp.equals("201"))
+                {
+                    str220enable=true;
+                    addr220setcmd[0]= (byte) 0xFD;
+                    addr220setcmd[3]= (byte) ((datalen+13)%0x100);
+                    addr220setcmd[5]=0x15;
+                    addr220setcmd[14]= (byte) (220);
+                    if(strlen<datalen)
+                    {
+                        for( i=0;i<datalen;i++)
+                        {
+                            addr220setcmd[16+i]=(byte)0x00;
+                        }
+                    }
+                    else
+                    {
+                        index201=temp.indexOf(",");
+                        Setstr201=temp.substring(0,index201);
+                        str220setting=Setstr201;
+                        crusetbyte=Setstr201.getBytes();
+                        for( i=0;i<datalen;i++)
+                        {
+                            if(i<crusetbyte.length)
+                            {
+                                addr220setcmd[16+i]=crusetbyte[i];
+                            }
+                            else
+                                addr220setcmd[16+i]=(byte)0x00;
+                        }
+                        Setstr201=temp.substring(index201,temp.length());
+                        crusetbyte=Setstr201.getBytes();
+                        str201setting=Setstr201;
+                    }
+                    CodeFormat.crcencode(addr220setcmd);
+                }
                 sendbuf=new byte[datalen+18];
                 sendbuf[0]= (byte) 0xFD;
                 sendbuf[3]= (byte) ((datalen+13)%0x100);
                 sendbuf[5]=0x15;
                 sendbuf[14]= (byte) (Integer.valueOf(mainActivity.fregment4.baseinfo[mposition][0])%0x100);
 
+                strlen=findstrlen(crusetbyte);
 
-                if(crusetbyte.length>datalen)
+                if(strlen>datalen)
                 {
                     Toast.makeText(ItemSetingActivity.this,"输入字节超出长度",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 for( i=0;i<datalen;i++)
                 {
-                    if(i<crusetbyte.length)
+                    if(i<strlen)
                     {
                         sendbuf[16+i]=crusetbyte[i];
                     }
@@ -481,6 +526,18 @@ public class ItemSetingActivity extends Activity {
 //                        intent.putExtra("addrs",mposition);
 //                        ItemSetingActivity.this.setResult(spinerposition,intent);
         }
+    }
+
+    private int findstrlen(byte[] p0) {
+        int len=0;
+        for(len=0;len<p0.length;len++)
+        {
+            if(p0[len]==0)
+            {
+                break;
+            }
+        }
+        return len;
     }
 
     private void verycutstatus(String readOutMsg) {
@@ -571,8 +628,30 @@ public class ItemSetingActivity extends Activity {
        public void datacometoparse(String readOutMsg1, byte[] readOutBuf1) {
            ItemSetingActivity.this.mDialog.dismiss();
            String temp=currentshow.getText().toString();
-           intent.putExtra("name",temp);
-           intent.putExtra("addrs",mposition);
+           //currentset_item_addr
+           String addrname = mtextaddr.getText().toString() ;
+           if(addrname.equals("201"))
+           {
+               if(str220enable)
+               {
+                   str220enable=false;
+                   String readOutMsg = DigitalTrans.byte2hex(addr220setcmd);
+                   verycutstatus(readOutMsg);
+                   return;
+               }
+               else
+               {
+                   intent.putExtra("name",str201setting);
+                   intent.putExtra("name1",str220setting);
+                   intent.putExtra("addrs",mposition);
+               }
+           }
+           else
+           {
+               intent.putExtra("name",temp);
+               intent.putExtra("addrs",mposition);
+           }
+
            ItemSetingActivity.this.setResult(1,intent);
            ItemSetingActivity.this.finish();
        }

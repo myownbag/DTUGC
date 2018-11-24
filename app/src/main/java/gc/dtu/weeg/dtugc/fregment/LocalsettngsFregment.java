@@ -17,9 +17,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
 
+import gc.dtu.weeg.dtugc.myview.LocalSetaddr219ExtraInfoView;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
@@ -51,6 +55,7 @@ public class LocalsettngsFregment extends BaseFragment {
             {"110","阀门选择","10","L"},
             {"198","无线模块","1","L"},
             {"201","联网参数","40","E"},
+            {"220","电信定制APN","40","T"},
             {"202","主站IP及端口","6","T"},
             {"205","校时IP及端口","6","T"},
             {"206","数据传输协议","1","L"},
@@ -305,6 +310,13 @@ public class LocalsettngsFregment extends BaseFragment {
             else if(tempint2==219)
             {
                 //解析219
+                byte[] data2convert = new byte[14];
+                ByteBuffer buf = ByteBuffer.allocate(14);
+                buf=buf.order(ByteOrder.LITTLE_ENDIAN);
+                buf.put(readOutBuf1,16,14)  ;
+                buf.rewind();
+                buf.get(data2convert);
+                settingscontent[mIndexcmd]=LocalSetaddr219ExtraInfoView.Hexinfo2Str(data2convert);
             }
             else
             {
@@ -444,6 +456,12 @@ public class LocalsettngsFregment extends BaseFragment {
             serverIntent.putExtra("settings",registerconnet);
             serverIntent.putExtra("datalen",registerlen);
             serverIntent.putExtra("addr198setting",mModuleType);
+            serverIntent.putExtra("220addrset",settingscontent[6]);
+            if(registername.equals("220"))
+            {
+                ToastUtils.showToast(MainActivity.getInstance(),"寄存器220必须和201关联设置");
+                return;
+            }
             startActivityForResult(serverIntent, Constants.LocalsetingFlag);
            // Log.d("zl","position:"+position+"id:"+id);
 
@@ -464,8 +482,17 @@ public class LocalsettngsFregment extends BaseFragment {
         }
         if(data!=null)
         {
+
             String temp=data.getStringExtra("name");
             int index=  data.getIntExtra("addrs",-1);
+            if(index==5)
+            {
+                if(temp!=null)
+                    settingscontent[index]=temp;
+                String temp1= data.getStringExtra("name1");
+                if(temp1!=null)
+                    settingscontent[index+1]=temp1;
+            }
             if(index>=0&&temp!=null)
             {
                 settingscontent[index]=temp;

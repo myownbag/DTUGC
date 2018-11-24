@@ -85,28 +85,28 @@ public class SlidingToggleButton extends BaseSlidingToggleButton {
 	@Override
 	public void onGestureStarted(GestureOverlayView overlay, MotionEvent event) {
 		// TODO Auto-generated method stub
-		Log.d("zl", "onGestureStarted");
+//		Log.d("zl", "onGestureStarted");
 		
 	}
 
 	@Override
 	public void onGesture(GestureOverlayView overlay, MotionEvent event) {
 		// TODO Auto-generated method stub
-		Log.d("zl", "onGesture");
+//		Log.d("zl", "onGesture");
 		
 	}
 
 	@Override
 	public void onGestureEnded(GestureOverlayView overlay, MotionEvent event) {
 		// TODO Auto-generated method stub
-		Log.d("zl", "onGestureEnded");
+//		Log.d("zl", "onGestureEnded");
 		
 	}
 
 	@Override
 	public void onGestureCancelled(GestureOverlayView overlay, MotionEvent event) {
 		// TODO Auto-generated method stub
-		Log.d("zl", "onGestureCancelled");
+//		Log.d("zl", "onGestureCancelled");
 		
 	}  
 }
