@@ -40,6 +40,7 @@ import gc.dtu.weeg.dtugc.fregment.BaseFragment;
 import gc.dtu.weeg.dtugc.fregment.BasicinfoFregment;
 import gc.dtu.weeg.dtugc.fregment.CNKFixedPagerAdapter;
 import gc.dtu.weeg.dtugc.fregment.FrozendataFregment;
+import gc.dtu.weeg.dtugc.fregment.GasSensorSetFragment;
 import gc.dtu.weeg.dtugc.fregment.Hex2BinConvertFragment;
 import gc.dtu.weeg.dtugc.fregment.InstrumentInputFregment;
 import gc.dtu.weeg.dtugc.fregment.LocalsettngsFregment;
@@ -94,8 +95,8 @@ public class MainActivity extends FragmentActivity {
     private ViewGroup mClassContainer;
     int mScrollX = 0;
     private List<BaseFragment> fragments;
-    private String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置"
-            , "传感器设置", "仪表接入","压力传感器配置","NB业务注册","版本信息","固件升级"};
+    public String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置"
+            , "温压传感器接入","气体传感器接入", "仪表接入","传感器调试","NB业务注册","版本信息","固件升级"};
     //蓝牙状态保存
     public Boolean mIsconnect = false;
     // Name of the connected device
@@ -123,6 +124,7 @@ public class MainActivity extends FragmentActivity {
     public NBRegisiterfragment      fregment8;
     public AppVersioninfoFregment   fregment9;
     public Hex2BinConvertFragment   fragment10;
+    public GasSensorSetFragment     fragment11;
 
     //接口
     Ondataparse mydataparse=null;
@@ -357,6 +359,14 @@ public class MainActivity extends FragmentActivity {
         bundle4.putString("extra",titles[index++]);
         fregment5.setArguments(bundle4);
         fragments.add(fregment5);
+
+        //添加气体传感器的设置
+        fragment11 = new GasSensorSetFragment();
+        Bundle bundle11 = new Bundle();
+        bundle11.putInt("position",index);
+        bundle11.putString("extra",titles[index++]);
+        fragment11.setArguments(bundle11);
+        fragments.add(fragment11);
 
         fregment6 = new InstrumentInputFregment();
         Bundle bundle5 = new Bundle();

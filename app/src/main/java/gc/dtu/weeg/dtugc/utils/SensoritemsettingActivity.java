@@ -43,11 +43,15 @@ public class SensoritemsettingActivity extends Activity {
     EditText editText1;
     EditText editText2;
 
+    TextView mAnologLableView;
+
     ImageView Imageback;
     Button   butcommit;
     ArrayList<String> listcontent;
     ArrayList<String> listvalue;
     int m_currentselect=0;
+    int m_curposition=-1;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,8 +69,7 @@ public class SensoritemsettingActivity extends Activity {
         m_range=findViewById(R.id.sensor_set_item_manual);
         editText1=findViewById(R.id.sensor_set_item_hight_input);
         editText2=findViewById(R.id.sensor_set_item_low_input);
-
-
+        mAnologLableView=findViewById(R.id.sensor_set_item_manual_label);
         initview();
 
     }
@@ -74,6 +77,15 @@ public class SensoritemsettingActivity extends Activity {
     private void initview() {
 
             int position=intent.getIntExtra("position",-1);
+            m_curposition=position;
+            if(position==5)
+            {
+                mAnologLableView.setText("请输入量程:");
+            }
+            else
+            {
+                mAnologLableView.setText("请输入量程:(单位:KPa)");
+            }
             String temptitle=intent.getStringExtra("name");
             boolean isfind=false;
             mtitle.setText(temptitle);
@@ -120,6 +132,30 @@ public class SensoritemsettingActivity extends Activity {
                     }
                 }
             }
+            else if(position==5) //燃气报警器参数设置
+            {
+                for(int i=0;i<mainActivity.fragment11.gassensorinfo.length;i++)
+                {
+                    if(mainActivity.fragment11.gassensorinfo[i][0]=="3")
+                    {
+                        listcontent.add(mainActivity.fragment11.gassensorinfo[i][1]);
+                        listvalue.add(mainActivity.fragment11.gassensorinfo[i][2]);
+
+                        if(tempcontent.equals(mainActivity.fragment11.gassensorinfo[i][1]))
+                        {
+                            m_currentselect=listvalue.size()-1;
+                            isfind=true;
+                        }
+                    }
+                }
+                if(isfind==false)
+                {
+                    if(tempcontent.length()!=0)
+                    {
+                        m_currentselect=listvalue.size()-1;
+                    }
+                }
+            }
         switch (position)
             {
                 case 1:
@@ -134,6 +170,7 @@ public class SensoritemsettingActivity extends Activity {
                     editText2.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_CLASS_NUMBER);
                     break;
                 case 4:
+                case 6:
                     selectlayout.setVisibility(View.GONE);
                     anologinputlayout.setVisibility(View.GONE);
                     text1.setText("扫描时间(秒)");
@@ -141,7 +178,15 @@ public class SensoritemsettingActivity extends Activity {
                     editText1.setInputType(InputType.TYPE_CLASS_NUMBER);
                     editText2.setInputType(InputType.TYPE_CLASS_NUMBER);
                     break;
-
+                case 5:
+                    selectlayout.setVisibility(View.VISIBLE);
+                    anologinputlayout.setVisibility(View.VISIBLE);
+                    text1.setText("高报警");
+                    text2.setText("低报警");
+                    m_range.setText(tempcontent);
+                    editText1.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_CLASS_NUMBER);
+                    editText2.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_CLASS_NUMBER);
+                    break;
             }
             editText1.setText(intent.getStringExtra("item2"));
             editText2.setText(intent.getStringExtra("item3"));
@@ -160,7 +205,7 @@ public class SensoritemsettingActivity extends Activity {
         msettings.setSelection(m_currentselect,true);
         msettings.setOnItemSelectedListener(new SpinerOnitemselectimp());
         int sizemax=listvalue.size()-1;
-        if(position==1||position==2)
+        if(position==1||position==2||position==5)
         {
             if(m_currentselect==sizemax)
                 anologinputlayout.setVisibility(View.VISIBLE);
@@ -171,7 +216,7 @@ public class SensoritemsettingActivity extends Activity {
         {
             anologinputlayout.setVisibility(View.GONE);
         }
-        else
+        else if(position==4||position==6)
         {
             selectlayout.setVisibility(View.GONE);
         }
@@ -291,8 +336,19 @@ public class SensoritemsettingActivity extends Activity {
                 temp.put("settings",editText2.getText().toString());
             }
             itemdata.add(temp);
-
-            mainActivity.fregment5.updateallsettingitems(itemdata);
+            switch (m_curposition)
+            {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                    mainActivity.fregment5.updateallsettingitems(itemdata);
+                    break;
+                case 5:
+                case 6:
+                    mainActivity.fragment11.updateallsettingitems(itemdata);
+                    break;
+            }
             SensoritemsettingActivity.this.setResult(1,intent);
             SensoritemsettingActivity.this.finish();
         }

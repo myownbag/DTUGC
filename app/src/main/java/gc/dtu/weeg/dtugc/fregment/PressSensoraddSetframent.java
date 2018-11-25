@@ -74,7 +74,7 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
             }
             else
             {
-                mTextResultView.setText("进入压力模式失败");
+                mTextResultView.setText("进入传感器调试模式失败");
                 MainActivity.getInstance().mDialog.dismiss();
             }
         }

@@ -418,11 +418,11 @@ public class SensorInputFregment extends BaseFragment {
 
     @Override
     public void Oncurrentpageselect(int index) {
-        if(index!=4)
+        if(index!=position)
         {
             mIsatart=false;
         }
-        if(index==4)
+        if(index==position)
         {
             sp = MainActivity.getInstance().getSharedPreferences("User", Context.MODE_PRIVATE);
             int inftshow=sp.getInt("info",-1);
