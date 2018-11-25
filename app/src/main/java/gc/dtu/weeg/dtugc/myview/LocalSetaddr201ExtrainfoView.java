@@ -126,16 +126,16 @@ public class LocalSetaddr201ExtrainfoView extends LinearLayout {
     }
 
     private void initshow(String strcontent) {
-        byte[] str;
-        str=strcontent.getBytes();
-        strcontent="";
-        for(int i=0;i<str.length;i++)
-        {
-            if(str[i]>7&&str[i]<127)
-                strcontent+=(char)str[i];
-            else
-                break;
-        }
+//        byte[] str;
+//        str=strcontent.getBytes();
+//        strcontent="";
+//        for(int i=0;i<str.length;i++)
+//        {
+//            if(str[i]>7&&str[i]<127)
+//                strcontent+=(char)str[i];
+//            else
+//                break;
+//        }
         int index=0;
         String show;
         if(strcontent.length()==0)
@@ -169,7 +169,7 @@ public class LocalSetaddr201ExtrainfoView extends LinearLayout {
         show=show.substring(index+1,show.length());
         EditviewPSWD.setText(show);
         mPWSD=show;
-        //setContent();
+        setContent();
     }
 
     public void setContent()
@@ -202,4 +202,8 @@ public class LocalSetaddr201ExtrainfoView extends LinearLayout {
         settingInterface=si;
     }
 
+    public void updatecurrentshow()
+    {
+        setContent();
+    }
 }

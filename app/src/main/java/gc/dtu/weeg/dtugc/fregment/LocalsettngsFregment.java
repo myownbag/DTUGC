@@ -323,6 +323,10 @@ public class LocalsettngsFregment extends BaseFragment {
                 temp="";
                 for(i=0;i<readOutBuf1.length-18;i++)
                 {
+                    if(readOutBuf1[i+16]==0)
+                    {
+                        break;
+                    }
                     temp+=(char)readOutBuf1[16+i];
                     settingscontent[mIndexcmd]=temp;
                 }
@@ -455,6 +459,7 @@ public class LocalsettngsFregment extends BaseFragment {
             serverIntent.putExtra("name",registersetting);
             serverIntent.putExtra("settings",registerconnet);
             serverIntent.putExtra("datalen",registerlen);
+            mModuleType=settingscontent[4];
             serverIntent.putExtra("addr198setting",mModuleType);
             serverIntent.putExtra("220addrset",settingscontent[6]);
             if(registername.equals("220"))

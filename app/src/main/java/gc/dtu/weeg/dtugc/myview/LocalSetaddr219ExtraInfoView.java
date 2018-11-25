@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -99,8 +98,8 @@ public class LocalSetaddr219ExtraInfoView extends LinearLayout {
                         default:
                             break;
                 }
-                Log.d("zl","call update in onTimeSelect"
-                        + CodeFormat.byteToHex(settings,settings.length));
+//                Log.d("zl","call update in onTimeSelect"
+//                        + CodeFormat.byteToHex(settings,settings.length));
                 updatesetting();
             }
         })
@@ -171,8 +170,8 @@ public class LocalSetaddr219ExtraInfoView extends LinearLayout {
                 buf1.putInt(gap);
                 buf1.rewind();
                 buf1.get(settings,0,2);
-                Log.d("zl","call update in afterTextChanged \n"
-                        +CodeFormat.byteToHex(settings,settings.length));
+//                Log.d("zl","call update in afterTextChanged \n"
+//                        +CodeFormat.byteToHex(settings,settings.length));
 
                 updatesetting();
             }
@@ -206,7 +205,7 @@ public class LocalSetaddr219ExtraInfoView extends LinearLayout {
     }
 
     private void addr219showinit() {
-        Log.d("zl","in addr219showinit");
+//        Log.d("zl","in addr219showinit");
         if(mCursetstr.length()==0)
         {
             for(int i=2;i<settings.length;i++)
@@ -314,7 +313,7 @@ public class LocalSetaddr219ExtraInfoView extends LinearLayout {
     }
     public void updatesetting()
     {
-        Log.d("zl","in update");
+//        Log.d("zl","in update");
 //        if(mFlaginitend==false)
 //        {
 //            return;
@@ -395,12 +394,12 @@ public class LocalSetaddr219ExtraInfoView extends LinearLayout {
                         settings[1]=0x00;
                         mTimegap.setText("功能禁止");
                     }
-                    Log.d("zl","call update in setOnCheckedChanageListener \n"+ CodeFormat.byteToHex(settings,settings.length));
+//                    Log.d("zl","call update in setOnCheckedChanageListener \n"+ CodeFormat.byteToHex(settings,settings.length));
                     updatesetting();
                     break;
             }
-            Log.d("zl","call updat in onCheckedChanage \n"
-                    + CodeFormat.byteToHex(settings,settings.length));
+//            Log.d("zl","call updat in onCheckedChanage \n"
+//                    + CodeFormat.byteToHex(settings,settings.length));
             updatesetting();
         }
     }

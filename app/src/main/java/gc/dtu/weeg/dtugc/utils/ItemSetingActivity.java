@@ -155,6 +155,7 @@ public class ItemSetingActivity extends Activity {
                         view = new LocalSetaddr201ExtrainfoView(this,setcontent,str220setting,mMdoulset);
                         ExtraSetView.addView(view);
                         view.setOncursettingChanged(new OnExtrasettingchange());
+                        view.updatecurrentshow();
                     }
                     else if (tempaddr.equals("219"))
                     {
