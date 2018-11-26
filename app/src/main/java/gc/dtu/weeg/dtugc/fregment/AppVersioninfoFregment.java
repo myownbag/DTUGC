@@ -27,9 +27,9 @@ public class AppVersioninfoFregment extends BaseFragment implements View.OnClick
     public TextView mVersionName;
     public Button mbut;
     public byte[] cmdrest={(byte)0xFD ,0x00 ,0x00 ,0x0E ,0x00 ,
-                           0x15 ,0x00 ,0x00 ,0x00 ,0x00 ,
-                           0x00 ,0x00 ,0x00 ,0x00 ,0x63 ,
-                           0x00 ,(byte)0xA5 ,0x52 ,(byte)0x88};
+            0x15 ,0x00 ,0x00 ,0x00 ,0x00 ,
+            0x00 ,0x00 ,0x00 ,0x00 ,0x63 ,
+            0x00 ,(byte)0xA5 ,0x52 ,(byte)0x88};
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

@@ -46,70 +46,132 @@
             android:layout_height="0.5dp"
             android:background="#CFCFCF" />
 
+        <TextView
+            android:gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="一级选项:"
+            />
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+            <RadioGroup
+                android:layout_gravity="center_vertical"
+                android:id="@+id/sensor_main_selected"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+                <RadioButton
+                    android:id="@+id/sensor_enternfactory"
+                    style="@style/statesetbtnstyle"
+                    android:text="进入工厂模式"
+                    android:checked="true"
+                    android:layout_margin="3dp"
+                    />
+                <RadioButton
+                    android:id="@+id/sensor_press_debug"
+                    style="@style/statesetbtnstyle"
+                    android:text="压力传感器"
+                    android:layout_margin="3dp"
+                    />
+                <RadioButton
+                    android:id="@+id/sensor_gas_1"
+                    style="@style/statesetbtnstyle"
+                    android:text="红外气体传感器"
+                    android:layout_margin="3dp"
+                    />
+                <RadioButton
+                    android:id="@+id/sensor_gas_2"
+                    style="@style/statesetbtnstyle"
+                    android:layout_margin="3dp"
+                    android:text="C16气体传感器"
+                    />
+                <RadioButton
+                    android:id="@+id/sensor_reset"
+                    style="@style/statesetbtnstyle"
+                    android:layout_margin="3dp"
+                    android:text="数据保存并复位"
+                    />
+            </RadioGroup>
+
+        </HorizontalScrollView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#CFCFCF" />
+        <TextView
+            android:gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:text="二级选项:"
+            />
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="90dp"
             android:fadeScrollbars="false"
             >
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="vertical"
+             >
 
-            <RadioGroup
-                android:id="@+id/press_sensor_set_but_group"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="vertical">
 
-                <RadioButton
-                    android:id="@+id/press_sensor_set_factory_mode"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:checked="true"
-                    android:text="进入工程模式" />
+             <RadioGroup
+                 android:id="@+id/press_sensor_set_but_group"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:gravity="center_vertical"
+                 android:orientation="vertical">
+                 <RadioButton
+                     android:id="@+id/press_sensor_set_but_press1rd"
+                     android:layout_width="match_parent"
+                     android:layout_height="50dp"
+                     android:text="读取第一路压力"
 
-                <RadioButton
-                    android:id="@+id/press_sensor_set_but_press1rd"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="读取第一路压力"
+                     />
 
-                    />
+                 <RadioButton
+                     android:id="@+id/press_sensor_set_but_press2rd"
+                     android:layout_width="match_parent"
+                     android:layout_height="50dp"
+                     android:text="读取第二路压力" />
 
-                <RadioButton
-                    android:id="@+id/press_sensor_set_but_press2rd"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="读取第二路压力" />
+                 <RadioButton
+                     android:id="@+id/press_sensor_set_but_press1wd"
+                     android:layout_width="match_parent"
+                     android:layout_height="50dp"
+                     android:text="压力传感器地址修改1->2" />
 
-                <RadioButton
-                    android:id="@+id/press_sensor_set_but_press1wd"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="压力传感器地址修改1->2" />
+                 <RadioButton
+                     android:id="@+id/press_sensor_set_but_press2wd"
+                     android:layout_width="match_parent"
+                     android:layout_height="50dp"
+                     android:text="压力传感器地址修改2->1" />
 
-                <RadioButton
-                    android:id="@+id/press_sensor_set_but_press2wd"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="压力传感器地址修改2->1" />
+                 <RadioButton
+                     android:id="@+id/press_sensor_gassensor_getdata"
+                     android:layout_width="match_parent"
+                     android:layout_height="50dp"
+                     android:text="气体传感器读数" />
 
-                <RadioButton
-                    android:id="@+id/press_sensor_gassensor_zero"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="气体传感器校零" />
+                 <RadioButton
+                     android:id="@+id/press_sensor_gassensor_zero"
+                     android:layout_width="match_parent"
+                     android:layout_height="50dp"
+                     android:text="气体传感器校零" />
 
-                <RadioButton
-                    android:id="@+id/press_sensor_gassensor_calb"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="气体传感器校量程" />
-                <RadioButton
-                    android:id="@+id/press_sensor_reset"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="设备复位" />
-            </RadioGroup>
+                 <RadioButton
+                     android:id="@+id/press_sensor_gassensor_calb"
+                     android:layout_width="match_parent"
+                     android:layout_height="50dp"
+                     android:text="气体传感器校量程" />
+             </RadioGroup>
+         </LinearLayout>
         </ScrollView>
 
         <View

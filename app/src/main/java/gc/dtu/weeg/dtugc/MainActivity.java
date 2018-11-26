@@ -594,7 +594,7 @@ public class MainActivity extends FragmentActivity {
     //当timeout设置为0时 ，不会做超时计算
     public void sendData(String data, String strOwner,int timeout) {
 
-        Log.d("zl","MainActivity:"+data);
+//        Log.d("zl","MainActivity:"+data);
         // Check that we're actually connected before trying anything
         if (mBTService.getState() != BluetoothState.STATE_CONNECTED) {
 
