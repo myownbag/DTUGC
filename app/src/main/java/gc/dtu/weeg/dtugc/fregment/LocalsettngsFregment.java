@@ -328,8 +328,8 @@ public class LocalsettngsFregment extends BaseFragment {
                         break;
                     }
                     temp+=(char)readOutBuf1[16+i];
-                    settingscontent[mIndexcmd]=temp;
                 }
+                settingscontent[mIndexcmd]=temp;
             }
         }
         mIndexcmd++;
@@ -467,6 +467,19 @@ public class LocalsettngsFregment extends BaseFragment {
                 ToastUtils.showToast(MainActivity.getInstance(),"寄存器220必须和201关联设置");
                 return;
             }
+            else if(registername.equals("201"))
+            {
+                if(mModuleType==null)
+                {
+                    ToastUtils.showToast(MainActivity.getInstance(),"请先设置好寄存器198:通信模块");
+                    return;
+                }
+                else if(mModuleType.equals(""))
+                {
+                    ToastUtils.showToast(MainActivity.getInstance(),"请先设置好寄存器198:通信模块");
+                    return;
+                }
+            }
             startActivityForResult(serverIntent, Constants.LocalsetingFlag);
            // Log.d("zl","position:"+position+"id:"+id);
 
@@ -497,6 +510,7 @@ public class LocalsettngsFregment extends BaseFragment {
                 String temp1= data.getStringExtra("name1");
                 if(temp1!=null)
                     settingscontent[index+1]=temp1;
+//                Log.d("zl","localreagment : 5-6"+settingscontent[5]+"  "+settingscontent[6]);
             }
             if(index>=0&&temp!=null)
             {

@@ -65,7 +65,7 @@
                 <RadioButton
                     android:id="@+id/sensor_enternfactory"
                     style="@style/statesetbtnstyle"
-                    android:text="进入工厂模式"
+                    android:text="进入工程模式"
                     android:checked="true"
                     android:layout_margin="3dp"
                     />

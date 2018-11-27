@@ -152,6 +152,14 @@ public class ItemSetingActivity extends Activity {
                     if(tempaddr.equals("201"))
                     {
                         LocalSetaddr201ExtrainfoView view;
+                        if(setcontent==null)
+                        {
+                            setcontent="";
+                        }
+                        if(str220setting==null)
+                        {
+                            str201setting="";
+                        }
                         view = new LocalSetaddr201ExtrainfoView(this,setcontent,str220setting,mMdoulset);
                         ExtraSetView.addView(view);
                         view.setOncursettingChanged(new OnExtrasettingchange());
@@ -456,30 +464,33 @@ public class ItemSetingActivity extends Activity {
             else
             {
                 int index201=0;
-                int strlen=0;
+      //          int strlen=0;
                 String Setstr201="";
                 byte crusetbyte[]=temp.getBytes();
-                strlen=findstrlen(crusetbyte);
-                Log.d("zl","len:"+strlen);
+//                strlen=findstrlen(crusetbyte);
+//                Log.d("zl","len:"+strlen);
                 if(addrtemp.equals("201"))
                 {
+//                    Log.d("zl","IiemSetting: str220setting"+str220setting);
                     str220enable=true;
                     addr220setcmd[0]= (byte) 0xFD;
                     addr220setcmd[3]= (byte) ((datalen+13)%0x100);
                     addr220setcmd[5]=0x15;
                     addr220setcmd[14]= (byte) (220);
-                    if(strlen<datalen)
+                    if(crusetbyte.length<datalen)
                     {
                         for( i=0;i<datalen;i++)
                         {
                             addr220setcmd[16+i]=(byte)0x00;
                         }
+                        str220setting="";
+                        str201setting=temp;
                     }
                     else
                     {
                         index201=temp.indexOf(",");
                         Setstr201=temp.substring(0,index201);
-                        str220setting=Setstr201;
+                        str220setting= new String(Setstr201);
                         crusetbyte=Setstr201.getBytes();
                         for( i=0;i<datalen;i++)
                         {
@@ -494,6 +505,8 @@ public class ItemSetingActivity extends Activity {
                         crusetbyte=Setstr201.getBytes();
                         str201setting=Setstr201;
                     }
+//                    Log.d("zl","IiemSetting: str220setting"+str220setting);
+//                    Log.d("zl","IiemSetting: str201setting"+str201setting);
                     CodeFormat.crcencode(addr220setcmd);
                 }
                 sendbuf=new byte[datalen+18];
@@ -502,16 +515,14 @@ public class ItemSetingActivity extends Activity {
                 sendbuf[5]=0x15;
                 sendbuf[14]= (byte) (Integer.valueOf(mainActivity.fregment4.baseinfo[mposition][0])%0x100);
 
-                strlen=findstrlen(crusetbyte);
-
-                if(strlen>datalen)
+                if(crusetbyte.length>datalen)
                 {
                     Toast.makeText(ItemSetingActivity.this,"输入字节超出长度",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 for( i=0;i<datalen;i++)
                 {
-                    if(i<strlen)
+                    if(i<crusetbyte.length)
                     {
                         sendbuf[16+i]=crusetbyte[i];
                     }

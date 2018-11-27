@@ -8,10 +8,13 @@ import android.view.KeyEvent;
 import android.view.View;
 
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
+import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
 public class LocalSetaddr201ExtrainfoView extends LinearLayout {
     String m198Modul="";
@@ -28,6 +31,8 @@ public class LocalSetaddr201ExtrainfoView extends LinearLayout {
     String mAPN;
     String mUSERS;
     String mPWSD;
+
+    boolean mDatacorrect=false;
 
     public LocalSetaddr201ExtrainfoView(Context context,String setcontent,String str220,String addr198Modul) {
         super(context);
@@ -59,7 +64,7 @@ public class LocalSetaddr201ExtrainfoView extends LinearLayout {
             public void afterTextChanged(Editable editable) {
                 //Log.d("zl",editable.toString());
                 LocalSetaddr201ExtrainfoView.this.mAPN= editable.toString();
-                setContent();
+                updatecontent();
             }
         });
 
@@ -77,7 +82,7 @@ public class LocalSetaddr201ExtrainfoView extends LinearLayout {
             @Override
             public void afterTextChanged(Editable editable) {
                 LocalSetaddr201ExtrainfoView.this.mUSERS= editable.toString();
-                setContent();
+                updatecontent();
             }
         });
 
@@ -95,7 +100,7 @@ public class LocalSetaddr201ExtrainfoView extends LinearLayout {
             @Override
             public void afterTextChanged(Editable editable) {
                 LocalSetaddr201ExtrainfoView.this.mPWSD= editable.toString();
-                setContent();
+                updatecontent();
             }
         });
 
@@ -126,54 +131,133 @@ public class LocalSetaddr201ExtrainfoView extends LinearLayout {
     }
 
     private void initshow(String strcontent) {
-//        byte[] str;
-//        str=strcontent.getBytes();
-//        strcontent="";
-//        for(int i=0;i<str.length;i++)
-//        {
-//            if(str[i]>7&&str[i]<127)
-//                strcontent+=(char)str[i];
-//            else
-//                break;
-//        }
         int index=0;
         String show;
-        if(strcontent.length()==0)
+        show=new String (strcontent);
+        if(m198Modul.equals("BC95")||m198Modul.equals("M72"))
         {
-            return;
-        }
-        index=strcontent.indexOf(",");
-        if(index==0)
-        {
-            if(str220set.length()==0)
+            if(str220set.equals("")==false|| show.indexOf(",")>=0)
             {
-                EditviewApn.setText("");
-                mAPN="";
+                //settingInterface.OncurSetting(str220set+","+strcontent);
+                mDatacorrect=false;
+                return;
             }
             else
             {
-                EditviewApn.setText(str220set);
-                mAPN=str220set;
+                mAPN=show;
             }
         }
-        else
+        else if(m198Modul.equals("MC323"))
         {
-            show=strcontent.substring(0,index);
-            EditviewApn.setText(show);
-            mAPN=show;
+            if(str220set.equals("")==false||show.indexOf(",")<0)
+            {
+//                settingInterface.OncurSetting(str220set+","+strcontent);
+                mDatacorrect=false;
+                return;
+            }
+            else if(show.indexOf(",")>=0)
+            {
+                index=show.indexOf(",");
+                int indextemp=index+1;
+                indextemp=show.indexOf(",",indextemp);
+                if(indextemp>=0)
+                {
+//                    settingInterface.OncurSetting(str220set+","+strcontent);
+                    mDatacorrect=false;
+                    return;
+                }
+//                mAPN="";
+                mUSERS=show.substring(0,index);
+                mPWSD = show.substring(index+1,show.length());
+            }
         }
-        show=strcontent.substring(index+1,strcontent.length());
-        index=show.indexOf(",");
-        EditviewUsers.setText(show.substring(0,index));
-        mUSERS=show.substring(0,index);
-        show=show.substring(index+1,show.length());
-        EditviewPSWD.setText(show);
-        mPWSD=show;
+        else if(m198Modul.equals("EC20 4G"))
+        {
+            index=show.indexOf(",");
+            if(str220set.equals(""))
+            {
+
+                if(index<0)
+                {
+//                    settingInterface.OncurSetting(str220set+","+strcontent);
+                    mDatacorrect=false;
+                    return;
+                }
+                mAPN=show.substring(0,index);
+
+            }
+            else
+            {
+                mAPN=str220set;
+            }
+
+            show=show.substring(index+1,show.length());
+            index=show.indexOf(",");
+            if(index<0)
+            {
+//                settingInterface.OncurSetting(str220set+","+strcontent);
+                mDatacorrect=false;
+                return;
+            }
+            else
+            {
+                mUSERS=show.substring(0,index);
+                mPWSD=show.substring(index+1,show.length());
+            }
+        }
+        mDatacorrect=true;
+//        if(strcontent.length()==0)
+//        {
+//            return;
+//        }
+//        index=strcontent.indexOf(",");
+//        if(index==0)
+//        {
+//            if(str220set.length()==0)
+//            {
+//                EditviewApn.setText("");
+//                mAPN="";
+//            }
+//            else
+//            {
+//                EditviewApn.setText(str220set);
+//                mAPN=str220set;
+//            }
+//        }
+//        else
+//        {
+//            show=strcontent.substring(0,index);
+//            EditviewApn.setText(show);
+//            mAPN=show;
+//        }
+//        show=strcontent.substring(index+1,strcontent.length());
+//        index=show.indexOf(",");
+//        EditviewUsers.setText(show.substring(0,index));
+//        mUSERS=show.substring(0,index);
+//        show=show.substring(index+1,show.length());
+//        EditviewPSWD.setText(show);
+//        mPWSD=show;
+        EditviewApn.setText(mAPN);
+        EditviewUsers.setText(mUSERS);
+        EditviewPSWD.setText(mPWSD);
         setContent();
     }
 
     public void setContent()
     {
+        if(settingInterface==null)
+        {
+            return;
+        }
+        if(mDatacorrect==false)
+        {
+            settingInterface.OncurSetting(str220set+mcurcontent);
+            return;
+        }
+        updatecontent();
+    }
+
+    private void updatecontent() {
         if(settingInterface==null)
         {
             return;

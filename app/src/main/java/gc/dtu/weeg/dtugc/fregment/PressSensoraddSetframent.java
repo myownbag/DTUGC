@@ -106,6 +106,7 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
                         CodeFormat.crcencode(cmd);
                         String readOutMsg = DigitalTrans.byte2hex(cmd);
                         verycutstatus(readOutMsg,2000);
+                        Log.d("zl","in dialog:"+CodeFormat.byteToHex(cmd,cmd.length));
                     }
                 })
                 .create();
@@ -115,19 +116,16 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
         Log.d("zl", "OndataCometoParse: "+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
-        String tempstr="";
-        for(int i=0;i<readOutBuf1.length;i++)
-        {
-            tempstr+=(char)readOutBuf1[i];
+        StringBuilder tempstr= new StringBuilder();
+        for (byte aReadOutBuf1 : readOutBuf1) {
+            tempstr.append((char) aReadOutBuf1);
         }
         Log.d("zl","OndataCometoParse: "+tempstr);
-        String readOutMsg;
         if(!mIsatart)
         {
             return;
         }
       //  String str="";
-        int i=0;
         switch (mfunstep)
         {
             case 0:
@@ -151,10 +149,10 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
 
     private void checkstep5(byte[] readOutBuf1) {
         int i;
-        String str="";
+        StringBuilder str= new StringBuilder();
         for(i=0;i<readOutBuf1.length;i++)
         {
-            str+=(char)readOutBuf1[i];
+            str.append((char) readOutBuf1[i]);
         }
         switch (mMainselectmode)
         {
@@ -169,10 +167,10 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
 
     private void checkstep4(byte[] readOutBuf1) {
         int i;
-        String str="";
+        StringBuilder str= new StringBuilder();
         for(i=0;i<readOutBuf1.length-2;i++)
         {
-            str+=(char)readOutBuf1[i];
+            str.append((char) readOutBuf1[i]);
         }
         switch (mMainselectmode)
         {
@@ -185,8 +183,8 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
                 else if(str.indexOf("USER")>=0)
                 {
                     mfunstep++;
-                   str="进入OEM失败";
-                    mTextResultView.setText(str);
+                   str = new StringBuilder("进入OEM失败");
+                    mTextResultView.setText(str.toString());
                     MainActivity.getInstance().mDialog.dismiss();
                 }
                 else
@@ -202,11 +200,11 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
 
     private void checkstep3(byte[] readOutBuf1) {
         int i;
-        String str="";
+        StringBuilder str= new StringBuilder();
         String readOutMsg;
         for(i=0;i<readOutBuf1.length;i++)
         {
-            str+=(char)readOutBuf1[i];
+            str.append((char) readOutBuf1[i]);
         }
         switch (mMainselectmode)
         {
@@ -257,17 +255,17 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
 
     private void checkstep2(byte[] readOutBuf1) {
         int i;
-        String str="";
+        StringBuilder str= new StringBuilder();
         String readOutMsg;
         for(i=0;i<readOutBuf1.length;i++)
         {
-            str+=(char)readOutBuf1[i];
+            str.append((char) readOutBuf1[i]);
         }
         switch (mMainselectmode)
         {
             case 1:
 
-                mTextResultView.setText(str);
+                mTextResultView.setText(str.substring(0,str.length()-2));
                 MainActivity.getInstance().mDialog.dismiss();
                 break;
             case 2:
@@ -310,11 +308,11 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
 
     private void checkstep1(byte[] readOutBuf1) {
         int i;
-        String str="";
+        StringBuilder str= new StringBuilder();
         String readOutMsg;
         for(i=0; i<readOutBuf1.length; i++)
         {
-            str+=(char)readOutBuf1[i];
+            str.append((char) readOutBuf1[i]);
         }
         int temp=-1;
         temp=str.indexOf("OK");
