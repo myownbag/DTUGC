@@ -199,7 +199,7 @@ public class GasSensorSetFragment extends BaseFragment {
             buf.put(sendbufwrite,18,4);
             buf.rewind();
             float f2=buf.getFloat();
-            mgasH.setText(""+f2);
+            mgasL.setText(""+f2);
 
 
 
@@ -208,7 +208,7 @@ public class GasSensorSetFragment extends BaseFragment {
             buf.put(sendbufwrite,22,4);
             buf.rewind();
             f2=buf.getFloat();
-            mgasL.setText(""+f2);
+            mgasH.setText(""+f2);
 
             temp=(sendbufwrite[27]&0x000000FF)*0x100+(sendbufwrite[26]&0x000000FF);
             mtime1.setText(""+temp);
@@ -312,14 +312,14 @@ public class GasSensorSetFragment extends BaseFragment {
                         buf.rewind();
                         buf.get(sendbufwrite,16,2);
 
-                        tem=mdataitem.get(1).get("settings");
+                        tem=mdataitem.get(2).get("settings");   //低报警
                         buf=ByteBuffer.allocateDirect(4);
                         buf=buf.order(ByteOrder.LITTLE_ENDIAN);
                         buf.putFloat(Float.valueOf(tem).floatValue());
                         buf.rewind();
                         buf.get(sendbufwrite,18,4);
 
-                        tem=mdataitem.get(2).get("settings");
+                        tem=mdataitem.get(1).get("settings");  //高报警
                         buf=ByteBuffer.allocateDirect(4);
                         buf=buf.order(ByteOrder.LITTLE_ENDIAN);
                         buf.putFloat(Float.valueOf(tem).floatValue());
