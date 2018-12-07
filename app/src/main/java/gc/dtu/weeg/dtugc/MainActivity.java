@@ -28,7 +28,6 @@ import android.widget.Toast;
 
 import org.xutils.x;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +40,7 @@ import gc.dtu.weeg.dtugc.fregment.BasicinfoFregment;
 import gc.dtu.weeg.dtugc.fregment.CNKFixedPagerAdapter;
 import gc.dtu.weeg.dtugc.fregment.FrozendataFregment;
 import gc.dtu.weeg.dtugc.fregment.GasSensorSetFragment;
+import gc.dtu.weeg.dtugc.fregment.GateStatusControlFragment;
 import gc.dtu.weeg.dtugc.fregment.Hex2BinConvertFragment;
 import gc.dtu.weeg.dtugc.fregment.InstrumentInputFregment;
 import gc.dtu.weeg.dtugc.fregment.LocalsettngsFregment;
@@ -96,7 +96,7 @@ public class MainActivity extends FragmentActivity {
     int mScrollX = 0;
     private List<BaseFragment> fragments;
     public String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置"
-            , "温压传感器接入","气体传感器接入", "仪表接入","传感器调试","NB业务注册","版本信息","固件升级"};
+            , "温压传感器接入","气体传感器接入", "仪表接入","传感器调试","NB业务注册",/*"阀门控制",*/"版本信息","固件升级"};
     //蓝牙状态保存
     public Boolean mIsconnect = false;
     // Name of the connected device
@@ -125,6 +125,8 @@ public class MainActivity extends FragmentActivity {
     public AppVersioninfoFregment   fregment9;
     public Hex2BinConvertFragment   fragment10;
     public GasSensorSetFragment     fragment11;
+    public GateStatusControlFragment fragment12;
+
 
     //接口
     Ondataparse mydataparse=null;
@@ -388,6 +390,13 @@ public class MainActivity extends FragmentActivity {
         bundle7.putString("extra",titles[index++]);
         fregment8.setArguments(bundle7);
         fragments.add(fregment8);
+
+//        fragment12 = new GateStatusControlFragment();
+//        Bundle bundle12 = new Bundle();
+//        bundle12.putInt("position",index);
+//        bundle12.putString("extra",titles[index++]);
+//        fragment12.setArguments(bundle12);
+//        fragments.add(fragment12);
 
         fregment9 =new AppVersioninfoFregment();
         Bundle bundle8= new Bundle();
