@@ -356,7 +356,7 @@ public class NBRegisiterfragment  extends BaseFragment {
                 {
                     str =registerName.code;
                 }
-                mresultview.setText("注册任务失败:"+str);
+                mresultview.setText("注册任务失败 STEP1:"+str);
                 mresultview.setTextColor(getResources().getColor(R.color.color_warning));
             }
         }
@@ -407,7 +407,7 @@ public class NBRegisiterfragment  extends BaseFragment {
                     str=registerName.code;
                 }
 
-                mresultview.setText("添加描述失败:"+str);
+                mresultview.setText("添加描述失败 STEP2:"+str);
                 mresultview.setTextColor(getResources().getColor(R.color.color_warning));
 
             }
