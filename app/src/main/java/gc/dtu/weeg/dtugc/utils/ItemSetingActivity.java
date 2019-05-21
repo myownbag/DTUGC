@@ -305,6 +305,18 @@ public class ItemSetingActivity extends Activity {
                              sendbuf[24]= (byte) 0x96;
                              sendbuf[25]=0x00;
                              break;
+                         case 5:
+                             sendbuf[16]=0x01;
+                             sendbuf[17]=0x01; //IC 卡控制阀
+                             sendbuf[18]=0x30;
+                             sendbuf[19]=0x75;
+                             sendbuf[20]= (byte) 0xe8;
+                             sendbuf[21]=0x03;
+                             sendbuf[22]=0x00;
+                             sendbuf[23]=0x00;
+                             sendbuf[24]=0x00;
+                             sendbuf[25]=0x00;
+                             break;
                      }
 
                  }

@@ -86,6 +86,7 @@ public class LocalsettngsFregment extends BaseFragment {
                     {"110","EMV CV GC","2"},
                     {"110","EMV CV G6+","3"},
                     {"110","EMV BV","4"},
+                    {"110","IC卡 控制阀","5"},
                     //无线模块
 //                    {"198","","-1"},
                     {"198","模块关闭","0"},
@@ -220,6 +221,10 @@ public class LocalsettngsFregment extends BaseFragment {
                 if(tempint2==2)
                 {
                     gatetype=1;
+                }
+                else if(tempint2==1)
+                {
+                    gatetype=5;
                 }
                 else if(tempint2==0)
                 {

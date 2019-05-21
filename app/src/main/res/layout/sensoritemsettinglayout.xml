@@ -121,11 +121,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:inputType="numberDecimal"
-            android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
             android:layout_toEndOf="@id/sensor_set_item_hight_lable"
             android:layout_toRightOf="@id/sensor_set_item_hight_lable"
+            android:inputType="numberSigned|numberDecimal"
             android:textColor="#444"
             android:textSize="14sp" />
     </RelativeLayout>
@@ -157,11 +157,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
-            android:inputType="numberDecimal"
+            android:layout_marginLeft="10dp"
             android:layout_toEndOf="@+id/sensor_set_item_low_lable"
             android:layout_toRightOf="@+id/sensor_set_item_low_lable"
+            android:inputType="numberSigned|numberPassword"
             android:textColor="#444"
             android:textSize="14sp" />
     </RelativeLayout>
