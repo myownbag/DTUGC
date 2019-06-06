@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -112,6 +113,41 @@ public class LocalsettngsFregment extends BaseFragment {
             };
     public String[] settingscontent=new String[baseinfo.length];
     byte [][] senddatabuf=new byte[baseinfo.length][18];
+
+    CountDownTimer mytimer= new CountDownTimer(1000, 500) {
+        @Override
+        public void onTick(long l) {
+
+        }
+
+        @Override
+        public void onFinish() {
+
+            if(MainActivity.getInstance()!=null)
+            {
+                updatecmdlist();
+                Log.d("zl","不支持的指令");
+            }
+        }
+    };
+
+    private void updatecmdlist() {
+        mIndexcmd++;
+        if (mIndexcmd == senddatabuf.length) {
+            myadpater.notifyDataSetChanged();
+            MainActivity.getInstance().mDialog.dismiss();
+        }
+        else
+        {
+            mytimer.start();
+        }
+        if (mIndexcmd < senddatabuf.length) {
+            String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
+            verycutstatus(readOutMsg, 0);
+        }
+    }
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -148,6 +184,7 @@ public class LocalsettngsFregment extends BaseFragment {
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
 //        Log.d("zl","in LocalsettngsFregment");
+        mytimer.cancel();
         if(mIsatart==false)
         {
             return;
@@ -337,18 +374,7 @@ public class LocalsettngsFregment extends BaseFragment {
                 settingscontent[mIndexcmd]=temp;
             }
         }
-        mIndexcmd++;
-        if(mIndexcmd==senddatabuf.length)
-        {
-            myadpater.notifyDataSetChanged();
-            MainActivity.getInstance().mDialog.dismiss();
-        }
-
-        if(mIndexcmd<senddatabuf.length)
-        {
-            String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
-            verycutstatus(readOutMsg);
-        }
+        updatecmdlist();
     }
 
     public class thislistviewadpater extends BaseAdapter
@@ -425,6 +451,7 @@ public class LocalsettngsFregment extends BaseFragment {
             {
                 String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
                 verycutstatus(readOutMsg);
+                mytimer.start();
             }
 
         }
@@ -445,7 +472,21 @@ public class LocalsettngsFregment extends BaseFragment {
             ToastUtils.showToast(getActivity(), "请先建立蓝牙连接!");
         }
     }
-
+    private void verycutstatus(String readOutMsg,int timeout) {
+        MainActivity parentActivity1 = (MainActivity) getActivity();
+        String strState1 = parentActivity1.GetStateConnect();
+        if(!strState1.equalsIgnoreCase("无连接"))
+        {
+            parentActivity1.mDialog.show();
+            parentActivity1.mDialog.setDlgMsg("读取中...");
+            //String input1 = Constants.Cmd_Read_Alarm_Pressure;
+            parentActivity1.sendData(readOutMsg, "FFFF",timeout);
+        }
+        else
+        {
+            ToastUtils.showToast(getActivity(), "请先建立蓝牙连接!");
+        }
+    }
     private class Onlistviewitemclicked implements AdapterView.OnItemClickListener
     {
 
