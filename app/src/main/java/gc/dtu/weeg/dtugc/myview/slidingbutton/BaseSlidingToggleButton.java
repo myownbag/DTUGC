@@ -19,6 +19,8 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Scroller;
 
+import static android.graphics.Canvas.ALL_SAVE_FLAG;
+
 /**
  * 滑动开关按钮
  */
@@ -134,11 +136,13 @@ public abstract class BaseSlidingToggleButton extends View implements OnGestureL
         }
 
         //创建一个新的全透明图层，大小同当前视图的大小一样，这一步绝对不可缺少，要不然最周绘制出来的图片背景会是黑色的
-        canvas.saveLayer(0, 0, getWidth(), getHeight(), null, Canvas.MATRIX_SAVE_FLAG | Canvas.CLIP_SAVE_FLAG | Canvas.HAS_ALPHA_LAYER_SAVE_FLAG | Canvas.FULL_COLOR_LAYER_SAVE_FLAG | Canvas.CLIP_TO_LAYER_SAVE_FLAG);  
+//        canvas.saveLayer(0, 0, getWidth(), getHeight(), null, Canvas.MATRIX_SAVE_FLAG | Canvas.CLIP_SAVE_FLAG | Canvas.HAS_ALPHA_LAYER_SAVE_FLAG | Canvas.FULL_COLOR_LAYER_SAVE_FLAG | Canvas.CLIP_TO_LAYER_SAVE_FLAG);
+        canvas.saveLayer(0, 0, getWidth(), getHeight(), null,ALL_SAVE_FLAG );
 //        if(SHOEMODE==1)
 //        {
 //        	currentLeft=checkedLeft;
 //        }
+
         //绘制状态层
         canvas.drawBitmap(enabled?stateNormalBitmap:stateDisableBitmap, currentLeft, 0, paint);  
         paint.setXfermode(porterDuffXfermode);  
