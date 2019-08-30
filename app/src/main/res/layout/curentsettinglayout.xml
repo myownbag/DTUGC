@@ -105,6 +105,7 @@
         android:layout_height="0.5dp"
         android:background="#CFCFCF" />
     <RelativeLayout
+        android:id="@+id/item_activity_setting_content"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="#fff" >
@@ -182,17 +183,18 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:background="#CFCFCF" />
-<LinearLayout
-    android:id="@+id/local_extraitem_set"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp">
-
+        android:orientation="vertical"
+        >
+        <LinearLayout
+            android:id="@+id/local_extraitem_set"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            />
         <Button
             android:id="@+id/tv_itemsettings_btn_write"
             android:layout_width="match_parent"

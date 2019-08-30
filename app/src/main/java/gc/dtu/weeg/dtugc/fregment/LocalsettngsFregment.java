@@ -25,6 +25,7 @@ import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
 
 import gc.dtu.weeg.dtugc.myview.LocalSetaddr219ExtraInfoView;
+import gc.dtu.weeg.dtugc.myview.LocalSetaddr221ExtrainfoView;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
@@ -48,6 +49,7 @@ public class LocalsettngsFregment extends BaseFragment {
 
     //把当前的模块选择项进行保存
     String mModuleType="";
+    byte[] reg221datacontent = new byte[23];
     public String[][] baseinfo=
     {
             {"100","连接设备属性","1","L",},
@@ -65,6 +67,7 @@ public class LocalsettngsFregment extends BaseFragment {
             {"209","传输频率(分)","2","T"},
             {"210","数据传输固定时刻","12","T"},
             {"219","时间段传输设置","14","E"},
+            {"221","月高峰采集传输","23","E"},
     };
     public String[][] registerinfosel=
             {
@@ -176,6 +179,7 @@ public class LocalsettngsFregment extends BaseFragment {
         mybut= mView.findViewById(R.id.btn_realtime_data);
         mybut.setOnClickListener(new butonclicklistener());
         mylist.setOnItemClickListener(new Onlistviewitemclicked());
+        reg221datacontent[0]=0;
     }
 //    private void initdata() {
 //        MainActivity.getInstance().setOndataparse(new DataParse());
@@ -360,6 +364,17 @@ public class LocalsettngsFregment extends BaseFragment {
                 buf.get(data2convert);
                 settingscontent[mIndexcmd]=LocalSetaddr219ExtraInfoView.Hexinfo2Str(data2convert);
             }
+            else if(tempint2==221)
+            {
+                //解析221
+
+                ByteBuffer buf = ByteBuffer.allocate(23);
+                buf=buf.order(ByteOrder.LITTLE_ENDIAN);
+                buf.put(readOutBuf1,16,23)  ;
+                buf.rewind();
+                buf.get(reg221datacontent);
+                settingscontent[mIndexcmd]= LocalSetaddr221ExtrainfoView.dacodetoStr(reg221datacontent);
+            }
             else
             {
                 temp="";
@@ -508,6 +523,10 @@ public class LocalsettngsFregment extends BaseFragment {
             mModuleType=settingscontent[4];
             serverIntent.putExtra("addr198setting",mModuleType);
             serverIntent.putExtra("220addrset",settingscontent[6]);
+            if(registername.equals("221"))
+            {
+                serverIntent.putExtra("221receivebytes",reg221datacontent);
+            }
             if(registername.equals("220"))
             {
                 ToastUtils.showToast(MainActivity.getInstance(),"寄存器220必须和201关联设置");

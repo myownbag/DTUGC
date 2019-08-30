@@ -30,7 +30,8 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Dialog" />
         <activity android:name=".utils.ItemSetingActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            />
         <activity android:name=".utils.SensoritemsettingActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".utils.InstrumemtItemseetingActivity"

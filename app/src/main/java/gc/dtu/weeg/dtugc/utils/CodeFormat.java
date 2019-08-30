@@ -1,5 +1,7 @@
 package gc.dtu.weeg.dtugc.utils;
 
+import android.content.Context;
+
 import java.io.ByteArrayOutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -247,5 +249,9 @@ public class CodeFormat {
             result[i]=HEX2BCD(buf[i]);
         }
         return result;
+    }
+    public static int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
     }
 }

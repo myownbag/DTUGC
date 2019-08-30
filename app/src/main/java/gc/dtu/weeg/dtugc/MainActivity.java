@@ -643,6 +643,7 @@ public class MainActivity extends FragmentActivity {
         }
     }
     // 双击退出-----------------------------------------------
+    @SuppressLint("RestrictedApi")
     public boolean dispatchKeyEvent(KeyEvent event) {
 
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {

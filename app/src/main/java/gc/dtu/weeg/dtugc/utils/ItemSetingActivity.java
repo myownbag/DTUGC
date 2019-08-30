@@ -29,6 +29,7 @@ import gc.dtu.weeg.dtugc.R;
 import gc.dtu.weeg.dtugc.myview.CustomDialog;
 import gc.dtu.weeg.dtugc.myview.LocalSetaddr201ExtrainfoView;
 import gc.dtu.weeg.dtugc.myview.LocalSetaddr219ExtraInfoView;
+import gc.dtu.weeg.dtugc.myview.LocalSetaddr221ExtrainfoView;
 
 
 /**
@@ -172,6 +173,17 @@ public class ItemSetingActivity extends Activity {
                         ExtraSetView.addView(view);
                         view.setOncursettingChanged(new OnExteasettingchange219());
                     }
+                    else if(tempaddr.equals("221"))
+                    {
+                        LocalSetaddr221ExtrainfoView view;
+                        byte[] setbytes = intent.getByteArrayExtra("221receivebytes");
+                        view =new LocalSetaddr221ExtrainfoView(this,setbytes);
+                        RelativeLayout relativeLayout = findViewById(R.id.item_activity_setting_content);
+                        relativeLayout.setVisibility(View.GONE);
+                        ExtraSetView.addView( view );
+//                        ExtraSetView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT
+//                                ,CodeFormat.dip2px(this,400)));
+                    }
                 }
                 else
                 {
@@ -232,6 +244,13 @@ public class ItemSetingActivity extends Activity {
             byte [] sendbuf={(byte)0xFD,0x00,0x00,0x0E,0x00,0x15,0x00,0x00,0x00,0x00,
                     0x00,0x00,0x00,0x00,0x64,0x00,0x02,(byte)0xA2,(byte) 0xF3};
            int transmit=0;
+           if(addrtemp.equals("221"))
+           {
+               //LocalSetaddr221ExtrainfoView.
+               //221解析有子View完成，这里给temp赋值，目的是为了能跳过 if(temp.length()==0)
+               if(temp.length()==0)
+                    temp="数据需要解析";
+           }
             if(temp.length()==0)
             {
                 Toast.makeText(ItemSetingActivity.this,"请输入填入的内容",Toast.LENGTH_LONG).show();
@@ -472,6 +491,41 @@ public class ItemSetingActivity extends Activity {
                         sendbuf[16+i]=(byte)0x00;
                 }
                 CodeFormat.crcencode(sendbuf);
+            }
+            else if(addrtemp.equals("221"))
+            {
+                byte[] settings;
+                LocalSetaddr221ExtrainfoView View221= (LocalSetaddr221ExtrainfoView) ExtraSetView.getChildAt(0);
+                settings=View221.dacodeshowinfo();
+                if(settings == null)
+                {
+                    return;
+                }
+                sendbuf=new byte[datalen+18];
+                sendbuf[0]= (byte) 0xFD;
+                sendbuf[3]= (byte) ((datalen+13)%0x100);
+                sendbuf[5]=0x15;
+                sendbuf[14]= (byte) (Integer.valueOf(mainActivity.fregment4.baseinfo[mposition][0])%0x100);
+
+                if(settings.length>datalen)
+                {
+                    Toast.makeText(ItemSetingActivity.this,"输入字节超出长度",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                for( i=0;i<datalen;i++)
+                {
+                    if(i<settings.length)
+                    {
+                        sendbuf[16+i]=settings[i];
+                    }
+                    else
+                        sendbuf[16+i]=(byte)0x00;
+                }
+                CodeFormat.crcencode(sendbuf);
+//                Log.d("zl","ddatalen:"+datalen);
+//                Log.d("zl","cmd:"+CodeFormat.byteToHex(sendbuf,sendbuf.length));
+                if(sendbuf!=null)
+                    currentshow.setText(LocalSetaddr221ExtrainfoView.dacodetoStr(sendbuf));
             }
             else
             {
