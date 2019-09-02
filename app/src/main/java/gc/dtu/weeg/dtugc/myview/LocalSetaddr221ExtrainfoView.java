@@ -1,9 +1,9 @@
 package gc.dtu.weeg.dtugc.myview;
 
 import android.app.Activity;
-import android.app.TimePickerDialog;
+
 import android.content.Context;
-import android.text.InputType;
+
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -13,16 +13,14 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import com.bigkoo.pickerview.builder.TimePickerBuilder;
-import com.bigkoo.pickerview.listener.OnTimeSelectChangeListener;
 import com.bigkoo.pickerview.listener.OnTimeSelectListener;
 import com.bigkoo.pickerview.view.TimePickerView;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,6 +28,7 @@ import java.util.Date;
 import gc.dtu.weeg.dtugc.R;
 import gc.dtu.weeg.dtugc.myview.slidingbutton.BaseSlidingToggleButton;
 import gc.dtu.weeg.dtugc.myview.slidingbutton.SlidingToggleButton;
+import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.SoftKeyBoardListener;
 import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
@@ -38,7 +37,7 @@ public class LocalSetaddr221ExtrainfoView extends LinearLayout {
     Context mContext;
     SlidingToggleButton mFunenbt;
     //SlidingToggleButton TimeEnablebts = new SlidingToggleButton[4];
-    ArrayList<SlidingToggleButton> TimeEnablebts= new ArrayList<SlidingToggleButton>();
+    ArrayList<SlidingToggleButton> TimeEnablebts= new ArrayList<>();
     SlidingToggleButton m1stenablebt;
     SlidingToggleButton m2ndenablebt;
     SlidingToggleButton m3rdenablebt;
@@ -70,8 +69,12 @@ public class LocalSetaddr221ExtrainfoView extends LinearLayout {
     TimePickerView pvTime;
     TimePickerView pvMonth;
 
-    String setingsinfo;
+    boolean mcursate;
 
+    public LocalSetaddr221ExtrainfoView(Context context)
+    {
+        this(context,null);
+    }
     public LocalSetaddr221ExtrainfoView(Context context,byte[] setbytes) {
         super(context);
         mContext = context;
@@ -80,10 +83,7 @@ public class LocalSetaddr221ExtrainfoView extends LinearLayout {
         softKeyBoardListener.setListener((Activity) context,onSoftKeyBoardChangeListener);
         myview = View.inflate(mContext,R.layout.localsetting_addr221_layout,null);
         addView(myview);
-
         initview();
-
-
     }
 
     private void initview() {
@@ -116,7 +116,7 @@ public class LocalSetaddr221ExtrainfoView extends LinearLayout {
         mIsenableinfoTx = findViewById(R.id.reg221isenableinfo);
 
         testlayout = findViewById(R.id.testheight);
-        initlisterners();
+//        initlisterners();
         setAllViews2Show();
         Calendar date1 = Calendar.getInstance();
         date1.set(Calendar.MONTH,1);
@@ -132,16 +132,12 @@ public class LocalSetaddr221ExtrainfoView extends LinearLayout {
                 .setType(new boolean[]{false,true,false,false,false,false})
                 .setLabel(null,"月",null,null,null,null)
                 .build();
+        initlisterners();
     }
 
 
     private void initlisterners() {
-        mFunenbt.setOnCheckedChanageListener(new BaseSlidingToggleButton.OnCheckedChanageListener() {
-            @Override
-            public void onCheckedChanage(BaseSlidingToggleButton slidingToggleButton, boolean isChecked) {
-                LocalSetaddr221ExtrainfoView.this.SetContentViewShow(isChecked);
-            }
-        });
+
         mReportModeslt.setOnCheckedChangeListener(new OnRadiobuttoncheckedlistenerimpl());
         mInstrumentTx.setOnFocusChangeListener(new onEdittextfocusimp());
         mAirPressTx.setOnFocusChangeListener(new onEdittextfocusimp());
@@ -161,19 +157,23 @@ public class LocalSetaddr221ExtrainfoView extends LinearLayout {
         }
         mStartTimeTx.setOnClickListener(new onClicklinternerbutimpl());
         mStopTimeTx.setOnClickListener(new onClicklinternerbutimpl());
+//        Log.d("zl"," mFunenbt:"+mFunenbt.isChecked());
+        mFunenbt.setOnCheckedChanageListener(new funenabellisterberimpl());
     }
 
     private void setAllViews2Show() {
         int i=0;
-
         if(mSetbytes==null)
         {
             mSetbytes = new byte[23];
             mSetbytes[0]=0;
         }
+//        Log.d("zl","setAllViews2Show:" + CodeFormat.byteToHex(mSetbytes,mSetbytes.length));
+        Log.d("zl","setAllViews2Show");
         if(mSetbytes[0]==0x00||mSetbytes[0]==(byte) 0xff)
         {
             SetContentViewShow(false);
+
         }
         else
         {
@@ -201,6 +201,7 @@ public class LocalSetaddr221ExtrainfoView extends LinearLayout {
             mGasSensorTx.setText(""+buf.getShort());
 
             //更新上传模式选择
+            mReportModeslt.clearCheck();
             if(mSetbytes[8]==0x00)
             {
                 mReportModeslt.check(R.id.reportmodefreqset);
@@ -214,6 +215,7 @@ public class LocalSetaddr221ExtrainfoView extends LinearLayout {
             }
             else if(mSetbytes[8]==0x02)
             {
+//                Log.d("zl","mReportModeslt.check(R.id.reportmodefirmtimeset);");
                 mReportModeslt.check(R.id.reportmodefirmtimeset);
                 mReportFreqTx.setVisibility(View.GONE);
                 mFirmTimeSetContentView.setVisibility(View.VISIBLE);
@@ -240,11 +242,13 @@ public class LocalSetaddr221ExtrainfoView extends LinearLayout {
                 }
             }
         }
+
     }
 
     public void SetContentViewShow(boolean isshow) {
         if (mFunenbt.isChecked() != isshow) {
-            mFunenbt.setChecked(isshow);
+//            Log.d("zl"," mFunenbt.setChecked(isshow) in SetContentViewShow ");
+            mFunenbt.setChecked(isshow,0);
         }
         if(isshow)
         {
@@ -259,6 +263,7 @@ public class LocalSetaddr221ExtrainfoView extends LinearLayout {
             mSetingsView.setVisibility(View.GONE);
             mIsenableinfoTx.setText("功能禁止");
         }
+        mcursate = isshow;
     }
 
      private SoftKeyBoardListener.OnSoftKeyBoardChangeListener onSoftKeyBoardChangeListener =
@@ -268,7 +273,7 @@ public class LocalSetaddr221ExtrainfoView extends LinearLayout {
                      int[] local=new int[2];
                      int[] local1 = new int[2];
                      LocalSetaddr221ExtrainfoView.this.mReportFreqTx.getLocationOnScreen(local);
-                     LocalSetaddr221ExtrainfoView.this.mFunenbt.getLocationOnScreen(local1);
+                     LocalSetaddr221ExtrainfoView.this.mIsenableinfoTx.getLocationOnScreen(local1);
                      if(local[1]>visiblehight)
                      {
                          mSetingsView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,visiblehight-local1[1]
@@ -379,6 +384,28 @@ public class LocalSetaddr221ExtrainfoView extends LinearLayout {
             mon = cal.get(Calendar.MONTH) + 1;
             if(mCurrentClickView!=null)
                 mCurrentClickView.setText(""+mon);
+        }
+    }
+    private class funenabellisterberimpl implements BaseSlidingToggleButton.OnCheckedChanageListener {
+
+        private boolean prestate = false;
+        funenabellisterberimpl()
+        {
+            prestate = !mcursate;
+        }
+        @Override
+        public void onCheckedChanage(BaseSlidingToggleButton slidingToggleButton, boolean isChecked) {
+//            Log.d("zl","funenabellisterberimpl:"+isChecked+prestate);
+//            LocalSetaddr221ExtrainfoView.this.SetContentViewShow(isChecked);
+            if(prestate==true)
+            {
+                LocalSetaddr221ExtrainfoView.this.SetContentViewShow(isChecked);
+//                Log.d("zl","run funenabellisterberimpl:"+isChecked+prestate);
+            }
+            else
+            {
+                prestate = true;
+            }
         }
     }
 //    @Override
@@ -553,12 +580,7 @@ public class LocalSetaddr221ExtrainfoView extends LinearLayout {
                         {
                             settimes=TimePointTxs[i].getText().toString();
                             index = settimes.indexOf(':');
-                            if(index<0)
-                            {
-                                setbyes[i*3+12]=0x00;
-                                setbyes[i*3+13]=0x00;
-                            }
-                            else
+                            if(index>0)
                             {
                                 infotime = settimes.substring(0,index);
                                 byte tempbyte = Integer.valueOf(infotime).byteValue();
@@ -629,24 +651,25 @@ public class LocalSetaddr221ExtrainfoView extends LinearLayout {
             //更新上传模式选择
             if(bytedecode[8]==0x00)
             {
-                sinfo+="频率";
+                sinfo+="F";
                 sinfo+=",";
                 buf=ByteBuffer.allocateDirect(2);
                 buf.order(ByteOrder.LITTLE_ENDIAN);
                 buf.put(bytedecode,9,2);
                 buf.rewind();
                 sinfo+=""+buf.getShort();
+                sinfo+=",";
             }
             else if(bytedecode[8]==0x02)
             {
-                sinfo+="时刻";
+                sinfo+="T";
                 sinfo+=",";
                 //第一段时间
                 for(i=0;i<4;i++)
                 {
                     if(bytedecode[12+i*3]==(byte) 0xff)
                     {
-                        sinfo+="无";
+                        sinfo+="N";
                         sinfo+=",";
                     }
                     else
@@ -659,5 +682,90 @@ public class LocalSetaddr221ExtrainfoView extends LinearLayout {
             }
         }
         return sinfo;
+    }
+
+    static public byte[] strinfo2bytes(String setinfo)
+    {
+        byte[] setbytes = null;
+        int index=-1;
+        String temp;
+        short setings=-1;
+        ByteBuffer buf;
+        int i=0;
+        if(setinfo!=null)
+        {
+            setbytes = new byte[23];
+            setbytes[0]=0x00;
+            if(setinfo.equals("功能禁止")==false && setinfo.length()!=0)
+            {
+                index = setinfo.indexOf(',');
+                temp = setinfo.substring(0,index);
+                setbytes[0] = Integer.valueOf(temp).byteValue();
+
+                setinfo = setinfo.substring(index+1);
+                index = setinfo.indexOf(',');
+                temp = setinfo.substring(0,index);
+                setbytes[1] = Integer.valueOf(temp).byteValue();
+                for(i=0;i<3;i++)
+                {
+                    setinfo = setinfo.substring(index+1);
+                    index = setinfo.indexOf(',');
+                    temp = setinfo.substring(0,index);
+                    setings = Integer.valueOf(temp).shortValue();
+
+                    buf = ByteBuffer.allocate(2);
+                    buf.order(ByteOrder.LITTLE_ENDIAN);
+                    buf.putShort(setings);
+                    buf.rewind();
+                    buf.get (setbytes,2+i*2,2);
+                }
+                setinfo = setinfo.substring(index+1);
+                index = setinfo.indexOf(',');
+                temp = setinfo.substring(0,index);
+                for(i=0;i<12;i++)
+                {
+                    setbytes[11+i]=(byte) 0xff;
+                }
+                if(temp.equals("F"))
+                {
+                    setbytes[8]=0x00;
+                    setinfo = setinfo.substring(index+1);
+                    index = setinfo.indexOf(',');
+                    temp = setinfo.substring(0,index);
+                    setings = Integer.valueOf(temp).shortValue();
+
+                    buf = ByteBuffer.allocate(2);
+                    buf.order(ByteOrder.LITTLE_ENDIAN);
+                    buf.putShort(setings);
+                    buf.rewind();
+                    buf.get (setbytes,9,2);
+                }
+                else if(temp.equals("T"))
+                {
+                    setbytes[8]=0x02;
+
+                    for(i=0;i<4;i++)
+                    {
+                        setinfo = setinfo.substring(index+1);
+                        index = setinfo.indexOf(',');
+                        temp = setinfo.substring(0,index);
+                        if(temp.equals("N"))
+                        {
+                            continue;
+                        }
+                        index = setinfo.indexOf(':');
+                        temp = setinfo.substring(0,index);
+                        setbytes[12+i*3] = Integer.valueOf(temp).byteValue();
+
+                        setinfo = setinfo.substring(index+1);
+                        index = setinfo.indexOf(',');
+                        temp = setinfo.substring(0,index);
+                        setbytes[13+i*3] = Integer.valueOf(temp).byteValue();
+                    }
+                }
+//                Log.d("zl","strinfo2bytes:"+CodeFormat.byteToHex(setbytes,setbytes.length));
+            }
+        }
+        return setbytes;
     }
 }

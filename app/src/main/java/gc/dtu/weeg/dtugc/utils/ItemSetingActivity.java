@@ -176,7 +176,7 @@ public class ItemSetingActivity extends Activity {
                     else if(tempaddr.equals("221"))
                     {
                         LocalSetaddr221ExtrainfoView view;
-                        byte[] setbytes = intent.getByteArrayExtra("221receivebytes");
+                        byte[] setbytes = LocalSetaddr221ExtrainfoView.strinfo2bytes(setcontent);
                         view =new LocalSetaddr221ExtrainfoView(this,setbytes);
                         RelativeLayout relativeLayout = findViewById(R.id.item_activity_setting_content);
                         relativeLayout.setVisibility(View.GONE);
@@ -506,7 +506,6 @@ public class ItemSetingActivity extends Activity {
                 sendbuf[3]= (byte) ((datalen+13)%0x100);
                 sendbuf[5]=0x15;
                 sendbuf[14]= (byte) (Integer.valueOf(mainActivity.fregment4.baseinfo[mposition][0])%0x100);
-
                 if(settings.length>datalen)
                 {
                     Toast.makeText(ItemSetingActivity.this,"输入字节超出长度",Toast.LENGTH_SHORT).show();
@@ -522,10 +521,10 @@ public class ItemSetingActivity extends Activity {
                         sendbuf[16+i]=(byte)0x00;
                 }
                 CodeFormat.crcencode(sendbuf);
+                currentshow.setText(LocalSetaddr221ExtrainfoView.dacodetoStr(settings));
 //                Log.d("zl","ddatalen:"+datalen);
 //                Log.d("zl","cmd:"+CodeFormat.byteToHex(sendbuf,sendbuf.length));
-                if(sendbuf!=null)
-                    currentshow.setText(LocalSetaddr221ExtrainfoView.dacodetoStr(sendbuf));
+
             }
             else
             {

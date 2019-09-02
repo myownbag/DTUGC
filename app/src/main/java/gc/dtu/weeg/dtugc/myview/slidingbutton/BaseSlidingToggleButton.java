@@ -353,7 +353,8 @@ public abstract class BaseSlidingToggleButton extends View implements OnGestureL
         }else{  
             scroll(startX, uncheckedLeft, duration);  
         }  
-        //����ѡ��״̬�ı�ص�  
+        //����ѡ��״̬�ı�ص�
+//        Log.d("zl","onCheckedChanageListener:"+onCheckedChanageListener);
         if(onCheckedChanageListener != null){  
             onCheckedChanageListener.onCheckedChanage(this, isChecked());  
         }  
