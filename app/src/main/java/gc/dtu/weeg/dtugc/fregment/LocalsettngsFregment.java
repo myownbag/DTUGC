@@ -98,7 +98,7 @@ public class LocalsettngsFregment extends BaseFragment {
                     {"198","M72","2"},
                     {"198","MC323","3"},
                     {"198","EC20 4G","4"},
-                    {"198","BC95","5"},
+                    {"198","NB-IOT","5"},
 
 //                    {"206","","-1"},
                     {"206","TCP","0"},

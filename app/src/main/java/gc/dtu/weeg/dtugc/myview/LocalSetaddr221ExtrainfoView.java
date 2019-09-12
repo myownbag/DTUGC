@@ -1,9 +1,7 @@
 package gc.dtu.weeg.dtugc.myview;
 
 import android.app.Activity;
-
 import android.content.Context;
-
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -20,7 +18,6 @@ import com.bigkoo.pickerview.view.TimePickerView;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -28,7 +25,6 @@ import java.util.Date;
 import gc.dtu.weeg.dtugc.R;
 import gc.dtu.weeg.dtugc.myview.slidingbutton.BaseSlidingToggleButton;
 import gc.dtu.weeg.dtugc.myview.slidingbutton.SlidingToggleButton;
-import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.SoftKeyBoardListener;
 import gc.dtu.weeg.dtugc.utils.ToastUtils;
 

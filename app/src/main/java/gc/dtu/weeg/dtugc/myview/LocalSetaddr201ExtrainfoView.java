@@ -106,7 +106,7 @@ public class LocalSetaddr201ExtrainfoView extends LinearLayout {
 
         addView(view201show);
         LinearLayout lineatView;
-        if(m198Modul.equals("BC95")||m198Modul.equals("M72"))
+        if(m198Modul.equals("NB-IOT")||m198Modul.equals("M72"))
         {
 
             lineatView = view201show.findViewById(R.id.addr201_USER_Container);
@@ -134,7 +134,7 @@ public class LocalSetaddr201ExtrainfoView extends LinearLayout {
         int index=0;
         String show;
         show=new String (strcontent);
-        if(m198Modul.equals("BC95")||m198Modul.equals("M72"))
+        if(m198Modul.equals("NB-IOT")||m198Modul.equals("M72"))
         {
             if(str220set.equals("")==false|| show.indexOf(",")>=0)
             {
@@ -263,7 +263,7 @@ public class LocalSetaddr201ExtrainfoView extends LinearLayout {
             return;
         }
         switch (m198Modul) {
-            case "BC95":
+            case "NB-IOT":
             case "M72":
                 settingInterface.OncurSetting(mAPN);
                 break;

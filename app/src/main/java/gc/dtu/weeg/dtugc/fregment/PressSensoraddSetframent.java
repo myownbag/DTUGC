@@ -1,10 +1,13 @@
 package gc.dtu.weeg.dtugc.fregment;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -113,6 +116,7 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
        // minfodlg.show();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
         Log.d("zl", "OndataCometoParse: "+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
@@ -147,6 +151,8 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
 
     }
 
+
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private void checkstep5(byte[] readOutBuf1) {
         int i;
         StringBuilder str= new StringBuilder();
@@ -165,6 +171,7 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private void checkstep4(byte[] readOutBuf1) {
         int i;
         StringBuilder str= new StringBuilder();
@@ -198,6 +205,7 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private void checkstep3(byte[] readOutBuf1) {
         int i;
         StringBuilder str= new StringBuilder();
@@ -253,6 +261,7 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private void checkstep2(byte[] readOutBuf1) {
         int i;
         StringBuilder str= new StringBuilder();
@@ -306,6 +315,7 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private void checkstep1(byte[] readOutBuf1) {
         int i;
         StringBuilder str= new StringBuilder();
