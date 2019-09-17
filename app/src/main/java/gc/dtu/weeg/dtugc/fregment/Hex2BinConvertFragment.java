@@ -2,6 +2,7 @@ package gc.dtu.weeg.dtugc.fregment;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,14 +28,17 @@ import android.widget.Toast;
 
 import org.xutils.common.Callback;
 import org.xutils.common.task.PriorityExecutor;
+import org.xutils.ex.HttpException;
 import org.xutils.http.RequestParams;
 import org.xutils.x;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
@@ -52,8 +56,15 @@ import gc.dtu.weeg.dtugc.myview.ScrollTextView;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
+import gc.dtu.weeg.dtugc.utils.FileWriterUtils;
 import gc.dtu.weeg.dtugc.utils.ToastUtils;
+import okhttp3.ResponseBody;
 import pub.devrel.easypermissions.EasyPermissions;
+import retrofit2.Call;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.http.HTTP;
+import retrofit2.http.Path;
 
 public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermissions.PermissionCallbacks {
     private View mView=null;
@@ -91,6 +102,9 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
     private Thread ErrorTimesTh=null;
 
     private int ErrorTimesCounter=0;
+
+    private FileWriterUtils.writefileResult mlisterner;
+    private FileWriterUtils mFileutile;
 
     //Http 请求
     Callback.Cancelable httpget;
@@ -190,55 +204,143 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
     }
 
     private void initListener() {
+
+
         btn_open.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 //                openBrowser();
-                HttpGetfile();
+                if(checkInternet())
+                        HttpGetfile();
+            }
+            private Boolean checkInternet()
+            {
+                Boolean result=false;
+                String[] perms = {Manifest.permission.INTERNET };
+                if (EasyPermissions.hasPermissions(MainActivity.getInstance(), perms)) {//检查是否获取该权限
+                    Log.i(TAG, "已获取网络权限");
+                   // httpgetfile2stored();
+                    result = true;
+                    ToastUtils.showToast(MainActivity.getInstance(),"已获取网络权限");
+                } else {
+                    //第二个参数是被拒绝后再次申请该权限的解释
+                    //第三个参数是请求码
+                    //第四个参数是要申请的权限
+                    ToastUtils.showToast(MainActivity.getInstance(),"无网络权限");
+                    EasyPermissions.requestPermissions(Hex2BinConvertFragment.this,"必要的权限", 1, perms);
+                    Log.i(TAG, "网络申请权限");
+                    result = false;
+                }
+                return  result;
             }
 
-            private void HttpGetfile() {
-                MainActivity.getInstance().mDialog.show();
-                MainActivity.getInstance().mDialog.setDlgMsg("正在下载");
-                RequestParams params = new RequestParams(Constants.FIRM_BASEUPDATESERVICER+Constants.FIRM_UPDATESERVER_INFO);
-                httpget =  x.http().get(params, new Callback.CommonCallback<String>() {
-                    @Override
-                    public void onSuccess(String result) {
-                        Log.d("zl","Http GET:"+result);
-                        mfileName=result;
-                        String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE };  //, Manifest.permission.CALL_PHONE
-                        if (EasyPermissions.hasPermissions(MainActivity.getInstance(), perms)) {//检查是否获取该权限
-                            Log.i(TAG, "已获取权限");
-                            httpgetfile2stored();
-                        } else {
-                            //第二个参数是被拒绝后再次申请该权限的解释
-                            //第三个参数是请求码
-                            //第四个参数是要申请的权限
-                            EasyPermissions.requestPermissions(Hex2BinConvertFragment.this,"必要的权限", 0, perms);
-                            Log.i(TAG, "申请权限");
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable ex, boolean isOnCallback) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(CancelledException cex) {
-
-                    }
-
-                    @Override
-                    public void onFinished() {
-
-                    }
-                });
-            }
         });
         btn_Convert.setOnClickListener(new firmwareupdatbutlisterner());
     }
+    private void HttpGetfile() {
+        MainActivity.getInstance().mDialog.show();
+        MainActivity.getInstance().mDialog.setDlgMsg("正在下载");
+        RequestParams params = new RequestParams(Constants.FIRM_BASEUPDATESERVICER+Constants.FIRM_UPDATESERVER_INFO);
+    //变更方法
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.FIRM_BASEUPDATESERVICER+"/") //设置网络请求的Url地址
+                .build();
+        GetRequest_Interface request = retrofit.create(GetRequest_Interface.class);
 
+        Call<ResponseBody> call = request.getCall(Constants.FIRM_UPDATESERVER_INFO);
+        call.enqueue(new retrofit2.Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.isSuccessful())
+                {
+                    try {
+                        String s = response.body().string();
+                        Log.d("zl",s);
+//                        MainActivity.getInstance().mDialog.setDlgMsg(s);
+
+                        //                Log.d("zl","Http GET:"+result);
+                mfileName=s;
+                String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE };  //, Manifest.permission.CALL_PHONE
+                if (EasyPermissions.hasPermissions(MainActivity.getInstance(), perms)) {//检查是否获取该权限
+                    Log.i(TAG, "已获取权限");
+                    httpgetfile2stored();
+                } else {
+                    //第二个参数是被拒绝后再次申请该权限的解释
+                    //第三个参数是请求码
+                    //第四个参数是要申请的权限
+                    EasyPermissions.requestPermissions(Hex2BinConvertFragment.this,"必要的权限", 0, perms);
+                    Log.i(TAG, "申请权限");
+                }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else
+                {
+                   if(MainActivity.getInstance().mDialog.isShowing())
+                   {
+                       MainActivity.getInstance().mDialog.dismiss();
+                   }
+                   ToastUtils.showToast(MainActivity.getInstance(),"网络访问失败");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                if(MainActivity.getInstance().mDialog.isShowing())
+                    MainActivity.getInstance().mDialog.dismiss();
+                ToastUtils.showToast(MainActivity.getInstance(),"网络访问失败");
+
+            }
+        });
+//        httpget =  x.http().get(params, new Callback.CommonCallback<String>() {
+//            @Override
+//            public void onSuccess(String result) {
+//                Log.d("zl","Http GET:"+result);
+//                mfileName=result;
+//                String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE };  //, Manifest.permission.CALL_PHONE
+//                if (EasyPermissions.hasPermissions(MainActivity.getInstance(), perms)) {//检查是否获取该权限
+//                    Log.i(TAG, "已获取权限");
+//                    httpgetfile2stored();
+//                } else {
+//                    //第二个参数是被拒绝后再次申请该权限的解释
+//                    //第三个参数是请求码
+//                    //第四个参数是要申请的权限
+//                    EasyPermissions.requestPermissions(Hex2BinConvertFragment.this,"必要的权限", 0, perms);
+//                    Log.i(TAG, "申请权限");
+//                }
+//            }
+//
+//            @Override
+//            public void onError(Throwable ex, boolean isOnCallback) {
+//                Log.d("zl","HTTP onError"+ex.toString());
+//                HttpException httpEx = (HttpException) ex;
+//                int responseCode = httpEx.getCode();
+//                String responseMsg = httpEx.getMessage();
+//                String errorResult = httpEx.getResult();
+//
+//                String result1 = ""+responseCode+","+responseMsg+","+errorResult;
+//              //  MainActivity.getInstance().mDialog.setDlgMsg(result1);
+//                Log.d("zl",result1);
+//                ToastUtils.showToast(MainActivity.getInstance(),result1);
+////                MainActivity.getInstance().mDialog.dismiss();
+////                String[] perms = {Manifest.permission.INTERNET };
+//               // EasyPermissions.requestPermissions(Hex2BinConvertFragment.this,"必要的权限", 1, perms);
+////                ToastUtils.showToast(MainActivity.getInstance(),ex.toString());
+//               // Log.i(TAG, "申请网络权限");
+//            }
+//
+//            @Override
+//            public void onCancelled(CancelledException cex) {
+//
+//            }
+//
+//            @Override
+//            public void onFinished() {
+//
+//            }
+//        });
+    }
     private void openBrowser() {
         new AlertDialog.Builder(MainActivity.getInstance()).setTitle("选择存储区域").setIcon(
                 R.drawable.icon_opnefile_browser).setSingleChoiceItems(
@@ -610,20 +712,45 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
         Boolean ishaveperms=false;
-        for(int i=0;i<perms.size();i++)
+        Boolean isInternet = false;
+        if(requestCode==0)
         {
-            if(perms.get(i).equals(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            Log.d("zl","存储权限获取");
+            for(int i=0;i<perms.size();i++)
             {
-                ishaveperms=true;
-                break;
+                if(perms.get(i).equals(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                {
+                    ishaveperms=true;
+                    break;
+                }
             }
+            if(!ishaveperms)
+            {
+                ToastUtils.showToast(MainActivity.getInstance(),"未获取权限");
+                return;
+            }
+            httpgetfile2stored();
         }
-        if(!ishaveperms)
+        else if(requestCode==1)
         {
-            ToastUtils.showToast(MainActivity.getInstance(),"未获取权限");
-            return;
+            Log.d("zl","网络权限获取");
+            for(int i=0;i<perms.size();i++)
+            {
+                if(perms.get(i).equals(Manifest.permission.INTERNET))
+                {
+                    isInternet=true;
+                    break;
+                }
+            }
+            if(!isInternet)
+            {
+                ToastUtils.showToast(MainActivity.getInstance(),"未获取网络权限");
+                return;
+            }
+            HttpGetfile();
         }
-        httpgetfile2stored();
+
+
     }
 
     private void httpgetfile2stored() {
@@ -634,6 +761,7 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
             Toast.makeText(MainActivity.getInstance(), "无法获取存储路径！", Toast.LENGTH_SHORT).show();
         } else {
             rootPath+="/GC2018";
+            final String fileroot = rootPath;
             File file = new File(rootPath);
             if(!file.exists())
             {
@@ -643,22 +771,56 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
             {
                 if(mfileName!=null)
                 {
-                    String Httpurl= Constants.FIRM_BASEUPDATESERVICER+mfileName;
-                    //设置请求参数
-                    RequestParams params = new RequestParams(Httpurl);
-                    params.setAutoResume(true);//设置是否在下载是自动断点续传
-                    params.setAutoRename(false);//设置是否根据头信息自动命名文件
-                    url=rootPath+"/"+mfileName;
-                    params.setSaveFilePath(url);
-                    Log.d("zl","缓存文件路径: "+url);
+                    String Httpurl= Constants.FIRM_BASEUPDATESERVICER;
+                    //变更方法
+                    Retrofit retrofit = new Retrofit.Builder()
+                            .baseUrl(Httpurl) //设置网络请求的Url地址
+                            .build();
+                    GetRequest_GetFile_Interface request = retrofit.create(GetRequest_GetFile_Interface.class);
 
-                    params.setExecutor(new PriorityExecutor(2, true));//自定义线程池,有效的值范围[1, 3], 设置为3时, 可能阻塞图片加载.
-                    params.setCancelFast(true);//是否可以被立即停止
+                    Call<ResponseBody> call = request.getCall(mfileName);
+                    call.enqueue(new retrofit2.Callback<ResponseBody>(){
 
-                    Log.d("zl","recallHttpgetrequest: 开始下载");
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            if(response.isSuccessful())
+                            {
+                                mFileutile = new FileWriterUtils((Context) MainActivity.getInstance(),fileroot+"/"+mfileName,response.body());
+                                mlisterner = new getfilewriteresultimpl(fileroot+"/"+mfileName);
+                                mFileutile.SetOnFilewriteResult(mlisterner);
+                                mFileutile.startthread();
 
-                    Log.d("zl","recallHttpgetrequest URL:"+Constants.FIRM_BASEUPDATESERVICER+mfileName);
-                    httpget = x.http().get(params,new recallHttpgetrequest(url) );
+                            }
+                            else
+                            {
+                                if(MainActivity.getInstance().mDialog.isShowing())
+                                    MainActivity.getInstance().mDialog.dismiss();
+                                ToastUtils.showToast(MainActivity.getInstance(), "文件下载失败");
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            if(MainActivity.getInstance().mDialog.isShowing())
+                                MainActivity.getInstance().mDialog.dismiss();
+                            ToastUtils.showToast(MainActivity.getInstance(), "文件下载失败");
+                        }
+                    });
+                            //设置请求参数
+//                    RequestParams params = new RequestParams(Httpurl);
+//                    params.setAutoResume(true);//设置是否在下载是自动断点续传
+//                    params.setAutoRename(false);//设置是否根据头信息自动命名文件
+//                    url=rootPath+"/"+mfileName;
+//                    params.setSaveFilePath(url);
+//                    Log.d("zl","缓存文件路径: "+url);
+//
+//                    params.setExecutor(new PriorityExecutor(2, true));//自定义线程池,有效的值范围[1, 3], 设置为3时, 可能阻塞图片加载.
+//                    params.setCancelFast(true);//是否可以被立即停止
+//
+//                    Log.d("zl","recallHttpgetrequest: 开始下载");
+//
+//                    Log.d("zl","recallHttpgetrequest URL:"+Constants.FIRM_BASEUPDATESERVICER+mfileName);
+//                    httpget = x.http().get(params,new recallHttpgetrequest(url) );
                 }
             }
         }
@@ -1020,4 +1182,46 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
             }
         }
     }
+
+    public interface GetRequest_Interface {
+        /**
+         * method：网络请求的方法（区分大小写）
+         * path：网络请求地址路径
+         * hasBody：是否有请求体
+         * @param id
+         */
+        @HTTP(method = "GET", path = "{id}", hasBody = false)
+        Call<ResponseBody> getCall(@Path("id")  String id);
+        // {id} 表示是一个变量
+        // method 的值 retrofit 不会做处理，所以要自行保证准确
+    }
+
+    public  interface GetRequest_GetFile_Interface
+    {
+        @HTTP(method = "GET", path = "{id}", hasBody = false)
+        Call<ResponseBody> getCall(@Path("id")  String id);
+    }
+
+    private class getfilewriteresultimpl implements FileWriterUtils.writefileResult{
+
+        String mUrl;
+        getfilewriteresultimpl(String url)
+        {
+            mUrl = url;
+            Hex2BinConvertFragment.this.url = url;
+        }
+        @Override
+        public void OnFilewritesuccess() {
+//                Log.d("zl","write success");
+            if(MainActivity.getInstance().mDialog.isShowing())
+                MainActivity.getInstance().mDialog.dismiss();
+            mDialog1.show();
+            mDialog1.setDlgMsg("文件格式转换...");
+            Hex2Bin hex2Bin;
+            hex2Bin=new Hex2Bin(mUrl);
+            hex2Bin.SetOnConverterListerner(new ConvertStatusImpl());
+            hex2Bin.converhex();
+        }
+    }
+
 }
