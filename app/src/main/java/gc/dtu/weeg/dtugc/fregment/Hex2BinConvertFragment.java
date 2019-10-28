@@ -429,7 +429,7 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
                         databytelen=0;
 
                         //发送数据
-                        verycutstatus(sendbuf1,2000);
+                        verycutstatus(sendbuf1,5000);
                         Log.d("zl","OndataCometoParse: 开始");
                     }
                     break;
@@ -1099,7 +1099,7 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
        @Override
        public void run() {
            try {
-               Thread.sleep(1000);
+               Thread.sleep(6000); //增加等待时间
                if(mtype==Constants.FIRMWARE_DATAERROR_TIMEOUT)
                {
                    semaphore2.acquire();

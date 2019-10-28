@@ -1,7 +1,7 @@
 package gc.dtu.weeg.dtugc.utils;
 
 import android.content.Context;
-import android.support.v4.app.Fragment;
+
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -10,16 +10,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import gc.dtu.weeg.dtugc.MainActivity;
-import gc.dtu.weeg.dtugc.hexfile2bin.Hex2Bin;
+
 import okhttp3.ResponseBody;
 
 public class FileWriterUtils {
-    Context mContext;
-    Fragment mCurFrag;
-    String mfileurl;
-    writefileResult mListerner;
-    ResponseBody mBody;
-    Thread thread1;
+    private Context mContext;
+//    Fragment mCurFrag;
+    private String mfileurl;
+    private writefileResult mListerner;
+    private ResponseBody mBody;
+    private Thread thread1;
   public FileWriterUtils(Context context, String Fileurl, ResponseBody body)
     {
         mContext = context;
