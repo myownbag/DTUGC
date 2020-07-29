@@ -18,10 +18,17 @@ public class Constants {
     public static final int  GCCLOSETIME = 6000;
     public static final int  G6OPENTIME = 15000;
     public static final int  G6CLOSETIME = 9000;
+
+
+    public static final int  MYDIF_MAXOPEN = 18000;
+    public static final int  MYDJF_MAXCLOSE = 18000;
+    public static final int  MYDJF_OPENDELY = 2000;
+    public static final int  MYDJF_CLOSEDELY = 1000;
     //SQL
 
     public static final String TABLENAME1 = "freezedatasensor" ;			// 数据表名称
     public static final String TABLENAME2 = "freezedatainstrument" ;
+    public static final String TABLENAME3 = "GateRecorders" ;
 
     public static final String COLUMN_TEM="temperature";
     public static final String COLUMN_MAC="mac";

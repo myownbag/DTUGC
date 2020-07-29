@@ -34,6 +34,17 @@ public class FreezedataSqlHelper extends SQLiteOpenHelper {
                 "instrument2		VARCHAR(50)		NOT NULL ," +
                 "date	TEXT			NOT NULL)";				// SQL语句
         db.execSQL(sql) ;	// 执行SQL语句
+
+        sql = "CREATE TABLE " + Constants.TABLENAME3 + " (" +
+                "id			INTEGER 		PRIMARY KEY ," +
+                "mac		VARCHAR(50)		NOT NULL ," +
+                "androidid		VARCHAR(50)		NOT NULL ," +
+                "userid		VARCHAR(50)		NOT NULL ," +
+                "userpassword		VARCHAR(50)		NOT NULL ," +
+                "updateflag		INTEGER		NOT NULL ," +
+                "gateresult		VARCHAR(50)		NOT NULL ," +
+                "date	TEXT			NOT NULL)";				// SQL语句
+        db.execSQL(sql) ;	// 执行SQL语句
     }
 
     @Override

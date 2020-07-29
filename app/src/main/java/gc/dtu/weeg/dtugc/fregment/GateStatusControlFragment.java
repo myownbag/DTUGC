@@ -1,5 +1,6 @@
 package gc.dtu.weeg.dtugc.fregment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -11,10 +12,19 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Map;
 
 import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
+import gc.dtu.weeg.dtugc.sqltools.FreezedataSqlHelper;
+import gc.dtu.weeg.dtugc.sqltools.GatetabCursor;
+import gc.dtu.weeg.dtugc.sqltools.MytabCursor;
+import gc.dtu.weeg.dtugc.sqltools.MytabOperate;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
+import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
 import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
@@ -24,6 +34,12 @@ public class GateStatusControlFragment extends BaseFragment {
     TextView mResultinfotextview;
     Button  mButton;
     RadioGroup mSelectitem;
+    public FreezedataSqlHelper helper = null ;		 //mysqlhelper				// 数据库操作
+    private MytabOperate mtab = null ;
+    private GatetabCursor cur;
+
+    public SimpleDateFormat myFmt = new SimpleDateFormat(Constants.DATE_FORMAT);
+
     int mCheckedindex=0;
     byte responecontrol[] = {(byte)0xFD,0x00,0x00,0x0F,0x00,0x16,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,(byte)0xC5,0x22,0x00,0x00,0x34,(byte)0xEC};
     byte[][] mCmds =
@@ -42,6 +58,11 @@ public class GateStatusControlFragment extends BaseFragment {
     }
 
     private void initdata() {
+
+        helper = new FreezedataSqlHelper(getContext(), Constants.TABLENAME3
+                ,null,1);
+        mtab = new MytabOperate(
+                GateStatusControlFragment.this.helper.getWritableDatabase());
     }
 
     private void initview() {
@@ -111,6 +132,15 @@ public class GateStatusControlFragment extends BaseFragment {
                case R.id.gate_status_control_query:
                    mCheckedindex=2;
                    break;
+               case R.id.gate_status_control_sqlinsert:
+                   mCheckedindex =3;
+                   break;
+               case R.id.gate_status_control_sqlquery:
+                   mCheckedindex = 4;
+                   break;
+               case R.id.gate_status_control_sqlupdate:
+                   mCheckedindex = 5;
+                   break;
            }
         }
     }
@@ -118,14 +148,63 @@ public class GateStatusControlFragment extends BaseFragment {
     {
         @Override
         public void onClick(View view) {
-            String readOutMsg;
-            mIsatart=true;
-            readOutMsg = DigitalTrans.byte2hex(mCmds[mCheckedindex]);
+            if(mCheckedindex>=3)
+            {
+                SQLfuntest(mCheckedindex);
+            }
+            else
+            {
+                String readOutMsg;
+                mIsatart=true;
+                readOutMsg = DigitalTrans.byte2hex(mCmds[mCheckedindex]);
 //            Log.d("zl","Gatestatus "+readOutMsg);
-            verycutstatus(readOutMsg);
-            mResultinfotextview.setText("");
+                verycutstatus(readOutMsg);
+                mResultinfotextview.setText("");
+            }
         }
     }
+
+    private void SQLfuntest(int index) {
+        if(index == 3)
+        {
+            Date now=new Date();
+            GateStatusControlFragment.this.mtab = new MytabOperate(
+                    GateStatusControlFragment.this.helper.getWritableDatabase());
+            mtab.insert3("51830001","12345567","root","root",0,"open",myFmt.format(now));
+        }
+        else if(index == 4)
+        {
+            ArrayList<Map<String,String>> alldata ;
+            GateStatusControlFragment.this.cur = new GatetabCursor(
+                    GateStatusControlFragment.this.helper.getWritableDatabase());
+            alldata=cur.find1("1","DESC",-1,-1);
+            if(alldata!=null)
+            {
+                for(Map<String,String> dataset:alldata)
+                {
+                    Log.d("zl","\nSQLfuntest find:"
+                            +dataset.get("ids")+"  "
+                            +dataset.get("mac")+"  "
+                            +dataset.get("androidid")+"  "
+                            +dataset.get("userid")+"  "
+                            +dataset.get("userpassword")+"  "
+                            +dataset.get("updateflag")+"  "
+                            +dataset.get("gateresult")+"  "
+                            +dataset.get("date")
+                    );
+                }
+            }
+
+        }
+        else if(index == 5)
+        {
+            GateStatusControlFragment.this.mtab = new MytabOperate(
+                    GateStatusControlFragment.this.helper.getWritableDatabase());
+            mtab.update3(5,1);
+        }
+
+    }
+
     private void verycutstatus(String readOutMsg) {
         MainActivity parentActivity1 = (MainActivity) getActivity();
         String strState1 = parentActivity1.GetStateConnect();

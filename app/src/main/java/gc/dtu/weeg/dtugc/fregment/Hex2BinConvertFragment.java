@@ -68,7 +68,7 @@ import retrofit2.http.Path;
 
 public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermissions.PermissionCallbacks {
     private View mView=null;
-    private static final int ByteSize = 200 * 1024; //读取的字节数
+    private static final int ByteSize = 300 * 1024; //读取的字节数
     private static final String TAG = "zl";
     public static final int FILE_RESULT_CODE = 1;
     private ImageView btn_open;
@@ -106,6 +106,7 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
     private FileWriterUtils.writefileResult mlisterner;
     private FileWriterUtils mFileutile;
 
+    private byte[] RepeateSendbuf;
     //Http 请求
     Callback.Cancelable httpget;
     String mfileName ;
@@ -201,6 +202,8 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
                 updatestep=-1;
             }
         });
+
+        mprodlg.setCanceledOnTouchOutside(false);
     }
 
     private void initListener() {
@@ -363,6 +366,7 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
         Log.d("zl","OndataCometoParse: "+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length).toUpperCase());
+
         if(!mIsatart)
         {
             return;
@@ -434,7 +438,6 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
                     }
                     break;
                 case 1:
-
                     if(readOutBuf1[0]!=0x06)
                     {
                         if(mprodlg.isShowing())
@@ -460,10 +463,10 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
                         memcry(sendbuf1,sendbuf,1,0,sendbuf.length);
 
                         CodeFormat.crcencode(sendbuf1);
-                        verycutstatus(sendbuf1,2000);
+                        verycutstatus(sendbuf1,5000);
 //                        Log.d("zl","新增序号"+CodeFormat.byteToHex(sendbuf1,sendbuf1.length).toLowerCase());
 //                        mprodlg.show();
-                        mprodlg.show("正在写入...");
+                        mprodlg.show("正在写入..."); // mprodlg.show(""+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
                         mprodlg.setCurProcess(0);
                         mpackagelen=Constants.FIRM_WRITE_FRAMELEN;
                     }
@@ -516,9 +519,12 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
                         memcry(sendbuf1,sendbuf,1,0,sendbuf.length);
 
                         CodeFormat.crcencode(sendbuf1);
-                        verycutstatus(sendbuf1,2000);
+                        verycutstatus(sendbuf1,5000);
+                        RepeateSendbuf = sendbuf1;
 //                        Log.d("zl","新增序号 "+CodeFormat.byteToHex(sendbuf1,sendbuf1.length).toLowerCase());
                         int process=databytelen*100/byte_firmware.length;
+////                        mprodlg.show(""+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length)
+//                                +"//"+process);
                         if(mprodlg.isShowing())
                             mprodlg.setCurProcess(process);
                     }
@@ -667,6 +673,7 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
 
             if(temp<3)
             {
+                /*
                 byte sendbuf[]=new byte[mpackagelen+4];
                 ByteBuffer buf;
                 buf = ByteBuffer.allocateDirect(4);
@@ -681,13 +688,16 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
 
                 memcry(sendbuf1,sendbuf,1,0,sendbuf.length);
                 CodeFormat.crcencode(sendbuf1);
-                verycutstatus(sendbuf1,2000);
+                verycutstatus(sendbuf1,5000);
                 CodeFormat.crcencode(sendbuf1);
                 Log.d("zl","新增序号 超时"+CodeFormat.byteToHex(sendbuf1,sendbuf1.length).toLowerCase());
-//                        mprodlg.show();
                 mprodlg.show("正在写入...");
                 int process=databytelen*100/byte_firmware.length;
                 mprodlg.setCurProcess(process);
+                 */
+                // 超时重传
+                verycutstatus(RepeateSendbuf,5000);
+                Log.d("zl","超时重传"+CodeFormat.byteToHex(RepeateSendbuf,RepeateSendbuf.length));
             }
             else
             {
@@ -1117,7 +1127,7 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
     {
         if(mprodlg.isShowing())
         {
-            mprodlg.showresult("写入超时",R.drawable.update_fail,true);
+            mprodlg.showresult("写入超时"+checksum,R.drawable.update_fail,true);
             updatestep=-1;
         }
     }

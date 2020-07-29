@@ -6,13 +6,19 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.warkiz.widget.IndicatorSeekBar;
+
+import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
+import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
 public class Procseedlg extends Dialog {
 
@@ -20,6 +26,8 @@ public class Procseedlg extends Dialog {
     private TextView infotext;
     private ImageView imageView;
     private Button mbtn_know;
+    IndicatorSeekBar proseekbar;
+    long exitTime = 0;
 
     public Procseedlg(@NonNull Context context) {
         super(context);
@@ -33,7 +41,15 @@ public class Procseedlg extends Dialog {
         infotext =findViewById(R.id.update_info);
         imageView =findViewById(R.id.image_update_result);
         mbtn_know = findViewById(R.id.but_updateresult);
+        proseekbar = findViewById(R.id.indicatorseekbar);
         initclickliterner();
+        proseekbar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
+
 //        Log.d("zl","mProgressBar / infotext / imageView: "+mProgressBar+" / "+infotext+" / "+imageView);
     }
     public void setCurProcess(int step)
@@ -42,6 +58,7 @@ public class Procseedlg extends Dialog {
         {
             mProgressBar.setProgress(step);
         }
+        proseekbar.setProgress(step);
     }
 
     private void initclickliterner()
@@ -104,4 +121,21 @@ public class Procseedlg extends Dialog {
         countDownTimer.start();
     }
 
+    @Override
+    public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
+        boolean resultvalue = false;
+        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+
+            if ((System.currentTimeMillis() - exitTime) > 2000) {
+                ToastUtils.showToast(MainActivity.getInstance(), "再按一次退出升级");
+                exitTime = System.currentTimeMillis();
+                resultvalue = true;
+            } else {
+                dismiss();
+                resultvalue =false;
+            }
+            return resultvalue;
+        }
+        return super.dispatchKeyEvent(event);
+    }
 }

@@ -4,6 +4,20 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     >
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:orientation="vertical"
+       >
+
+       <TextView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:textSize="30sp"
+           android:text="功能正在规划中..."
+           />
+
+   </LinearLayout>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -80,6 +94,24 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:text="阀门查询"
+            />
+        <RadioButton
+            android:id="@+id/gate_status_control_sqlinsert"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text= "数据插入"
+            />
+        <RadioButton
+            android:id="@+id/gate_status_control_sqlquery"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="数据查询"
+            />
+        <RadioButton
+            android:id="@+id/gate_status_control_sqlupdate"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="数据更新"
             />
     </RadioGroup>
     <View

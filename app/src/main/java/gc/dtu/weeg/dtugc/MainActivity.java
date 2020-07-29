@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -26,8 +28,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.tencent.bugly.crashreport.CrashReport;
+
 import org.xutils.x;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,7 +103,7 @@ public class MainActivity extends FragmentActivity {
     int mScrollX = 0;
     private List<BaseFragment> fragments;
     public String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置"
-            , "温压传感器接入","气体传感器接入", "仪表接入","传感器调试","NB业务注册",/*"阀门控制",*/"版本信息","固件升级"};
+            , "温压传感器接入","气体传感器接入", "仪表接入","传感器调试","NB业务注册","阀门控制","版本信息","固件升级"};
     //蓝牙状态保存
     public Boolean mIsconnect = false;
     // Name of the connected device
@@ -139,12 +146,52 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         x.Ext.init(getApplication());
-       // x.Ext.setDebug(BuildConfig.DEBUG); // 是否输出debug日志, 开启debug会影响性能.
+
+        Context context = getApplicationContext();
+// 获取当前包名
+        String packageName = context.getPackageName();
+// 获取当前进程名
+        String processName = getProcessName(android.os.Process.myPid());
+// 设置是否为上报进程
+        CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(context);
+        strategy.setUploadProcess(processName == null || processName.equals(packageName));
+// 初始化Bugly
+//        CrashReport.initCrashReport(getApplicationContext(), "77550d3c58", true);
+        CrashReport.initCrashReport(context, "77550d3c58", false, strategy);
+// 如果通过“AndroidManifest.xml”来配置APP信息，初始化方法如下
+// CrashReport.initCrashReport(context, strategy);
+
+
+        // x.Ext.setDebug(BuildConfig.DEBUG); // 是否输出debug日志, 开启debug会影响性能.
         instanceMainActivity = this;
         mydataparse=null;
         InitView();
         InitFrgment();
         InitBlueTooth();
+    }
+
+    private String getProcessName(int myPid) {
+
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader("/proc/" + myPid + "/cmdline"));
+            String processName = reader.readLine();
+            if (!TextUtils.isEmpty(processName)) {
+                processName = processName.trim();
+            }
+            return processName;
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+        }
+        return null;
     }
 
     @Override
@@ -391,12 +438,12 @@ public class MainActivity extends FragmentActivity {
         fregment8.setArguments(bundle7);
         fragments.add(fregment8);
 
-//        fragment12 = new GateStatusControlFragment();
-//        Bundle bundle12 = new Bundle();
-//        bundle12.putInt("position",index);
-//        bundle12.putString("extra",titles[index++]);
-//        fragment12.setArguments(bundle12);
-//        fragments.add(fragment12);
+        fragment12 = new GateStatusControlFragment();
+        Bundle bundle12 = new Bundle();
+        bundle12.putInt("position",index);
+        bundle12.putString("extra",titles[index++]);
+        fragment12.setArguments(bundle12);
+        fragments.add(fragment12);
 
         fregment9 =new AppVersioninfoFregment();
         Bundle bundle8= new Bundle();
@@ -671,6 +718,8 @@ public class MainActivity extends FragmentActivity {
             switch(v.getId())
             {
                 case R.id.rll_bt_scan:// 蓝牙扫描
+//                    TextView test = null;
+//                    test.setText("");
                     if(!mIsconnect)
                     {
                         Intent serverIntent = new Intent(MainActivity.this, DeviceListActivity.class);

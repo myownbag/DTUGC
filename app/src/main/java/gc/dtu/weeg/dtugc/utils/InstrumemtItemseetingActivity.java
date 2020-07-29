@@ -106,6 +106,14 @@ public class InstrumemtItemseetingActivity extends FragmentActivity implements V
             {"2000","2","FLOWSIC500","1024"},
             {"2000","2","FLOWSIC500_V2","1025"},
             {"2000","2","Tancy_Modbus_TFC","1026"},
+            {"2000","2","Elgas_Elcor","1027"},
+
+            {"2000","2","TianQing 1.1","1028"},
+            {"2000","2","V2FCMODBUS","10502"},
+            {"2000","2","Nanyi_EMF_Modbus","10503"},
+            {"2000","2","CN_MODBUS_WATCH","10504"},
+
+            {"2000","2","ACOL","10505"},
 
             {"2000","2","Control Valve","10500"},
             {"2000","2","电压读取","10501"},

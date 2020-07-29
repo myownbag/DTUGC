@@ -336,6 +336,18 @@ public class ItemSetingActivity extends Activity {
                              sendbuf[24]=0x00;
                              sendbuf[25]=0x00;
                              break;
+                         case 6:
+                             sendbuf[16]=0x03;
+                             sendbuf[17]=0x01; //MYDIF
+                             sendbuf[18]=(byte)(Constants.MYDIF_MAXOPEN%0x100);
+                             sendbuf[19]=(byte)(Constants.MYDIF_MAXOPEN/0x100);
+                             sendbuf[20]= (byte)(Constants.MYDJF_MAXCLOSE%0x100);
+                             sendbuf[21]=(byte)(Constants.MYDJF_MAXCLOSE/0x100);
+                             sendbuf[22]=(byte)(Constants.MYDJF_OPENDELY%0x100);;
+                             sendbuf[23]=(byte)(Constants.MYDJF_OPENDELY/0x100);;
+                             sendbuf[24]=(byte)(Constants.MYDJF_CLOSEDELY%0x100);;
+                             sendbuf[25]=(byte)(Constants.MYDJF_CLOSEDELY/0x100);;
+                             break;
                      }
 
                  }
