@@ -170,6 +170,16 @@
                      android:layout_width="match_parent"
                      android:layout_height="50dp"
                      android:text="气体传感器校量程" />
+                 <RadioButton
+                     android:id="@+id/press_sensor_gassensor_lowpower"
+                     android:layout_width="match_parent"
+                     android:layout_height="50dp"
+                     android:text="气体传感器低功耗" />
+                 <RadioButton
+                     android:id="@+id/press_sensor_gassensor_nomalpower"
+                     android:layout_width="match_parent"
+                     android:layout_height="50dp"
+                     android:text="气体传感器普通模式" />
              </RadioGroup>
          </LinearLayout>
         </ScrollView>

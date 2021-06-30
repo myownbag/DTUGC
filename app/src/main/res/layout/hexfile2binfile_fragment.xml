@@ -18,7 +18,13 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:hint="请先下载文件"
-            android:layout_weight="9" />
+            android:layout_weight="4" />
+        <TextView
+            android:id="@+id/hex2binfilename"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="5" />
         <ImageView
             android:id="@+id/btn_openfile"
             android:layout_width="30dp"

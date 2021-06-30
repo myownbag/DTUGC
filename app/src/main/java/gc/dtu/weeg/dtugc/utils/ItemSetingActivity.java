@@ -733,6 +733,7 @@ public class ItemSetingActivity extends Activity {
                    intent.putExtra("name",str201setting);
                    intent.putExtra("name1",str220setting);
                    intent.putExtra("addrs",mposition);
+                   Log.d("zl","intent.putExtra(\"addrs\",mposition) :"+ mposition);
                }
            }
            else

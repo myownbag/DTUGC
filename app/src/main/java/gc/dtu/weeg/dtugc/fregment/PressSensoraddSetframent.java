@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -34,6 +36,7 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
    public RadioGroup mMainSelectGroup;
    public Button mbutsend;
    public int mSelectfun=0;
+    ColorStateList defaultcolor;
    public String cmd1="+++++7";
    public String cmdgas="+++++4";
    String[] cmds={"R_1","R_2","W12","W21"};
@@ -42,7 +45,9 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
            {
                    "DATAE\r",
                    "ZERO2\r",
-                   "CALB 0250\r"
+                   "CALB 0250\r",
+                   "LOWPW1\r",
+                   "LOWPW0\r",
            };
 
    byte[][] factorysetcmd= {
@@ -84,7 +89,7 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
         mMainSelectGroup = mView.findViewById(R.id.sensor_main_selected);
         mMainSelectGroup.setOnCheckedChangeListener(new OnMainGroupCheckedListenerimpl());
         mSelectGroup.setVisibility(View.GONE);
-
+        defaultcolor = mTextResultView.getTextColors();
 
         minfodlg =new  AlertDialog.Builder(MainActivity.getInstance())
                 .setTitle("模式切换提示")
@@ -99,14 +104,15 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
                         }
                         else if(mMainselectmode==4)
                         {
-                            cmd=factorysetcmd[1];
-
+//                            cmd=factorysetcmd[1];
+                              cmd = "+++++E".getBytes();
                         }
                         else
                         {
                             cmd=new byte[3];
                         }
-                        CodeFormat.crcencode(cmd);
+                        if(cmd.length>6)
+                            CodeFormat.crcencode(cmd);
                         String readOutMsg = DigitalTrans.byte2hex(cmd);
                         verycutstatus(readOutMsg,2000);
                         Log.d("zl","in dialog:"+CodeFormat.byteToHex(cmd,cmd.length));
@@ -160,15 +166,44 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
         {
             str.append((char) readOutBuf1[i]);
         }
-        switch (mMainselectmode)
+        if(mSelectfun == 7 )
         {
-            case 2:  //gas1
-                mTextResultView.setText(str.substring(0,str.length()-1));
-                MainActivity.getInstance().mDialog.dismiss();
-                break;
-            case 3: //gas2
-                break;
+            if(str.indexOf("OK")>0)
+            {
+                mTextResultView.setText("进入低功耗成功");
+            }
+            else
+            {
+                mTextResultView.setText("进入低功耗失败");
+
+                mTextResultView.setTextColor(getResources().getColor(R.color.color_warning));
+            }
         }
+        else if(mSelectfun == 8)
+        {
+            if(str.indexOf("OK")>0)
+            {
+                mTextResultView.setText("进入正常模式成功");
+            }
+            else
+            {
+                mTextResultView.setText("进入正常模式失败");
+
+                mTextResultView.setTextColor(getResources().getColor(R.color.color_warning));
+            }
+        }
+        else
+        {
+            switch (mMainselectmode)
+            {
+                case 2:  //gas1
+                    mTextResultView.setText(str.substring(0,str.length()-1));
+                    break;
+                case 3: //gas2
+                    break;
+            }
+        }
+        MainActivity.getInstance().mDialog.dismiss();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
@@ -254,6 +289,15 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
                 readOutMsg = DigitalTrans.byte2hex(cmdgasitems[2].getBytes());
                 Log.d("zl","IN PRESS"+cmdgasitems[2]);
                 break;
+            case 7: //低功耗
+                readOutMsg = DigitalTrans.byte2hex(cmdgasitems[3].getBytes());
+                Log.d("zl","IN PRESS"+cmdgasitems[3]);
+                break;
+            case 8:
+                readOutMsg = DigitalTrans.byte2hex(cmdgasitems[4].getBytes());
+                Log.d("zl","IN PRESS"+cmdgasitems[4]);
+                break;
+
         }
 
         verycutstatus(readOutMsg);
@@ -295,11 +339,23 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
                             break;
                         case 5:
                         case 6:
+                        case 7:
+                        case 8:
+                            /**************************
+                             * 无需要判断OEM状态直接发送调试指令
+                             *
+                             *
+                             *
+                             *
+                             *
+                             * *************************************/
                             readOutMsg = DigitalTrans.byte2hex("UART?\r".getBytes());
                             verycutstatus(readOutMsg);
                             Log.d("zl","IN press: UART?");
                             Log.d("zl",readOutMsg);
-                            break;
+//                            sendstep4();
+//                            mfunstep = 5;
+//                            break;
                     }
                 }
                 else if( (readOutBuf1[2]&0x01) !=0 )
@@ -344,6 +400,7 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
         {
             case 0:
             case 4:
+                MainActivity.getInstance().mDialog.dismiss();
                 break;
             case 1:
                 if(temp>=0)
@@ -396,6 +453,8 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
         mIsatart=true;
         mfunstep=0;
         mTextResultView.setText("");
+        mTextResultView.setTextColor(defaultcolor);
+
         String readOutMsg;
         switch (mMainselectmode)
         {
@@ -414,8 +473,28 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
                     ToastUtils.showToast(MainActivity.getInstance(),"暂时不支持");
                     return;
                 }
-                readOutMsg = DigitalTrans.byte2hex(cmdgas.getBytes());
-                verycutstatus(readOutMsg);
+                if(mSelectfun == 6||mSelectfun == 5)
+                {
+                     new  AlertDialog.Builder(MainActivity.getInstance())
+                            .setTitle("红外探头校准提示")
+                            .setMessage("即将进行探头校准，请确认")
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    String sendcmd;
+                                    sendcmd = DigitalTrans.byte2hex(cmdgas.getBytes());
+                                    verycutstatus(sendcmd);
+                                }
+                            })
+                             .setNegativeButton("取消",null)
+                            .create()
+                            .show();
+                }
+                else
+                {
+                    readOutMsg = DigitalTrans.byte2hex(cmdgas.getBytes());
+                    verycutstatus(readOutMsg);
+                }
                 break;
                 default:
 
@@ -480,6 +559,12 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
                 case R.id.press_sensor_gassensor_calb:
                     mSelectfun=6;
                     break;
+                case R.id.press_sensor_gassensor_lowpower:
+                    mSelectfun=7;
+                    break;
+                case R.id.press_sensor_gassensor_nomalpower:
+                    mSelectfun = 8;
+                    break;
             }
         }
     }
@@ -542,15 +627,19 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
     }
     private void setGassettingsVisivility(boolean state )
     {
-        RadioButton bt1,bt2,bt3;
+        RadioButton bt1,bt2,bt3,bt4,bt5;
         bt1=mView.findViewById(R.id.press_sensor_gassensor_calb);
         bt2=mView.findViewById(R.id.press_sensor_gassensor_getdata);
         bt3=mView.findViewById(R.id.press_sensor_gassensor_zero);
+        bt4=mView.findViewById(R.id.press_sensor_gassensor_lowpower);
+        bt5=mView.findViewById(R.id.press_sensor_gassensor_nomalpower);
         if(state)
         {
             bt1.setVisibility(View.VISIBLE);
             bt2.setVisibility(View.VISIBLE);
             bt3.setVisibility(View.VISIBLE);
+            bt4.setVisibility(View.VISIBLE);
+            bt5.setVisibility(View.VISIBLE);
             bt2.setChecked(true);
         }
         else
@@ -558,6 +647,8 @@ public class PressSensoraddSetframent extends BaseFragment implements View.OnCli
             bt1.setVisibility(View.GONE);
             bt2.setVisibility(View.GONE);
             bt3.setVisibility(View.GONE);
+            bt4.setVisibility(View.GONE);
+            bt5.setVisibility(View.GONE);
         }
     }
 }

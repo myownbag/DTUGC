@@ -56,6 +56,7 @@ public class LocalsettngsFregment extends BaseFragment {
             {"101","设备供电方式","1","L"},
             {"103","二级地址","8","T"},
             {"110","阀门选择","10","L"},
+            {"197","上传解析协议","1","L"},
             {"198","无线模块","1","L"},
             {"201","联网参数","40","E"},
             {"220","电信定制APN","40","T"},
@@ -94,6 +95,11 @@ public class LocalsettngsFregment extends BaseFragment {
                     {"110","MYDJF","6"},
                     //无线模块
 //                    {"198","","-1"},
+                    {"197","维格TCP","0"},
+                    {"197","维格IOT通用","1"},
+                    {"197","杭州IOT通用","2"},
+
+
                     {"198","模块关闭","0"},
                    // {"198","模块自适应","1"},
                     {"198","M72","2"},
@@ -247,6 +253,8 @@ public class LocalsettngsFregment extends BaseFragment {
                         else if(Integer.valueOf(baseinfo[mIndexcmd][0])==198)
                         {
                             mModuleType = settingscontent[mIndexcmd];
+
+                            Log.d("zl"," mModuleType = settingscontent[mIndexcmd] :" + mModuleType);
                         }
                         break;
                     }
@@ -382,6 +390,11 @@ public class LocalsettngsFregment extends BaseFragment {
             }
             else
             {
+//                if(tempint2 == 220)
+//                {
+//                    Log.d("zl","12345678");
+//                }
+
                 temp="";
                 for(i=0;i<readOutBuf1.length-18;i++)
                 {
@@ -525,9 +538,10 @@ public class LocalsettngsFregment extends BaseFragment {
             serverIntent.putExtra("name",registersetting);
             serverIntent.putExtra("settings",registerconnet);
             serverIntent.putExtra("datalen",registerlen);
-            mModuleType=settingscontent[4];
+            mModuleType=settingscontent[5];
+            Log.d("zl"," mModuleType=settingscontent[4] :" +mModuleType);
             serverIntent.putExtra("addr198setting",mModuleType);
-            serverIntent.putExtra("220addrset",settingscontent[6]);
+            serverIntent.putExtra("220addrset",settingscontent[7]);
 //            if(registername.equals("221"))
 //            {
 //                serverIntent.putExtra("221receivebytes",reg221datacontent);
@@ -573,7 +587,7 @@ public class LocalsettngsFregment extends BaseFragment {
 
             String temp=data.getStringExtra("name");
             int index=  data.getIntExtra("addrs",-1);
-            if(index==5)
+            if(index==6)
             {
                 if(temp!=null)
                     settingscontent[index]=temp;

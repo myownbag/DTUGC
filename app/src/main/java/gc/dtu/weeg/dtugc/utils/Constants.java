@@ -66,8 +66,12 @@ public class Constants {
     public static final int FIRMWARE_CONVERT_SUCCESS=1;
     public static final int FIRMWARE_CONVERT_FAIL=2;
     public static final int FIRMWARE_CONVERT_BUSING=3;
+    //"http://58.216.223.222:8000/download/DTUGC2018/"; "http://192.168.1.71:8000/download/DTUGC2018/"
     public static final String FIRM_BASEUPDATESERVICER = "http://58.216.223.222:8000/download/DTUGC2018/";
     public static final String FIRM_UPDATESERVER_INFO = "DTUGC2018.txt";
+
+    public static final String FIRM_BASEUPDATESERVICER_MSU = "http://58.216.223.222:8000/download/MSUGC2018/";
+    public static final String FIRM_UPDATESERVER_INFO_MSU = "MSUGC.txt";
 
     public static final int FIRMWARE_DATAWRITE_TIMEOUT=6;
     public static final int FIRMWARE_DATAERROR_TIMEOUT=7;
@@ -87,4 +91,59 @@ public class Constants {
     public static final int PARSE_FLOAT1=0;
     public static final int PARSE_FLOAT2=1;
     public static final int PARSE_INT=2;
+
+    //PTZ相关设置的常量
+    public static String[][] workmodetype ={
+            {"脉冲计数器","0"},
+            {"T标况修正仪","1"},
+            {"PT标况修正仪","2"},
+            {"PTZ标况修正仪","3"},
+    };
+
+    public static String[][] plusemode ={
+            {"双脉冲","1"},
+            {"单脉冲","2"},
+            {"单脉冲+对比脉冲","3"}
+    };
+
+
+
+    public static String[][] plusedevice ={
+            {"干簧管","1"},
+            {"磁阻开关","2"}
+    };
+
+    public static String[][] plusedata ={
+            {"0.001","1"},
+            {"0.01","2"},
+            {"0.1","3"},
+            {"1","4"},
+            {"10","5"}
+    };
+    public static String[][] pressmode =  //压力传感器
+            {
+                    {"无","0"},
+                    {"常量","1"},
+                    {"I2C","2"},
+                    {"I2C-206C","3"}
+            };
+    public static String[][] temperaturemode ={
+            {"无","0"},
+            {"常量","1"},
+            {"I2C","2"},
+            {"I2C-206C","3"}
+    };
+
+    public static String[][] compressibilityfactormode ={
+            {"常量","0"},
+            {"计算","2"}
+    };
+
+    public static String[][] Scantimemode ={
+            {"10","10"},
+            {"15","15"},
+            {"20","20"},
+            {"30","30"}
+    };
+
 }

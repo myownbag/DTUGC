@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -52,6 +53,7 @@ import gc.dtu.weeg.dtugc.fregment.Hex2BinConvertFragment;
 import gc.dtu.weeg.dtugc.fregment.InstrumentInputFregment;
 import gc.dtu.weeg.dtugc.fregment.LocalsettngsFregment;
 import gc.dtu.weeg.dtugc.fregment.NBRegisiterfragment;
+import gc.dtu.weeg.dtugc.fregment.PTZSettingsFragment;
 import gc.dtu.weeg.dtugc.fregment.PressSensoraddSetframent;
 import gc.dtu.weeg.dtugc.fregment.RealtimedataFregment;
 import gc.dtu.weeg.dtugc.fregment.SensorInputFregment;
@@ -102,7 +104,7 @@ public class MainActivity extends FragmentActivity {
     private ViewGroup mClassContainer;
     int mScrollX = 0;
     private List<BaseFragment> fragments;
-    public String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置"
+    public String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置","PTZ设置"
             , "温压传感器接入","气体传感器接入", "仪表接入","传感器调试","NB业务注册","阀门控制","版本信息","固件升级"};
     //蓝牙状态保存
     public Boolean mIsconnect = false;
@@ -126,6 +128,7 @@ public class MainActivity extends FragmentActivity {
     public FrozendataFregment   fregment3;
     public LocalsettngsFregment fregment4;
     public SensorInputFregment  fregment5;
+    public PTZSettingsFragment  fragment13;
     public InstrumentInputFregment fregment6;
     public PressSensoraddSetframent fregment7;
     public NBRegisiterfragment      fregment8;
@@ -402,6 +405,13 @@ public class MainActivity extends FragmentActivity {
         fregment4.setArguments(bundle3);
         fragments.add(fregment4);
 
+        fragment13 = new PTZSettingsFragment();
+        Bundle bundle10 = new Bundle();
+        bundle10.putInt("position",index);
+        bundle10.putString("extra",titles[index++]);
+        fragment13.setArguments(bundle10);
+        fragments.add(fragment13);
+
         fregment5 = new SensorInputFregment();
         Bundle bundle4 = new Bundle();
         bundle4.putInt("position",index);
@@ -487,11 +497,14 @@ public class MainActivity extends FragmentActivity {
             if (i == mCurClassIndex) {
                 //已经选中
                 type_name.setTextColor(ContextCompat.getColor(this, R.color.color_selected));
+                type_name.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));//加粗
+//                textView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));//取消加粗
                 img_type.setImageResource(R.drawable.bottom_line_blue);
             } else {
                 //未选中
                 type_name.setTextColor(ContextCompat.getColor(this, R.color.color_unselected));
                 img_type.setImageResource(R.drawable.bottom_line_gray);
+                type_name.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));//取消加粗
             }
             final int index=i;
             //点击顶部Tab标签，动态设置下面的ViewPager页面
@@ -503,12 +516,15 @@ public class MainActivity extends FragmentActivity {
                     View currentItem=mClassContainer.getChildAt(mCurClassIndex);
                     ((TextView)(currentItem.findViewById(R.id.horizontal_tv_type))).setTextColor(ContextCompat.getColor(getBaseContext(), R.color.color_unselected));
                     ((ImageView)(currentItem.findViewById(R.id.horizontal_img_type))).setImageResource(R.drawable.bottom_line_gray);
+                    ((TextView)(currentItem.findViewById(R.id.horizontal_tv_type))).setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));//取消加粗
+
                     mCurClassIndex=index;
                     mCurClassIndex1=index;
                     // Log.e("tchl","onclick: first index:"+index);
                     //设置点击状态
                     img_type.setImageResource(R.drawable.bottom_line_blue);
                     type_name.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.color_selected));
+                    type_name.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));//取消加粗
                     //跳转到指定的ViewPager
                     info_viewpager.setCurrentItem(mCurClassIndex);
                     mCurrentpage=fragments.get(mCurClassIndex);
@@ -778,11 +794,13 @@ public class MainActivity extends FragmentActivity {
             View preView=mClassContainer.getChildAt(mCurClassIndex);
             ((TextView)(preView.findViewById(R.id.horizontal_tv_type))).setTextColor(ContextCompat.getColor(MainActivity.this, R.color.color_unselected));
             ((ImageView)(preView.findViewById(R.id.horizontal_img_type))).setImageResource(R.drawable.bottom_line_gray);
+            ((TextView)(preView.findViewById(R.id.horizontal_tv_type))).setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));//正常
             mCurClassIndex=position;
             //设置当前为选中状态
             View currentItem=mClassContainer.getChildAt(mCurClassIndex);
             ((ImageView)(currentItem.findViewById(R.id.horizontal_img_type))).setImageResource(R.drawable.bottom_line_blue);
             ((TextView)(currentItem.findViewById(R.id.horizontal_tv_type))).setTextColor(ContextCompat.getColor(MainActivity.this, R.color.color_selected));
+            ((TextView)(currentItem.findViewById(R.id.horizontal_tv_type))).setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));//加粗
             //这边移动的距离 是经过计算粗略得出来的
             mScrollX=currentItem.getLeft()-300;
             //Log.d("zttjiangqq", "mScrollX:" + mScrollX);

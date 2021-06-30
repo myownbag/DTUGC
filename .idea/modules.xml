@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/DTUGC.iml" filepath="$PROJECT_DIR$/DTUGC.iml" group="DTUGC" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="DTUGC/app" />
-      <module fileurl="file://$PROJECT_DIR$/indicatorseekbar/indicatorseekbar.iml" filepath="$PROJECT_DIR$/indicatorseekbar/indicatorseekbar.iml" group="DTUGC/indicatorseekbar" />
+      <module fileurl="file://$PROJECT_DIR$/DTUGC.iml" filepath="$PROJECT_DIR$/DTUGC.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/DTUGC.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/DTUGC.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/indicatorseekbar/DTUGC.indicatorseekbar.iml" filepath="$PROJECT_DIR$/.idea/modules/indicatorseekbar/DTUGC.indicatorseekbar.iml" />
     </modules>
   </component>
 </project>
