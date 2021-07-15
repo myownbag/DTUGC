@@ -111,6 +111,7 @@ public class LocalsettngsFregment extends BaseFragment {
                     {"206","TCP","0"},
                     {"206","UDP","1"},
                     {"206","CoAP","2"},
+                    {"206","Onenet","3"},
 
 //                    {"207","","-1"},
                     {"207","主动上传","0"},
