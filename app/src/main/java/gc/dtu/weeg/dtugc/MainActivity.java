@@ -50,6 +50,7 @@ import gc.dtu.weeg.dtugc.fregment.FrozendataFregment;
 import gc.dtu.weeg.dtugc.fregment.GasSensorSetFragment;
 import gc.dtu.weeg.dtugc.fregment.GateStatusControlFragment;
 import gc.dtu.weeg.dtugc.fregment.Hex2BinConvertFragment;
+import gc.dtu.weeg.dtugc.fregment.ICCardSettingFragment;
 import gc.dtu.weeg.dtugc.fregment.InstrumentInputFregment;
 import gc.dtu.weeg.dtugc.fregment.LocalsettngsFregment;
 import gc.dtu.weeg.dtugc.fregment.NBRegisiterfragment;
@@ -105,7 +106,7 @@ public class MainActivity extends FragmentActivity {
     int mScrollX = 0;
     private List<BaseFragment> fragments;
     public String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置","PTZ设置"
-            , "温压传感器接入","气体传感器接入", "仪表接入","传感器调试","NB业务注册","阀门控制","版本信息","固件升级"};
+            , "温压传感器接入","气体传感器接入", "仪表接入","传感器调试","NB业务注册","阀门控制","版本信息","固件升级","IC卡设置"};
     //蓝牙状态保存
     public Boolean mIsconnect = false;
     // Name of the connected device
@@ -136,6 +137,7 @@ public class MainActivity extends FragmentActivity {
     public Hex2BinConvertFragment   fragment10;
     public GasSensorSetFragment     fragment11;
     public GateStatusControlFragment fragment12;
+    public ICCardSettingFragment  fragment14;
 
 
     //接口
@@ -303,6 +305,7 @@ public class MainActivity extends FragmentActivity {
                     String readOutMsg = DigitalTrans.byte2hex(readOutBuf);
 
                     //获取接收的返回数据
+//                    Log.d("zl","MainActivity Read:"+readOutMsg);
                     Log.v("ttt", "recv:" + readOutMsg);
 
                     if (mydataparse != null) {
@@ -473,6 +476,14 @@ public class MainActivity extends FragmentActivity {
         bundle9.putString("extra",titles[index++]);
         fragment10.setArguments(bundle9);
         fragments.add(fragment10);
+
+        //添加ICCard 设置页面
+        fragment14 = new ICCardSettingFragment();
+        Bundle bundle13= new Bundle();
+        bundle13.putInt("position",index);
+        bundle13.putString("extra",titles[index++]);
+        fragment14.setArguments(bundle13);
+        fragments.add(fragment14);
 
         mPagerAdater=new CNKFixedPagerAdapter(getSupportFragmentManager());
         mPagerAdater.setTitles(titles);

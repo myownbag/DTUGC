@@ -112,6 +112,8 @@ public class InstrumemtItemseetingActivity extends FragmentActivity implements V
             {"2000","2","V2FCMODBUS","10502"},
             {"2000","2","Nanyi_EMF_Modbus","10503"},
             {"2000","2","CN_MODBUS_WATCH","10504"},
+            //{ 2,3,"WEEG_IC_DIRECT",10506 },
+            {"2000","2","WEEG_IC_DIRECT","10506"},
 
             {"2000","2","ACOL","10505"},
 
