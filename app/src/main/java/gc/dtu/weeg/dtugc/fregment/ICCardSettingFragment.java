@@ -106,9 +106,13 @@ public class ICCardSettingFragment extends BaseFragment {
 //        ByteBuffer buf2 ;
         int len = readOutBuf1.length-16-2;
         String  test = "";
-        if(len == 2 )
+        if(len < 9 )
         {
             test = "FFFF";
+            ToastUtils.showToast(MainActivity.getInstance(),"接收数据长度出错 长度="+len);
+            MainActivity.getInstance().mDialog.dismiss();
+            MeterDataInfoShowText.setText("接收数据长度出错 长度="+len);
+            return;
         }
         else
         {

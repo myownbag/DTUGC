@@ -590,7 +590,7 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
                     if(readOutMsg1.equals("0406"))
                     {
                         if(mprodlg.isShowing())
-                            mprodlg.showresult("文件写入成功",R.drawable.update_success,true);
+                            mprodlg.showresult("文件写入成功，\r\n请保持设备不要断电，\r\n并等待设备液晶PPPPPPP显示消失",R.drawable.update_success,true);
                     }
                     else
                     {

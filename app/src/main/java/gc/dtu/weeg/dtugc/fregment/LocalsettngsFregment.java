@@ -1,10 +1,12 @@
 package gc.dtu.weeg.dtugc.fregment;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -18,6 +20,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -29,6 +35,8 @@ import gc.dtu.weeg.dtugc.myview.LocalSetaddr221ExtrainfoView;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
+import gc.dtu.weeg.dtugc.utils.FileWriterUtils;
+import gc.dtu.weeg.dtugc.utils.FileWriterUtilsV2;
 import gc.dtu.weeg.dtugc.utils.ItemSetingActivity;
 import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
@@ -147,6 +155,8 @@ public class LocalsettngsFregment extends BaseFragment {
         if (mIndexcmd == senddatabuf.length) {
             myadpater.notifyDataSetChanged();
             MainActivity.getInstance().mDialog.dismiss();
+
+//            WriteLogFile();
         }
         else
         {
@@ -155,6 +165,68 @@ public class LocalsettngsFregment extends BaseFragment {
         if (mIndexcmd < senddatabuf.length) {
             String readOutMsg = DigitalTrans.byte2hex(senddatabuf[mIndexcmd]);
             verycutstatus(readOutMsg, 0);
+        }
+    }
+
+    private void WriteLogFile() {
+
+        boolean  test;
+        String mfileName = "/LOG.txt";
+        String rootPath  = Environment.getExternalStorageDirectory()
+                .toString();
+        Log.d("zl","LocalsettngsFregment+URL: "+rootPath);
+        if (rootPath == null) {
+            Toast.makeText(MainActivity.getInstance(), "无法获取存储路径！", Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            rootPath+="/GC2018";
+            final String fileroot = rootPath;
+            File file = new File(rootPath);
+            if(!file.exists())
+            {
+//                Boolean test ;
+                test  = file.mkdirs();
+//                mfileName = "/LOG.txt";
+                Log.d("zl","file dir mk result ："+test);
+                if(test == true)
+                {
+                    Log.d("zl","文件处理:"+fileroot+"/"+mfileName);
+//                    mFileutile = new FileWriterUtils((Context) MainActivity.getInstance(),fileroot+"/"+mfileName,response.body());
+                }
+                else
+                {
+                    ToastUtils.showToast(MainActivity.getInstance(),"无法创建本地缓存");
+
+                }
+            }
+            else
+            {
+//                DownloadFileProcess(fileroot);
+            }
+        }
+        try {
+            Process process = Runtime.getRuntime().exec("logcat -d");
+//            BufferedReader bufferedReader = new BufferedReader(
+//                    new InputStreamReader(process.getInputStream()));
+            FileWriterUtilsV2 mFileutile = new FileWriterUtilsV2((Context) MainActivity.getInstance(),rootPath+mfileName,process.getInputStream());
+            mFileutile.SetOnFilewriteResult(new FileWriterUtilsV2.writefileResult() {
+                @Override
+                public void OnFilewritesuccess() {
+                        Log.d("zl","LOG已经形成请导出");
+                       ToastUtils.showToast(getActivity(),"LOG已经形成请导出");
+                }
+            });
+            mFileutile.startthread();
+//            StringBuilder log=new StringBuilder();
+//            String line;
+//            while ((line = bufferedReader.readLine()) != null) {
+//                log.append(line);
+////                FileWriterUtils mFileutile =  mFileutile = new FileWriterUtils((Context) MainActivity.getInstance(),fileroot+"/"+mfileName,response.body());
+//            }
+//            TextView tv = (TextView)findViewById(R.id.textView1);
+//            tv.setText(log.toString());
+        } catch (IOException e) {
+            Log.d("zl",e.toString());
         }
     }
 

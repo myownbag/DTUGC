@@ -1,5 +1,6 @@
 package gc.dtu.weeg.dtugc;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -7,8 +8,11 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -34,8 +38,10 @@ import com.tencent.bugly.crashreport.CrashReport;
 import org.xutils.x;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +67,7 @@ import gc.dtu.weeg.dtugc.fregment.SensorInputFregment;
 import gc.dtu.weeg.dtugc.myview.CustomDialog;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
+import gc.dtu.weeg.dtugc.utils.FileWriterUtils;
 import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
 import static gc.dtu.weeg.dtugc.bluetooth.BluetoothState.REQUEST_CONNECT_DEVICE;
@@ -163,6 +170,7 @@ public class MainActivity extends FragmentActivity {
 // 初始化Bugly
 //        CrashReport.initCrashReport(getApplicationContext(), "77550d3c58", true);
         CrashReport.initCrashReport(context, "77550d3c58", false, strategy);
+
 // 如果通过“AndroidManifest.xml”来配置APP信息，初始化方法如下
 // CrashReport.initCrashReport(context, strategy);
 
@@ -173,6 +181,18 @@ public class MainActivity extends FragmentActivity {
         InitView();
         InitFrgment();
         InitBlueTooth();
+
+//        if (Build.VERSION.SDK_INT >= 23) {
+//            int REQUEST_CODE_CONTACT = 101;
+//            String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+//            //验证是否许可权限
+//            for (String str : permissions) {
+//                if (this.checkSelfPermission(str) != PackageManager.PERMISSION_GRANTED) {
+//                    //申请权限
+//                    this.requestPermissions(permissions, REQUEST_CODE_CONTACT);
+//                }
+//            }
+//        }
     }
 
     private String getProcessName(int myPid) {

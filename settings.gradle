@@ -1,1 +1,2 @@
+include ':hellocharts-library'
 include ':app', ':indicatorseekbar'

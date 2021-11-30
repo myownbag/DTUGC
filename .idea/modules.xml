@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/DTUGC.iml" filepath="$PROJECT_DIR$/DTUGC.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/DTUGC.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/DTUGC.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hellocharts-library/DTUGC.hellocharts-library.iml" filepath="$PROJECT_DIR$/.idea/modules/hellocharts-library/DTUGC.hellocharts-library.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/indicatorseekbar/DTUGC.indicatorseekbar.iml" filepath="$PROJECT_DIR$/.idea/modules/indicatorseekbar/DTUGC.indicatorseekbar.iml" />
     </modules>
   </component>
