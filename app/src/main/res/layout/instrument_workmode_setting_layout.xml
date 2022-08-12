@@ -75,6 +75,7 @@
         android:layout_height="0.5dp"
         android:background="#CFCFCF" />
     <RelativeLayout
+        android:id="@+id/pw_container"
         android:layout_width="match_parent"
         android:layout_height="50dp">
         <TextView

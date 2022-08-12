@@ -40,7 +40,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerVertical="true"
-                                android:text="地址设定：" />
+                                android:text="设备归属：" />
 
                             <TextView
                                 android:id="@+id/nb_add_info"
@@ -48,9 +48,22 @@
                                 android:layout_height="wrap_content"
                                 android:layout_centerVertical="true"
                                 android:layout_toEndOf="@id/nb_addr_lable"
-                                android:layout_toRightOf="@id/nb_addr_lable" />
+                                android:layout_toRightOf="@id/nb_addr_lable"
+                                android:visibility="gone"
+                                />
+
+                            <Spinner
+                                android:id="@+id/iccard_spiner_owner"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_toEndOf="@id/nb_addr_lable"
+                                android:layout_toRightOf="@id/nb_addr_lable"
+                                android:layout_alignParentRight="true"
+                                />
 
                             <RelativeLayout
+                                android:visibility="gone"
                                 android:id="@+id/rll_bt_scan"
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"

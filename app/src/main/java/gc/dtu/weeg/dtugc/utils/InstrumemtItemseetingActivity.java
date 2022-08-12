@@ -38,6 +38,7 @@ public class InstrumemtItemseetingActivity extends FragmentActivity implements V
     private instrumenttimegapFragment fragment2;
     private instrumentWorkModeSetFragment fragment3;
     private instrumentWorkModeSetFragment fragment4;
+    private ExternedAlarmWorkModeSetFragment fragment5;
     private Button mButwrite;
     private static Activity activity;
     public ArrayList<Map<String,String>> settings;
@@ -111,14 +112,28 @@ public class InstrumemtItemseetingActivity extends FragmentActivity implements V
             {"2000","2","TianQing 1.1","1028"},
             {"2000","2","V2FCMODBUS","10502"},
             {"2000","2","Nanyi_EMF_Modbus","10503"},
+            //            {"2000","2","ACOL","10505"},
+            {"2000","2","WEEG_MSU_PTZ","10505"},
             {"2000","2","CN_MODBUS_WATCH","10504"},
             //{ 2,3,"WEEG_IC_DIRECT",10506 },
             {"2000","2","WEEG_IC_DIRECT","10506"},
+            {"2000","2","WEEG_METER_485","10507"},
+            {"2000","2","郎汗得三轴振动传感器","10508"},
 
-            {"2000","2","ACOL","10505"},
+
+
 
             {"2000","2","Control Valve","10500"},
             {"2000","2","电压读取","10501"},
+
+            {"3000","2","AlarmControlDsafexRK2000","2000"},
+            {"3000","2","AlarmControlJncqjRB_KY","2001"},
+            {"3000","2","AlarmControlJncqjRB_KZI","2002"},
+            {"3000","2","AlarmControlAegisafeCRT","2003"},
+            {"3000","2","AlarmControlAnalogToRs485_YXAI","2004"},
+
+            {"3000","1","关闭","0"},
+            {"3000","1","打开","1"},
     };
 
     int reg;
@@ -149,6 +164,7 @@ public class InstrumemtItemseetingActivity extends FragmentActivity implements V
         mbutback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                InstrumemtItemseetingActivity.this.setResult(0,intent);
                 InstrumemtItemseetingActivity.this.finish();
             }
         });
@@ -195,6 +211,17 @@ public class InstrumemtItemseetingActivity extends FragmentActivity implements V
                 fragment4.setArguments(bundle_4);
                 transaction.replace(R.id.content_insitem, fragment4);
                 break;
+            default:
+                if(reg>=3000&&reg<=3010)
+                {
+                    Bundle bundle_5 = new Bundle();
+                    String[] tempset2=intent.getStringArrayExtra("listdata");
+                    bundle_5.putStringArray("listdata",tempset2);
+                    bundle_5.putInt("regsetting",reg);
+                    fragment5.setArguments(bundle_5);
+                    transaction.replace(R.id.content_insitem, fragment5);
+                }
+                break;
         }
         transaction.commit();
         mainActivity.setOndataparse(new Onbluetoothdataparse());
@@ -210,6 +237,8 @@ public class InstrumemtItemseetingActivity extends FragmentActivity implements V
         fragments.add(fragment3);
         fragment4=new instrumentWorkModeSetFragment();
         fragments.add(fragment4);
+        fragment5 = new ExternedAlarmWorkModeSetFragment();
+        fragments.add(fragment5);
     }
 
     private void initdata()
@@ -261,12 +290,27 @@ public class InstrumemtItemseetingActivity extends FragmentActivity implements V
                 headbuf[14]= (byte) 0xD1;
                 sendbuf=new byte[44];
                 break;
+            default:
+                if(reg>=3000||reg<=3010)
+                {
+                    headbuf[3]=0x27;
+                    headbuf[14]= (byte) (reg&0x000000ff);
+                    headbuf[15]= (byte) (reg/0xff);
+                    sendbuf=new byte[44];
+                }
+                break;
         }
         buf1.put(headbuf);
         buf1.rewind();
         buf1.get(sendbuf,0,headbuf.length);
-
-        settings=fragments.get(reg-1998).OnbutOKPress(sendbuf);
+        if(reg<3000)
+        {
+            settings=fragments.get(reg-1998).OnbutOKPress(sendbuf);
+        }
+       else
+        {
+            settings=fragments.get(4).OnbutOKPress(sendbuf);
+        }
         if(settings==null)
         {
             return;

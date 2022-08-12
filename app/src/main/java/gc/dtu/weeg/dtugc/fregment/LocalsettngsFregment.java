@@ -106,6 +106,9 @@ public class LocalsettngsFregment extends BaseFragment {
                     {"197","维格TCP","0"},
                     {"197","维格IOT通用","1"},
                     {"197","杭州IOT通用","2"},
+                    {"197","无锡华润IOT","3"},
+                    {"197","常州港华IOT","4"},
+                    {"197","新奥燃气IOT","5"},
 
 
                     {"198","模块关闭","0"},

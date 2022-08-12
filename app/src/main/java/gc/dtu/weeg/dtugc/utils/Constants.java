@@ -13,6 +13,7 @@ public class Constants {
     public static final int  SensorlsetingFlag = 801;
     public static final int  InstrumemtsetingFlag = 802;
     public static final int  NBINPUTSETTINGFLAG = 803;
+    public static final int  EXTERNEDALARMINPUTSETTINGFLAG = 805;
 
     public static final int  GCOPENTIME = 8000;
     public static final int  GCCLOSETIME = 6000;
@@ -59,6 +60,8 @@ public class Constants {
 
     //IC CARD  service
     public static final String ICCARD_SERVICE_KEY="iccardservice";
+    //IC EXTERNED ALARM service
+    public static final String EXALARM_SERVICE_KEY="exalarmservice";
     //历史数据业务标记
     public static final int NB_FRESONDATA_KEY_BLOCK_FINISHED=1;
     public static final int NB_FRESONDATA_KEY_TASKFINISHED_FINISHED=2;
@@ -73,6 +76,9 @@ public class Constants {
 
     public static final String FIRM_BASEUPDATESERVICER_MSU = "http://58.216.223.222:8000/download/MSUGC2018/";
     public static final String FIRM_UPDATESERVER_INFO_MSU = "MSUGC.txt";
+
+    public static final String FIRM_BASEUPDATESERVICER_SGU = "http://58.216.223.222:8000/download/SGU/";
+    public static final String FIRM_UPDATESERVER_INFO_SGU = "SGU.txt";
 
     public static final int FIRMWARE_DATAWRITE_TIMEOUT=6;
     public static final int FIRMWARE_DATAERROR_TIMEOUT=7;

@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -31,6 +32,7 @@ import gc.dtu.weeg.dtugc.R;
 import gc.dtu.weeg.dtugc.databean.Ask;
 import gc.dtu.weeg.dtugc.databean.Take;
 import gc.dtu.weeg.dtugc.databean.Take2;
+import gc.dtu.weeg.dtugc.databean.Take3;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
@@ -53,6 +55,7 @@ public class ICCardSettingFragment extends BaseFragment {
     LinearLayout mConnter;
     TextView MeterDataInfoShowText;
     Spinner  MeterTypeSelectView;
+    Spinner  MeterOwnerSelectView;
     EditText MeterSnInputView;
     Button SettingICCardBtn;
     Button ReadICCardBtn;
@@ -67,11 +70,12 @@ public class ICCardSettingFragment extends BaseFragment {
     ArrayList<Map<String,String>> MeterListContentData;
     MeterListViewAdapter MeterListContentDataAdapter;
     public ImageView mImageView;
-    private SharedPreferences sp ;
+//    private SharedPreferences sp ;
     private String addrurl;
     public TextView maddrview;
-    String[] MeterTypeSelectContentData = {"莱德","普瑞米特"};
-    int[]  MeterTypeSelectContentDataSnLength = {12,14};
+    String[] MeterTypeSelectContentData = {"莱德","普瑞米特","莱德物联网表"};
+    String[] MeterOwnerSelectContentData = {"秦华燃气","长安燃气"};
+    int[]  MeterTypeSelectContentDataSnLength = {12,14,14};
 
     byte[] setbufhead = {(byte)0xFD ,0x00 ,0x00 ,0x6A ,0x00 ,0x15 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x7A,0x03,0x01 ,0x30 ,0x35,0x30
                               ,0x31 ,0x30 ,0x37 ,0x34 ,0x32 ,0x34 ,0x35 ,0x33 ,0x38 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00};
@@ -132,6 +136,15 @@ public class ICCardSettingFragment extends BaseFragment {
                 }
                 test =  DigitalTrans.byte2hex(buftest);
             }
+            else if(Metertype == 3)
+            {
+                byte[] buftest =new byte[len];
+                for(int i=0;i<len;i++)
+                {
+                    buftest[i] = readOutBuf1[16+i];
+                }
+                test =  DigitalTrans.byte2hex(buftest);
+            }
         }
         mCmdRespone.setText(test);
         ask.data = new Ask.DataDTO();
@@ -152,8 +165,8 @@ public class ICCardSettingFragment extends BaseFragment {
                 .baseUrl(addrurl) //设置网络请求的Url地址
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        final Api1 request = retrofit.create(Api1.class);
-
+        final Api1  request = retrofit.create(Api1.class);
+        final Api2  request1 = retrofit.create(Api2.class);
 
 
         if(MainActivity.getInstance().mDialog.isShowing()==false)
@@ -162,35 +175,70 @@ public class ICCardSettingFragment extends BaseFragment {
         }
         MainActivity.getInstance().mDialog.setDlgMsg("请求服务器解析返回");
 
+        if(Metertype ==-1)  // 3
+        {
+            Call<Take3> call = request1.request(ask);
+            call.enqueue(new Callback<Take3>() {
+                @Override
+                public void onResponse(Call<Take3> call, Response<Take3> response) {
+                    if(response.isSuccessful())
+                    {
+                        MainActivity.getInstance().mDialog.dismiss();
 
-        Call<Take2> call = request.request(ask);
+                        Take3 t = response.body();
+                        String res = "csq="+ response.body().data.analysisResult.csq+" curprice="+response.body().data.analysisResult.curprice
+                                 +" gleft="+response.body().data.analysisResult.gleft + " switchstate="+ response.body().data.analysisResult.switchstate
+                                +" gsum="+response.body().data.analysisResult.gsum;
+                        Log.d("zl","服务器解析返回："+res);
+                        MeterDataInfoShowText.setText(""+res);
 
-        call.enqueue(new Callback<Take2>() {
-            @Override
-            public void onResponse(Call<Take2> call, Response<Take2> response) {
-                if(response.isSuccessful())
-                {
-                    MainActivity.getInstance().mDialog.dismiss();
-
-                    Take2 t = response.body();
-                     String res =  response.body().data.analysisResult;
-                     Log.d("zl","服务器解析返回："+res);
-                    MeterDataInfoShowText.setText(""+res);
-
+                    }
+                    else
+                    {
+                        ToastUtils.showToast(MainActivity.getInstance(),"服务器解析失败");
+                        MainActivity.getInstance().mDialog.dismiss();
+                    }
                 }
-                else
-                {
-                    ToastUtils.showToast(MainActivity.getInstance(),"服务器解析失败");
+
+                @Override
+                public void onFailure(Call<Take3> call, Throwable t) {
+                    ToastUtils.showToast(MainActivity.getInstance(),"连接服务器失败");
                     MainActivity.getInstance().mDialog.dismiss();
                 }
-            }
+            });
+        }
+        else
+        {
+            Call<Take2> call = request.request(ask);
 
-            @Override
-            public void onFailure(Call<Take2> call, Throwable t) {
-                ToastUtils.showToast(MainActivity.getInstance(),"连接服务器失败");
-                MainActivity.getInstance().mDialog.dismiss();
-            }
-        });
+            call.enqueue(new Callback<Take2>() {
+                @Override
+                public void onResponse(Call<Take2> call, Response<Take2> response) {
+                    if(response.isSuccessful())
+                    {
+                        MainActivity.getInstance().mDialog.dismiss();
+
+                        Take2 t = response.body();
+                        String res =  response.body().data.analysisResult;
+                        Log.d("zl","服务器解析返回："+res);
+                        MeterDataInfoShowText.setText(""+res);
+
+                    }
+                    else
+                    {
+                        ToastUtils.showToast(MainActivity.getInstance(),"服务器解析失败");
+                        MainActivity.getInstance().mDialog.dismiss();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Take2> call, Throwable t) {
+                    ToastUtils.showToast(MainActivity.getInstance(),"连接服务器失败");
+                    MainActivity.getInstance().mDialog.dismiss();
+                }
+            });
+        }
+
 
     }
 
@@ -209,7 +257,7 @@ public class ICCardSettingFragment extends BaseFragment {
     }
 
     private void initdata() {
-        sp=MainActivity.getInstance().getSharedPreferences("User", Context.MODE_PRIVATE);
+//        sp=MainActivity.getInstance().getSharedPreferences("User", Context.MODE_PRIVATE);
         MeterListContentData = new ArrayList<>();
 //        Map<String,String> map = new HashMap<>();
 //        map.put("Meterinfo","仪表信息");
@@ -225,6 +273,7 @@ public class ICCardSettingFragment extends BaseFragment {
         MeterDataInfoShowText = mView.findViewById(R.id.iccard_meter_data_show_text);
         MeterDataInfoShowList = mView.findViewById(R.id.iccard_meter_data_show_list);
         MeterTypeSelectView  = mView.findViewById(R.id.iccard_type_setting);
+        MeterOwnerSelectView = mView.findViewById(R.id.iccard_spiner_owner);
         MeterSnInputView = mView.findViewById(R.id.iccard_sn_input);
         SettingICCardBtn = mView.findViewById(R.id.iccard_btn_setting);
         ReadICCardBtn = mView.findViewById(R.id.iccard_btn_reading);
@@ -238,14 +287,17 @@ public class ICCardSettingFragment extends BaseFragment {
         mCmdRequest = mView.findViewById(R.id.iccard_meter_cmd_request);
         mCmdRespone = mView.findViewById(R.id.iccard_meter_cmd_respone);
 
-        addrurl=sp.getString(Constants.ICCARD_SERVICE_KEY,"http://58.216.223.222:7988/");
+//        addrurl=sp.getString(Constants.ICCARD_SERVICE_KEY,"http://58.216.223.222:7988/");
+        addrurl = "http://58.216.223.222:7988/";
         maddrview.setText(addrurl);
 
         setSpinneradpater(MeterTypeSelectView,MeterTypeSelectContentData);
+        setSpinneradpater(MeterOwnerSelectView,MeterOwnerSelectContentData);
 
         SettingICCardBtn.setOnClickListener(new OnButtonClickedListerner());
         ReadICCardBtn.setOnClickListener(new OnButtonClickedListerner());
-        mImageView.setOnClickListener(new OnButtonClickedListerner());
+        mImageView.setVisibility(View.INVISIBLE);
+//        mImageView.setOnClickListener(new OnButtonClickedListerner());
 //        MeterSnInputView.setOnClickListener(new OnButtonClickedListerner());
 
         View headview = View.inflate(MainActivity.getInstance(),R.layout.iccard_meter_info_item_show,null);
@@ -281,6 +333,30 @@ public class ICCardSettingFragment extends BaseFragment {
             }
         });
 
+        MeterOwnerSelectView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("zl","iccard select position " +position);
+                switch (position)
+                {
+                    case 0:
+                        addrurl = "http://58.216.223.222:7988/";
+                        maddrview.setText("http://58.216.223.222:7988/");
+                        break;
+                    case 1:
+                        addrurl = "http://58.216.223.222:7080/";
+                        maddrview.setText("http://58.216.223.222:7080/");
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
 //    public class MeterTypeSettingAdapter extends
@@ -345,6 +421,7 @@ public class ICCardSettingFragment extends BaseFragment {
             switch (id)
             {
                 case R.id.iccard_btn_setting:
+                    Log.d("zl","ICCard RequestURL:"+addrurl);
                     if(addrurl.indexOf("http://")!=0)
                     {
                         ToastUtils.showToast(MainActivity.getInstance(),"服务器未正确设置");
@@ -355,8 +432,16 @@ public class ICCardSettingFragment extends BaseFragment {
                     mCmdRequest.setText("");
                     mCmdRespone.setText("");
                     onCmdRequest();
+
                     break;
                 case R.id.iccard_btn_reading:
+//                    String  temp= "00000000000000000000000000000000683000012421999000810050C3968CA58FAB50C801D6999E2B2D280229463CD4D4E2D2A1B51DED2941C40065A8665F75C0291807FF004C5E4872701EDD8B6B605F61B8AB590634459F44A488F90FDC526EDBD3DE1098DF624F1186378C160000";
+
+//                      String temp = "00000000000000000000000000000000683000012421999000810050C3968CA58FAB50C801D6999E2B2D280229463CD4D4E2D2A1B51DED2941C40065A8665F75C0291807FF004C5E4872701EDD8B6B605F61B8AB590634459F44A488F90FDC526EDBD3DE1098DF624F1186378C160000";
+//                    byte[] buff = DigitalTrans.hex2byte(temp);
+//                    buff[3] = (byte) (buff.length-5);
+//                    Metertype = 3;
+//                    OndataCometoParse(temp,buff);
 
                     break;
                 case R.id.nb_img_set_addr:
@@ -376,6 +461,7 @@ public class ICCardSettingFragment extends BaseFragment {
         Ask ask = new Ask();
         ask.icType= String.format("%d",MeterTypeSelectView.getSelectedItemPosition()+1);
         ask.icSerial = MeterSnInputView.getText().toString();
+        Log.d("zl","请求序列号:"+ ask.icSerial);
 //        ask.data.icResponse ="";
         if(ask.icSerial.length()!= MeterTypeSelectContentDataSnLength[MeterTypeSelectView.getSelectedItemPosition()])
         {
@@ -390,9 +476,8 @@ public class ICCardSettingFragment extends BaseFragment {
                 .build();
         final Api request = retrofit.create(Api.class);
 
-
         ask.cmdType = "RM";
-
+      //  String test = ask.data.toString();
         Call<Take> call = request.request(ask);
 
         call.enqueue(new Callback<Take>() {
@@ -413,6 +498,10 @@ public class ICCardSettingFragment extends BaseFragment {
                             buff = test.getBytes();
                         }
                         else if(Metertype == 2) // 普瑞米特
+                        {
+                            buff = DigitalTrans.hex2byte(test);
+                        }
+                        else if(Metertype == 3)
                         {
                             buff = DigitalTrans.hex2byte(test);
                         }
@@ -520,7 +609,7 @@ public class ICCardSettingFragment extends BaseFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        addrurl=sp.getString(Constants.ICCARD_SERVICE_KEY,"");
+//        addrurl=sp.getString(Constants.ICCARD_SERVICE_KEY,"");
         Log.d("zl","onActivityResult: "+addrurl);
         maddrview.setText(addrurl);
     }
@@ -535,4 +624,8 @@ public class ICCardSettingFragment extends BaseFragment {
         Call<Take2> request(@Body Ask ask);
     }
 
+    public interface Api2 {
+        @POST("icverifycmdresponse")
+        Call<Take3> request(@Body Ask ask);
+    }
 }

@@ -1,6 +1,5 @@
-package gc.dtu.weeg.dtugc.fregment;
+package gc.dtu.weeg.dtugc.utils;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -10,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -19,16 +19,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.R;
-import gc.dtu.weeg.dtugc.utils.CodeFormat;
+import gc.dtu.weeg.dtugc.fregment.instrumentbaseFragment;
+import gc.dtu.weeg.dtugc.myview.MyDlg;
+import gc.dtu.weeg.dtugc.myview.slidingbutton.AlarmSettingDlg;
 
-public class instrumentWorkModeSetFragment extends instrumentbaseFragment {
+public class ExternedAlarmWorkModeSetFragment extends instrumentbaseFragment {
     View mView;
     Spinner mdevicestatus;
     Spinner mdevicetype;
     EditText maddrET;
     EditText mPowsuptime;
     EditText mElsteraddr;
+    RelativeLayout pw_container;
+
+
     ArrayList<Map<String,String>> mdevicestatuslist;
     ArrayList<Map<String,String>> mdevicetypelist;
 
@@ -56,9 +62,25 @@ public class instrumentWorkModeSetFragment extends instrumentbaseFragment {
         maddrET=mView.findViewById(R.id.instrument_device_addr_value);
         mPowsuptime=mView.findViewById(R.id.instrument_device_pow_suply_value);
         mElsteraddr=mView.findViewById(R.id.instrument_device_elster_value);
-
+        pw_container = mView.findViewById(R.id.pw_container);
+        pw_container.setVisibility(View.GONE);
         setSpinneradpater(mdevicestatus,mdevicestatuslist);
         setSpinneradpater(mdevicetype,mdevicetypelist);
+
+        mElsteraddr.setFocusable(false);
+        mElsteraddr.setFocusableInTouchMode(false);
+        mElsteraddr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              //  Log.d("zl","mElsteraddr clicked");
+                AlarmSettingDlg alarmSettingDlg;
+                alarmSettingDlg = new AlarmSettingDlg(getActivity(),DigitalTrans.hex2byte(mElsteraddr.getText().toString()));
+                alarmSettingDlg.SetOnbutclickListernerdlg(new Onbuttonresult());
+                alarmSettingDlg.show();
+//                MyDlg dlg=new MyDlg(MainActivity.getInstance());
+//                dlg.show();
+            }
+        });
 
         mdevicestatus.setOnItemSelectedListener(new onSpinnerSelectimp());
         mdevicetype.setOnItemSelectedListener(new onSpinnerSelectimp());
@@ -213,10 +235,11 @@ public class instrumentWorkModeSetFragment extends instrumentbaseFragment {
                 return  null;
             }
         }
-        if(maddrET.getText().length()==0||mPowsuptime.getText().length()==0)
-        {
-            return null;
-        }
+//        if(maddrET.getText().length()==0||mPowsuptime.getText().length()==0)
+            if(maddrET.getText().length()==0)
+            {
+                return null;
+            }
         //仪表状态
         list.add(mdevicestatuslist.get(mCurrentposition[0]));
         int temp= Integer.valueOf(mdevicestatuslist.get(mCurrentposition[0]).get("value"));
@@ -255,16 +278,17 @@ public class instrumentWorkModeSetFragment extends instrumentbaseFragment {
         buf.get(sendbuf,19,1);
         //供电时长
         String powtime=mPowsuptime.getText().toString();
-        temp= Integer.valueOf(powtime);
+      //  temp= Integer.valueOf(powtime);
         map=new HashMap<>();
         map.put("items",powtime);
         map.put("value",powtime);
         list.add(map);
-        if(temp>5000)
-        {
-            Toast.makeText(mActivity,"供电时长不能超过 5000",Toast.LENGTH_SHORT).show();
-            return null;
-        }
+//        if(temp>5000)
+//        {
+//            Toast.makeText(mActivity,"供电时长不能超过 5000",Toast.LENGTH_SHORT).show();
+//            return null;
+//        }
+         temp = 0;
         buf=ByteBuffer.allocateDirect(4);
         buf.order(ByteOrder.BIG_ENDIAN);
         buf.putInt(temp);
@@ -287,6 +311,12 @@ public class instrumentWorkModeSetFragment extends instrumentbaseFragment {
         }
         byte [] elsterbyte=elster.getBytes();
         byte[] hexbyte = CodeFormat.ASCII_To_BCD(elsterbyte,elsterbyte.length);
+        byte[] setbyte = new byte[hexbyte.length];
+
+        for(int i=0;i<hexbyte.length;i++)
+        {
+            setbyte[hexbyte.length-1-i] = hexbyte[i];
+        }
         map=new HashMap<>();
         map.put("items",elster);
         map.put("value",elster);
@@ -294,7 +324,7 @@ public class instrumentWorkModeSetFragment extends instrumentbaseFragment {
 
         buf=ByteBuffer.allocateDirect(8);
         buf.order(ByteOrder.LITTLE_ENDIAN);
-        buf.put(hexbyte);
+        buf.put(setbyte);
         buf.rewind();
         buf.get(sendbuf,28,8);
 
@@ -337,6 +367,21 @@ public class instrumentWorkModeSetFragment extends instrumentbaseFragment {
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
 
+        }
+    }
+
+    private class Onbuttonresult implements AlarmSettingDlg.Onbutclicked{
+        @Override
+        public void Onbutclicked(byte[] select) {
+            byte [] set = new byte[8];
+            if(select!=null)
+            {
+                for(int i=0;i<8;i++)
+                {
+                    set[7-i] = select[i];
+                }
+            }
+            mElsteraddr.setText(DigitalTrans.byte2hex(set));
         }
     }
 }

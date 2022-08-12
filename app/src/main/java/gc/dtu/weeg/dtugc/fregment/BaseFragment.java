@@ -42,6 +42,15 @@ public abstract class BaseFragment extends Fragment {
         }
         if(str.equals("固件升级"))
         {
+
+//            if(((Hex2BinConvertFragment)this).mCurDevices == 2)
+//            {
+//                MainActivity.getInstance().getcurblueservice().ChangetimeoutofPackage(50);
+//            }
+//            else
+//            {
+//                MainActivity.getInstance().getcurblueservice().ChangetimeoutofPackage(50);
+//            }
             MainActivity.getInstance().getcurblueservice().ChangetimeoutofPackage(50);
         }
         else

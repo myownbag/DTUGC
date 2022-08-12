@@ -4,7 +4,7 @@ package gc.dtu.weeg.dtugc.databean;
 public class Ask {
 
 
-    public String icType;
+    public  String icType;
 
     public String icSerial;
 

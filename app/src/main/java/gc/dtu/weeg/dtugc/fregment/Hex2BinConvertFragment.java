@@ -253,17 +253,26 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
         MainActivity.getInstance().mDialog.setDlgMsg("正在下载");
 //        RequestParams params = new RequestParams(Constants.FIRM_BASEUPDATESERVICER+Constants.FIRM_UPDATESERVER_INFO);
     //变更方法
-        String FIRMBASEUPDATESERVICER;
-        String FIRMUPDATESERVERINFO;
+        String FIRMBASEUPDATESERVICER="";
+        String FIRMUPDATESERVERINFO="";
         if(ids == 0)
         {
             FIRMBASEUPDATESERVICER = Constants.FIRM_BASEUPDATESERVICER;
             FIRMUPDATESERVERINFO = Constants.FIRM_UPDATESERVER_INFO;
         }
-        else
+        else if(ids == 1)
         {
             FIRMBASEUPDATESERVICER = Constants.FIRM_BASEUPDATESERVICER_MSU;
             FIRMUPDATESERVERINFO = Constants.FIRM_UPDATESERVER_INFO_MSU;
+        }
+        else if(ids == 2)
+        {
+            FIRMBASEUPDATESERVICER = Constants.FIRM_BASEUPDATESERVICER_SGU;
+            FIRMUPDATESERVERINFO = Constants.FIRM_UPDATESERVER_INFO_SGU;
+        }
+        else
+        {
+
         }
         Log.d("zl","URL IN DOWNLOAD :"+FIRMBASEUPDATESERVICER+"/");
         Retrofit retrofit = new Retrofit.Builder()
@@ -830,9 +839,17 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
             {
                 Httpurl = Constants.FIRM_BASEUPDATESERVICER;
             }
-            else
+            else if(mCurDevices == 1)
             {
                 Httpurl = Constants.FIRM_BASEUPDATESERVICER_MSU;
+            }
+            else if(mCurDevices == 2)
+            {
+                Httpurl = Constants.FIRM_BASEUPDATESERVICER_SGU;
+            }
+            else
+            {
+
             }
             //变更方法
             Log.d("zl","file is downloading ...");
@@ -1298,9 +1315,17 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
             {
                 filename.setText("DTUGC-2018");
             }
-            else
+            else if(mCurDevices == 1)
             {
                 filename.setText("MSUGC");
+            }
+            else if(mCurDevices == 2)
+            {
+                filename.setText("SGU");
+            }
+            else
+            {
+
             }
             Log.d("zl","current deviceID is :"+mCurDevices);
                             if(checkInternet())

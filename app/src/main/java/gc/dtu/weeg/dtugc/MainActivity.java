@@ -52,6 +52,7 @@ import gc.dtu.weeg.dtugc.fregment.AppVersioninfoFregment;
 import gc.dtu.weeg.dtugc.fregment.BaseFragment;
 import gc.dtu.weeg.dtugc.fregment.BasicinfoFregment;
 import gc.dtu.weeg.dtugc.fregment.CNKFixedPagerAdapter;
+import gc.dtu.weeg.dtugc.fregment.ExternedGasAlarmSettingFragment;
 import gc.dtu.weeg.dtugc.fregment.FrozendataFregment;
 import gc.dtu.weeg.dtugc.fregment.GasSensorSetFragment;
 import gc.dtu.weeg.dtugc.fregment.GateStatusControlFragment;
@@ -113,7 +114,7 @@ public class MainActivity extends FragmentActivity {
     int mScrollX = 0;
     private List<BaseFragment> fragments;
     public String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置","PTZ设置"
-            , "温压传感器接入","气体传感器接入", "仪表接入","传感器调试","NB业务注册","阀门控制","版本信息","固件升级","IC卡设置"};
+            , "温压传感器接入","气体传感器接入", "仪表接入","传感器调试","NB业务注册","阀门控制","版本信息","固件升级","IC卡设置","外接报警设置"};
     //蓝牙状态保存
     public Boolean mIsconnect = false;
     // Name of the connected device
@@ -145,7 +146,7 @@ public class MainActivity extends FragmentActivity {
     public GasSensorSetFragment     fragment11;
     public GateStatusControlFragment fragment12;
     public ICCardSettingFragment  fragment14;
-
+    public ExternedGasAlarmSettingFragment fragment15;
 
     //接口
     Ondataparse mydataparse=null;
@@ -504,6 +505,14 @@ public class MainActivity extends FragmentActivity {
         bundle13.putString("extra",titles[index++]);
         fragment14.setArguments(bundle13);
         fragments.add(fragment14);
+
+        //添加外接报警器设置页面
+        fragment15 = new ExternedGasAlarmSettingFragment();
+        Bundle bundle14= new Bundle();
+        bundle14.putInt("position",index);
+        bundle14.putString("extra",titles[index++]);
+        fragment15.setArguments(bundle14);
+        fragments.add(fragment15);
 
         mPagerAdater=new CNKFixedPagerAdapter(getSupportFragmentManager());
         mPagerAdater.setTitles(titles);

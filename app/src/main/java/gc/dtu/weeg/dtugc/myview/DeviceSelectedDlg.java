@@ -40,6 +40,10 @@ public class DeviceSelectedDlg extends Dialog {
                 {
                     mIO=1;
                 }
+                else if(checkedId == R.id.devices_sgugc)
+                {
+                    mIO=2;
+                }
             }
         });
         but.setOnClickListener(new View.OnClickListener() {
