@@ -15,6 +15,17 @@ public class Constants {
     public static final int  NBINPUTSETTINGFLAG = 803;
     public static final int  EXTERNEDALARMINPUTSETTINGFLAG = 805;
 
+    public static final int PTZSETTINGFLAG1 = 801;
+    public static final int PTZSETTINGFLAG2 = 802;
+    public static final int PTZSETTINGFLAG3 = 803;
+    public static final int PTZSETTINGFLAG4 = 804;
+    public static final int PTZSETTINGFLAG5 = 805;
+    public static final int PTZSETTINGFLAG6 = 806;
+    public static final int PTZSETTINGFLAG7 = 807;
+    public static final int PTZSETTINGFLAG8 = 808;
+    public static final int PTZSETTINGFLAG9 = 809;
+    public static final int PTZSETTINGFLAG10 = 810;
+
     public static final int  GCOPENTIME = 8000;
     public static final int  GCCLOSETIME = 6000;
     public static final int  G6OPENTIME = 15000;
@@ -71,6 +82,7 @@ public class Constants {
     public static final int FIRMWARE_CONVERT_FAIL=2;
     public static final int FIRMWARE_CONVERT_BUSING=3;
     //"http://58.216.223.222:8000/download/DTUGC2018/"; "http://192.168.1.71:8000/download/DTUGC2018/"
+    public static final String FIRM_BASEUPDATESERVICER_P = "http://58.216.223.222:8000/download/DTUGC2018P/";
     public static final String FIRM_BASEUPDATESERVICER = "http://58.216.223.222:8000/download/DTUGC2018/";
     public static final String FIRM_UPDATESERVER_INFO = "DTUGC2018.txt";
 
@@ -79,6 +91,15 @@ public class Constants {
 
     public static final String FIRM_BASEUPDATESERVICER_SGU = "http://58.216.223.222:8000/download/SGU/";
     public static final String FIRM_UPDATESERVER_INFO_SGU = "SGU.txt";
+
+    public static final String FIRM_BASEUPDATESERVICER_FMMCU_DTUGC = "http://58.216.223.222:8000/download/FMMCU/DTUGC/";
+    public static final String FIRM_UPDATESERVER_FMMCU_DTUGC = "DTUGC.txt";
+
+    public static final String FIRM_BASEUPDATESERVICER_FMMCU_MSUGC = "http://58.216.223.222:8000/download/FMMCU/MSUGC/";
+    public static final String FIRM_UPDATESERVER_FMMCU_MSUGC = "MSUGC.txt";
+
+    public static final String FIRM_BASEUPDATESERVICER_FMMCU_SGULCA = "http://58.216.223.222:8000/download/FMMCU/SGULCA/";
+    public static final String FIRM_UPDATESERVER_FMMCU_SGULCA = "SGULCA.txt";
 
     public static final int FIRMWARE_DATAWRITE_TIMEOUT=6;
     public static final int FIRMWARE_DATAERROR_TIMEOUT=7;
@@ -136,7 +157,7 @@ public class Constants {
             };
     public static String[][] temperaturemode ={
             {"无","0"},
-            {"常量","1"},
+            {"脉冲","1"},
             {"I2C","2"},
             {"I2C-206C","3"}
     };
@@ -152,5 +173,7 @@ public class Constants {
             {"20","20"},
             {"30","30"}
     };
+
+
 
 }

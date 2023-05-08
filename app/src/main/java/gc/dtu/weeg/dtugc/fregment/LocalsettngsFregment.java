@@ -32,6 +32,7 @@ import gc.dtu.weeg.dtugc.R;
 
 import gc.dtu.weeg.dtugc.myview.LocalSetaddr219ExtraInfoView;
 import gc.dtu.weeg.dtugc.myview.LocalSetaddr221ExtrainfoView;
+import gc.dtu.weeg.dtugc.myview.LocalSetaddr222ExtraInfoView;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
@@ -77,6 +78,7 @@ public class LocalsettngsFregment extends BaseFragment {
             {"210","数据传输固定时刻","12","T"},
             {"219","时间段传输设置","14","E"},
             {"221","月高峰采集传输","23","E"},
+            {"222","拍照功能","3","E"},
     };
     public String[][] registerinfosel=
             {
@@ -117,6 +119,7 @@ public class LocalsettngsFregment extends BaseFragment {
                     {"198","MC323","3"},
                     {"198","EC20 4G","4"},
                     {"198","NB-IOT","5"},
+                    {"198","5G-RM500UCN","6"},
 
 //                    {"206","","-1"},
                     {"206","TCP","0"},
@@ -463,6 +466,16 @@ public class LocalsettngsFregment extends BaseFragment {
                 buf.rewind();
                 buf.get(reg221datacontent);
                 settingscontent[mIndexcmd]= LocalSetaddr221ExtrainfoView.dacodetoStr(reg221datacontent);
+            }
+            else if(tempint2 == 222)
+            {
+                byte[] reg222datacontent = new byte[3];
+                ByteBuffer buf = ByteBuffer.allocate(3);
+                buf=buf.order(ByteOrder.LITTLE_ENDIAN);
+                buf.put(readOutBuf1,16,3)  ;
+                buf.rewind();
+                buf.get(reg222datacontent);
+                settingscontent[mIndexcmd]= LocalSetaddr222ExtraInfoView.dacodetoStr(reg222datacontent);
             }
             else
             {

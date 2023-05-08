@@ -40,6 +40,11 @@ public abstract class BaseFragment extends Fragment {
         {
             mIsatart=false;
         }
+        if(str == null)
+        {
+            MainActivity.getInstance().getcurblueservice().ChangetimeoutofPackage(200);
+            return;
+        }
         if(str.equals("固件升级"))
         {
 

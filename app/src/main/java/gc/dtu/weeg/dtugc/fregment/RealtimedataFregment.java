@@ -39,11 +39,21 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
     public TextView mVolumeView;
     //public TextView mRealVolumeview;
 
+    public  TextView mGpsStatus;
+    public  TextView mGpsVDirection;
+    public  TextView mGpsVValue;
+    public  TextView mGpsHDirection;
+    public  TextView mGpsHValue;
+
     public TextView mTempview1;
     public TextView mPressview1;
     public TextView mFluxview1;
     public TextView mRealFluxview1;
     public TextView mVolumeView1;
+
+    //阴极保护相关输出显示
+    public TextView[] mYinjibaohuViews;
+
 
     public int step=0;
 
@@ -80,7 +90,29 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
         mRealFluxview1=mView.findViewById(R.id.real_realflux1_timeinfo);
         mVolumeView1 =mView.findViewById(R.id.real_volume1_timeinfo);
 
+        mGpsStatus = mView.findViewById(R.id.real_gps_timeinfo);
+        mGpsHDirection = mView.findViewById(R.id.real_directionv_value);
+        mGpsHValue = mView.findViewById(R.id.real_gps1_timeinfo);
+        mGpsVValue = mView.findViewById(R.id.real_vgps1_timeinfo);
+        mGpsVDirection = mView.findViewById(R.id.real_gps_directionh_value);
 
+        //阴极保护初始化
+
+        int index = 0;
+        mYinjibaohuViews = new TextView[13];
+        mYinjibaohuViews[index++] = mView.findViewById(R.id.real_yingji_tongdian_v);
+        mYinjibaohuViews[index++] = mView.findViewById(R.id.real_yingji_zhiliuzan_i);
+        mYinjibaohuViews[index++] = mView.findViewById(R.id.real_yingji_duandian_v);
+        mYinjibaohuViews[index++] = mView.findViewById(R.id.real_yingji_zhiranq_v);
+        mYinjibaohuViews[index++] = mView.findViewById(R.id.real_yingji_jiaoliu_v);
+        mYinjibaohuViews[index++] = mView.findViewById(R.id.real_yingji_jiaoliu_i);
+        mYinjibaohuViews[index++] = mView.findViewById(R.id.real_yingji_yangji1_v);
+        mYinjibaohuViews[index++] = mView.findViewById(R.id.real_yingji_yangji2_v);
+        mYinjibaohuViews[index++] = mView.findViewById(R.id.real_yingji_yangji3_v);
+        mYinjibaohuViews[index++] = mView.findViewById(R.id.real_yingji_yangji1_i);
+        mYinjibaohuViews[index++] = mView.findViewById(R.id.real_yingji_yangji2_i);
+        mYinjibaohuViews[index++] = mView.findViewById(R.id.real_yingji_yangji3_i);
+        mYinjibaohuViews[index++] = mView.findViewById(R.id.real_yingji_yangji4_i);
         mBut.setOnClickListener(this);
     }
 
@@ -156,7 +188,76 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
             parsecurrentdata(readOutBuf1,30,mRealFluxview1,"",Constants.PARSE_FLOAT2);
             parsecurrentdata(readOutBuf1,34,mVolumeView1,"",Constants.PARSE_INT);
 
+
+            buf1=ByteBuffer.allocateDirect(4);
+            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+            buf1.putInt(810);
+            buf1.rewind();
+            buf1.get(sendbufread,14,2);
+            CodeFormat.crcencode(sendbufread);
+            String readOutMsg = DigitalTrans.byte2hex(sendbufread);
+            verycutstatus(readOutMsg,0);
+
+            step++;
             MainActivity.getInstance().mDialog.dismiss();
+        }
+        else if(step == 3)
+        {
+            String Gpstemp = "";
+            Gpstemp += (char)readOutBuf1[22];
+            mGpsHDirection.setText(Gpstemp);
+            Gpstemp = "";
+            buf1=ByteBuffer.allocateDirect(4);
+            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+            buf1.put(readOutBuf1,23,4);
+            buf1.rewind();
+            float gpsflaot =buf1.getFloat();
+            mGpsHValue.setText(""+gpsflaot);
+
+            Gpstemp = "";
+            Gpstemp += (char)readOutBuf1[27];
+            mGpsVDirection.setText(Gpstemp);
+            buf1=ByteBuffer.allocateDirect(4);
+            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+            buf1.put(readOutBuf1,28,4);
+            buf1.rewind();
+            gpsflaot =buf1.getFloat();
+            mGpsVValue.setText(""+gpsflaot);
+
+            if(readOutBuf1[40] == 0)
+            {
+                mGpsStatus.setText("数据无效");
+            }
+            else
+            {
+                mGpsStatus.setText("数据有效");
+            }
+        //    MainActivity.getInstance().mDialog.dismiss();
+            buf1=ByteBuffer.allocateDirect(4);
+            buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+            buf1.putInt(8997);
+            buf1.rewind();
+            buf1.get(sendbufread,14,2);
+            CodeFormat.crcencode(sendbufread);
+            String readOutMsg = DigitalTrans.byte2hex(sendbufread);
+            verycutstatus(readOutMsg);
+            if(MainActivity.getInstance().mDialog.isShowing()== true)
+            {
+                MainActivity.getInstance().mDialog.dismiss();
+            }
+            step++;
+        }
+        else if(step == 4){
+                float tempfloat = 0;
+                for(int i =0;i<13;i++)
+                {
+                    buf1=ByteBuffer.allocateDirect(4);
+                    buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
+                    buf1.put(readOutBuf1,18+i*4,4);
+                    buf1.rewind();
+                    tempfloat =buf1.getFloat();
+                    mYinjibaohuViews[i].setText(""+tempfloat);
+                }
         }
     }
 
@@ -247,6 +348,22 @@ public class RealtimedataFregment extends BaseFragment  implements View.OnClickL
             parentActivity1.mDialog.setDlgMsg("读取中...");
             //String input1 = Constants.Cmd_Read_Alarm_Pressure;
             parentActivity1.sendData(readOutMsg, "FFFF");
+        }
+        else
+        {
+            ToastUtils.showToast(getActivity(), "请先建立蓝牙连接!");
+        }
+    }
+
+    private void verycutstatus(String readOutMsg,int timeout) {
+        MainActivity parentActivity1 = (MainActivity) getActivity();
+        String strState1 = parentActivity1.GetStateConnect();
+        if(!strState1.equalsIgnoreCase("无连接"))
+        {
+            parentActivity1.mDialog.show();
+            parentActivity1.mDialog.setDlgMsg("读取中...");
+            //String input1 = Constants.Cmd_Read_Alarm_Pressure;
+            parentActivity1.sendData(readOutMsg, "FFFF",timeout);
         }
         else
         {

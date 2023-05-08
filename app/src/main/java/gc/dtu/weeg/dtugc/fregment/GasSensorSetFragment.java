@@ -53,6 +53,7 @@ public class GasSensorSetFragment extends BaseFragment {
                     {"3","MIPEX-TTL","65532"},
                     {"3","MIPEX-485","65531"},
                     {"3","4-20 mA","65530"},
+                    {"3","SPEC-PD-196","65529"},
                     {"3","手动输入","65535"},
             };
     @Nullable

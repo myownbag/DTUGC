@@ -120,7 +120,7 @@ public class LocalSetaddr201ExtrainfoView extends LinearLayout {
             lineatView = view201show.findViewById(R.id.addr201_APN_Container);
             lineatView.setVisibility(View.GONE);
         }
-        else if(m198Modul.equals("EC20 4G"))
+        else if(m198Modul.equals("EC20 4G") || m198Modul.equals("5G-RM500UCN"))  //"5G-RM500UCN"
         {
 
         }
@@ -171,7 +171,7 @@ public class LocalSetaddr201ExtrainfoView extends LinearLayout {
                 mPWSD = show.substring(index+1,show.length());
             }
         }
-        else if(m198Modul.equals("EC20 4G"))
+        else if(m198Modul.equals("EC20 4G") || m198Modul.equals("5G-RM500UCN"))
         {
             index=show.indexOf(",");
             if(str220set.equals(""))
@@ -271,6 +271,7 @@ public class LocalSetaddr201ExtrainfoView extends LinearLayout {
                 settingInterface.OncurSetting(mUSERS + "," + mPWSD);
                 break;
             case "EC20 4G":
+            case "5G-RM500UCN":
                 settingInterface.OncurSetting(mAPN + "," + mUSERS + "," + mPWSD);
                 break;
         }

@@ -52,6 +52,7 @@ import gc.dtu.weeg.dtugc.fregment.AppVersioninfoFregment;
 import gc.dtu.weeg.dtugc.fregment.BaseFragment;
 import gc.dtu.weeg.dtugc.fregment.BasicinfoFregment;
 import gc.dtu.weeg.dtugc.fregment.CNKFixedPagerAdapter;
+import gc.dtu.weeg.dtugc.fregment.CameraTestFragment;
 import gc.dtu.weeg.dtugc.fregment.ExternedGasAlarmSettingFragment;
 import gc.dtu.weeg.dtugc.fregment.FrozendataFregment;
 import gc.dtu.weeg.dtugc.fregment.GasSensorSetFragment;
@@ -114,7 +115,7 @@ public class MainActivity extends FragmentActivity {
     int mScrollX = 0;
     private List<BaseFragment> fragments;
     public String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置","PTZ设置"
-            , "温压传感器接入","气体传感器接入", "仪表接入","传感器调试","NB业务注册","阀门控制","版本信息","固件升级","IC卡设置","外接报警设置"};
+            , "温压传感器接入","气体传感器接入", "仪表接入","传感器调试","NB业务注册","阀门控制","版本信息","固件升级","IC卡设置","外接报警设置","拍照测试"};
     //蓝牙状态保存
     public Boolean mIsconnect = false;
     // Name of the connected device
@@ -130,6 +131,7 @@ public class MainActivity extends FragmentActivity {
 
     private long exitTime = 0;
     public CustomDialog mDialog;
+//    public CustomDialog mInfoShow;
 
     //各个子页面
     public BasicinfoFregment fregment1;
@@ -147,6 +149,7 @@ public class MainActivity extends FragmentActivity {
     public GateStatusControlFragment fragment12;
     public ICCardSettingFragment  fragment14;
     public ExternedGasAlarmSettingFragment fragment15;
+    public CameraTestFragment fragment16;
 
     //接口
     Ondataparse mydataparse=null;
@@ -514,6 +517,13 @@ public class MainActivity extends FragmentActivity {
         fragment15.setArguments(bundle14);
         fragments.add(fragment15);
 
+        fragment16 = new CameraTestFragment();
+        Bundle bundle15 = new Bundle();
+        bundle15.putInt("position",index);
+        bundle15.putString("extra",titles[index++]);
+        fragment16.setArguments(bundle15);
+        fragments.add(fragment16);
+
         mPagerAdater=new CNKFixedPagerAdapter(getSupportFragmentManager());
         mPagerAdater.setTitles(titles);
         mPagerAdater.setFragments(fragments);
@@ -600,6 +610,7 @@ public class MainActivity extends FragmentActivity {
                 ToastUtils.showToast(getBaseContext(), "超时啦!");
             }
         });
+
         mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {

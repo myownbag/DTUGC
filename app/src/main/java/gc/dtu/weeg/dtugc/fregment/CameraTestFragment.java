@@ -5,14 +5,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.SyncStateContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.text.method.ScrollingMovementMethod;
@@ -28,15 +28,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.xutils.common.Callback;
-import org.xutils.common.task.PriorityExecutor;
-import org.xutils.ex.HttpException;
-import org.xutils.http.RequestParams;
-import org.xutils.x;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -52,9 +49,7 @@ import gc.dtu.weeg.dtugc.hexfile2bin.FileBrowserActivity;
 import gc.dtu.weeg.dtugc.hexfile2bin.Hex2Bin;
 import gc.dtu.weeg.dtugc.myview.CustomDialog;
 import gc.dtu.weeg.dtugc.myview.DeviceSelectedDlg;
-import gc.dtu.weeg.dtugc.myview.MyDlg;
 import gc.dtu.weeg.dtugc.myview.Procseedlg;
-import gc.dtu.weeg.dtugc.myview.ScrollTextView;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
@@ -68,7 +63,7 @@ import retrofit2.Retrofit;
 import retrofit2.http.HTTP;
 import retrofit2.http.Path;
 
-public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermissions.PermissionCallbacks {
+public class CameraTestFragment extends BaseFragment implements  EasyPermissions.PermissionCallbacks {
     private View mView=null;
     private static final int ByteSize = 512 * 1024; //读取的字节数
     private static final String TAG = "zl";
@@ -78,6 +73,7 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
     private TextView textshow;
     private TextView filename;
     private CardView textcontainerView;
+    private ImageView CameraView;
 
     private int curdevicetype ; //-1通信失败，1，老的ST设备，2，新的复旦微设备，-2通信正常,型号未定
 //    private ViewFlipper viewFlipper;
@@ -89,6 +85,9 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
     private byte[] byte_firmware;
     private Semaphore semaphore = new Semaphore(1);
     private Semaphore semaphore2 = new Semaphore(1);
+
+    InputStream mInStream;
+    ByteArrayOutputStream mOutStream;
 
     private String buftextshow;
 
@@ -121,12 +120,14 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
     DeviceSelectedDlg  deviceSelectedDlg;
     CountDownTimer  mcountDownTimer;
 
+    CustomDialog mCameraInfoShowDlg;
+
     public int FMMCU_DEVICE; // 0,未知设备 1，DTUGC 2,MSUGC  3 SGULCA  4,压力密集采集
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 //        return super.onCreateView(inflater, container, savedInstanceState);
-        mView=inflater.inflate(R.layout.hexfile2binfile_fragment,null,false);
+        mView=inflater.inflate(R.layout.camera_test_fragment,null,false);
 
         FMMCU_DEVICE = 0;
         initView();
@@ -148,6 +149,16 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
     }
 
     private void initView() {
+        mCameraInfoShowDlg = CustomDialog.createProgressDialog(getContext(), 3*60*1000, new CustomDialog.OnTimeOutListener() {
+            @Override
+            public void onTimeOut(CustomDialog dialog) {
+                dialog.dismiss();
+                ToastUtils.showToast(getContext(), "超时啦!");
+            }
+        });
+
+//        mInStream = new ByteArrayInputStream(mOutStream.toByteArray());
+
         deviceSelectedDlg = new DeviceSelectedDlg(MainActivity.getInstance());
         deviceSelectedDlg.SetOnDevicesSelectedListerner(new OndeviceshaveSelectedp());
         btn_open =  mView.findViewById(R.id.btn_openfile);
@@ -162,12 +173,13 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
         {
             ViewGroup.LayoutParams layoutParams =new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
                     , ViewGroup.LayoutParams.MATCH_PARENT);
-            textshow = new TextView(MainActivity.getInstance());
-            textshow.setLayoutParams(new WindowManager
+//            textshow = new TextView(MainActivity.getInstance());
+            CameraView = new ImageView(MainActivity.getInstance());
+            CameraView.setLayoutParams(new WindowManager
                     .LayoutParams(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.MATCH_PARENT));
 
-            textcontainerView.addView(textshow);
-            textshow.setMovementMethod(ScrollingMovementMethod.getInstance());
+            textcontainerView.addView(CameraView);
+//            textshow.setMovementMethod(ScrollingMovementMethod.getInstance());
 //
 
 //            WebView scrollView  = new WebView(MainActivity.getInstance());
@@ -187,12 +199,15 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
             ViewGroup.LayoutParams layoutParams =new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
                     , ViewGroup.LayoutParams.MATCH_PARENT);
             scrollView.setLayoutParams(new ViewGroup.LayoutParams(layoutParams));
-            textshow = new TextView(MainActivity.getInstance());
-            textshow.setLayoutParams(new WindowManager
+//            textshow = new TextView(MainActivity.getInstance());
+            CameraView = new ImageView(MainActivity.getInstance());
+            CameraView.setLayoutParams(new WindowManager
                     .LayoutParams(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.MATCH_PARENT));
-            scrollView.addView(textshow);
+            scrollView.addView(CameraView);
             textcontainerView.addView(scrollView);
         }
+
+
 //        textshow = mView.findViewById(R.id.firmware_show);
 //        textshow.setMovementMethod(ScrollingMovementMethod.getInstance());
         mDialog1 = CustomDialog.createProgressDialog(MainActivity.getInstance(), Constants.TimeOutSecond, new CustomDialog.OnTimeOutListener() {
@@ -301,7 +316,7 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
             //第三个参数是请求码
             //第四个参数是要申请的权限
             ToastUtils.showToast(MainActivity.getInstance(),"无网络权限");
-            EasyPermissions.requestPermissions(Hex2BinConvertFragment.this,"必要的权限", 1, perms);
+            EasyPermissions.requestPermissions(CameraTestFragment.this,"必要的权限", 1, perms);
             Log.i(TAG, "网络申请权限");
             result = false;
         }
@@ -365,7 +380,7 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
                     //第二个参数是被拒绝后再次申请该权限的解释
                     //第三个参数是请求码
                     //第四个参数是要申请的权限
-                    EasyPermissions.requestPermissions(Hex2BinConvertFragment.this,"必要的权限", 0, perms);
+                    EasyPermissions.requestPermissions(CameraTestFragment.this,"必要的权限", 0, perms);
                     Log.i(TAG, "申请权限");
                 }
                     } catch (IOException e) {
@@ -498,7 +513,7 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
                             //第二个参数是被拒绝后再次申请该权限的解释
                             //第三个参数是请求码
                             //第四个参数是要申请的权限
-                            EasyPermissions.requestPermissions(Hex2BinConvertFragment.this,"必要的权限", 0, perms);
+                            EasyPermissions.requestPermissions(CameraTestFragment.this,"必要的权限", 0, perms);
                             Log.i(TAG, "申请权限");
                         }
                     } catch (IOException e) {
@@ -710,155 +725,66 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
                         Log.d("zl","非法指令"+readOutMsg1);
                     }
                     break;
-                case 0:
-                    if(MainActivity.getInstance().mDialog.isShowing())
+                case 1:
+                    if(MainActivity.getInstance().mDialog.isShowing() == true)
                     {
+                        Log.d("zl","mDialog is cancled");
                         MainActivity.getInstance().mDialog.dismiss();
                     }
-                    if(readOutBuf1[0]!=0x06)
-                    {
-                        Dialog dialog = new android.app.AlertDialog.Builder(MainActivity.getInstance()) // 实例化对象
-                                .setIcon(R.drawable.warning_icon) 						// 设置显示图片
-                                .setTitle("操作提示") 							// 设置显示标题
-                                .setMessage("设备禁止写入!!\n请确认写入版本号是否高于设备版本号。") 				// 设置显示内容
-                                .setPositiveButton("确定", 						// 增加一个确定按钮
-                                        new DialogInterface.OnClickListener() {	// 设置操作监听
-                                            public void onClick(DialogInterface dialog,
-                                                                int whichButton) { 			// 单击事件
-                                            }
-                                        }).create(); 							// 创建Dialog
-                        dialog.show();
-                    }
-                    else
-                    {
-                        updatestep=1;
-                        byte [] sendbuf=new byte[10];
-                        ByteBuffer buf;
-                        buf=ByteBuffer.allocateDirect(4);
-                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);
-                        buf.putInt(byte_firmware.length);
-                        buf.rewind();
-                        buf.get(sendbuf,0,4);
+                    CountDownTimer countDownTimer = new CountDownTimer(1*60*1000,1000) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                        //    long timeleft = 2*60*1000-millisUntilFinished;
+                            if(mCameraInfoShowDlg.isShowing() == false)
+                            {
+                                mCameraInfoShowDlg.show();
+                            }
+                            mCameraInfoShowDlg.setDlgMsg("请等待:"+millisUntilFinished/1000+"秒");
+//                            Log.d("zl","wait second:"+millisUntilFinished);
+                        }
 
-                        buf=ByteBuffer.allocateDirect(8);
-                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);
-                        buf.putLong(checksum);
-                        buf.rewind();
-                        buf.get(sendbuf,4,4);
-                        Log.d("zl","lenth/checksum: "+byte_firmware.length+" / "+checksum);
+                        @Override
+                        public void onFinish() {
+                            mCameraInfoShowDlg.dismiss();
+                            updatestep = 2;
+                            byte buf[];
+                            buf = new byte[]{
+                                    (byte) 0xFD,0x00 ,0x00 ,0x0D ,0x00 ,0x19 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x74 ,0x00 ,0x70 ,0x30
+                            };
 
+                            String readOutMsg = DigitalTrans.byte2hex(buf);
+                            verycutstatus(readOutMsg,0);
+                        }
+                    };
 
-                        //根据新增协议，添加步骤序号
-                        byte [] sendbuf1= new byte[11];
-                        sendbuf1[0]=0x01;
-                        //拷贝数据
-//                        buf=ByteBuffer.allocateDirect(11);
-//                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);
-//                        buf.put(sendbuf);
-//                        buf.rewind();
-//                        buf.get(sendbuf1,1,10);
-
-                        memcry(sendbuf1,sendbuf,1,0,10);
-
-                        CodeFormat.crcencode(sendbuf1);
-                        Log.d("zl","checksum"+CodeFormat.byteToHex(sendbuf1,sendbuf1.length).toLowerCase());
-                        databytelen=0;
-
-                        //发送数据
-                        verycutstatus(sendbuf1,5000);
-                        Log.d("zl","OndataCometoParse: 开始");
-                    }
-                    break;
-                case 1:
-                    if(readOutBuf1[0]!=0x06)
-                    {
-                        if(mprodlg.isShowing())
-                            mprodlg.showresult("文件属性失败",R.drawable.update_fail,true);
-                    }
-                    else
-                    {
-                        updatestep=2;
-                        mpackageIndex=0;
-                        byte sendbuf[]=new byte[Constants.FIRM_WRITE_FRAMELEN+4];
-                        ByteBuffer buf;
-                        buf = ByteBuffer.allocateDirect(4);
-                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);
-                        buf.putInt(mpackageIndex);
-                        buf.rewind();
-                        buf.get(sendbuf,0,2);
-
-                        memcry(sendbuf,byte_firmware,2,0,Constants.FIRM_WRITE_FRAMELEN);
-                        //根据新增协议添加步骤序号
-                        byte sendbuf1[]=new byte[Constants.FIRM_WRITE_FRAMELEN+4+1];
-                        //拷贝数据
-                        sendbuf1[0]=0x02;
-                        memcry(sendbuf1,sendbuf,1,0,sendbuf.length);
-
-                        CodeFormat.crcencode(sendbuf1);
-                        verycutstatus(sendbuf1,5000);
-//                        Log.d("zl","新增序号"+CodeFormat.byteToHex(sendbuf1,sendbuf1.length).toLowerCase());
-//                        mprodlg.show();
-                        mprodlg.show("正在写入..."); // mprodlg.show(""+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
-                        mprodlg.setCurProcess(0);
-                        mpackagelen=Constants.FIRM_WRITE_FRAMELEN;
-                    }
+                    countDownTimer.start();
                     break;
                 case 2:
-                    if(ErrorTimesTh!=null)
-                    {
-                        ErrorTimesTh.interrupt();
-                        ErrorTimesTh=null;
-
+                    try {
+                        mOutStream.write(readOutBuf1);
+                    } catch (IOException e) {
+                        ToastUtils.showToast(getContext(),e.toString());
+                        e.printStackTrace();
                     }
-                    if(readOutBuf1[0]!=0x06)
+                    int pos = readOutBuf1.length;
+                    if((readOutBuf1[pos-1]&0x00ff) == 0x00D9&&(readOutBuf1[pos-2]&0x00ff)== 0x00ff)
                     {
-                       // mprodlg.showresult("文件写入失败",R.drawable.update_fail,true);
-
-                        ErrorTimesTh = new Thread(new ErrortiemsSupercisor() );
-                        ErrorTimesTh.start();
-                    }
-                    else
-                    {
-                        ErrorTimesCounter=0;
-                        mpackageIndex++;
-                        byte[] sendbuf;
-                        databytelen+=Constants.FIRM_WRITE_FRAMELEN;
-                        ByteBuffer buf;
-                        buf = ByteBuffer.allocateDirect(4);
-                        buf=buf.order(ByteOrder.LITTLE_ENDIAN);
-                        buf.putInt(mpackageIndex);
-                        buf.rewind();
-                        if((byte_firmware.length-databytelen)>Constants.FIRM_WRITE_FRAMELEN)
-                        {
-                            mpackagelen=Constants.FIRM_WRITE_FRAMELEN;
-                            sendbuf=new byte[Constants.FIRM_WRITE_FRAMELEN+4];
-                            buf.get(sendbuf,0,2);
-                            memcry(sendbuf,byte_firmware,2,databytelen,Constants.FIRM_WRITE_FRAMELEN);
+                        MainActivity.getInstance().mDialog.dismiss();
+                        Log.d("zl","detect the rail of the jpg file");
+                        try {
+                            mInStream = new ByteArrayInputStream(mOutStream.toByteArray());
+                            mOutStream.flush();
+                            Bitmap bitmap;
+                            Log.d("zl","input stream lenthe is "+mInStream.available());
+                            bitmap = BitmapFactory.decodeStream(mInStream);
+                            CameraView.setImageBitmap(bitmap);
+//                            mInStream.reset();
+                            mInStream.close();
+                        } catch (IOException e) {
+                            ToastUtils.showToast(getContext(),e.toString());
+                            e.printStackTrace();
                         }
-                        else
-                        {
-                            int lenleft= byte_firmware.length-databytelen;
-                            mpackagelen=lenleft;
-                            sendbuf=new byte[lenleft+4];
-                            buf.get(sendbuf,0,2);
-                            memcry(sendbuf,byte_firmware,2,databytelen,lenleft);
-                            updatestep=3;
-                        }
-                        //根据新增协议添加步骤序号
-                        byte sendbuf1[]=new byte[sendbuf.length+1];
-                        //拷贝数据
-                        sendbuf1[0]=0x02;
-                        memcry(sendbuf1,sendbuf,1,0,sendbuf.length);
 
-                        CodeFormat.crcencode(sendbuf1);
-                        verycutstatus(sendbuf1,5000);
-                        RepeateSendbuf = sendbuf1;
-//                        Log.d("zl","新增序号 "+CodeFormat.byteToHex(sendbuf1,sendbuf1.length).toLowerCase());
-                        int process=databytelen*100/byte_firmware.length;
-////                        mprodlg.show(""+CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length)
-//                                +"//"+process);
-                        if(mprodlg.isShowing())
-                            mprodlg.setCurProcess(process);
                     }
                     break;
                 case 3:
@@ -1369,56 +1295,34 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
         public void onClick(View v) {
 //            Toast.makeText(getActivity(),"开始转换",Toast.LENGTH_SHORT)
 //                    .show();
-            if(byte_firmware==null)
+                updatestep = 1;
+            mIsatart = true;
+            if(mInStream !=null)
             {
-                ToastUtils.showToast(getActivity(),"请先载入文件");
-                return;
-            }
-            else if(byte_firmware.length==0)
-            {
-                ToastUtils.showToast(getActivity(),"文件数据长度异常");
-                return;
-            }
-            else
-            {
-                //让设备处于等待状态
-                updatestep=-1;
-                verycutstatus("18",0);
-                //延时2秒
-                CountDownTimer countDownTimer = new CountDownTimer(2000,1000) {
-                    @Override
-                    public void onTick(long millisUntilFinished) {
 
-                    }
-
-                    @Override
-                    public void onFinish() {
-                        updatestep=0;
-                        byte [] sendbuf;
-                        int datalen=4;
-                        sendbuf=new byte[datalen+18];
-                        sendbuf[0]= (byte) 0xFD;
-                        sendbuf[3]= (byte) ((datalen+13)%0x100);
-                        sendbuf[5]=0x15;
-                        sendbuf[14]= (byte) (0xff&3);
-                        sendbuf[16]=(byte) 'V';
-                        String ver = url.substring(url.length()-7,url.length()-4);
-                        Log.d("zl",ver);
-                        ByteBuffer buf1;
-                        buf1=ByteBuffer.allocateDirect(3);
-                        buf1=buf1.order(ByteOrder.LITTLE_ENDIAN);
-                        buf1.put(ver.getBytes());
-                        buf1.rewind();
-                        buf1.get(sendbuf,17,3);
-                        CodeFormat.crcencode(sendbuf);
-                        String readOutMsg = DigitalTrans.byte2hex(sendbuf);
-                        Log.d("zl",CodeFormat.byteToHex(sendbuf,sendbuf.length).toLowerCase());
-                        verycutstatus(readOutMsg,2000);
-                    }
-                };
-                countDownTimer.start();
-                mIsatart=true;
+                try {
+                    mInStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+            try {
+                if(mOutStream !=null){
+                    mOutStream.close();
+                }
+                mOutStream = new ByteArrayOutputStream();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            byte buf[] ;
+                //拍照指令
+                buf = new byte[]{(byte) 0xFD, 0x00, 0x00, 0x19, 0x00, 0x15, 0x00, 0x00, 0x00,
+                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x74, 0x00, 0x01, 0x01,
+                                        0x00, 0x00, 0x00, 0x00, 0x3A, (byte) 0xD8, (byte) 0xDF,
+                                        (byte) 0xDE, 0x71, 0x42, (byte) 0xC9, 0x63};
+            String readOutMsg = DigitalTrans.byte2hex(buf);
+        //    Log.d("zl",CodeFormat.byteToHex(sendbuf,sendbuf.length).toLowerCase());
+            verycutstatus(readOutMsg,0);
         }
     }
 
@@ -1602,7 +1506,7 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
          * @param id
          */
         @HTTP(method = "GET", path = "{id}", hasBody = false)
-        Call<ResponseBody> getCall(@Path("id")  String id);
+        Call<ResponseBody> getCall(@Path("id") String id);
         // {id} 表示是一个变量
         // method 的值 retrofit 不会做处理，所以要自行保证准确
     }
@@ -1610,7 +1514,7 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
     public  interface GetRequest_GetFile_Interface
     {
         @HTTP(method = "GET", path = "{id}", hasBody = false)
-        Call<ResponseBody> getCall(@Path("id")  String id);
+        Call<ResponseBody> getCall(@Path("id") String id);
     }
 
     private class getfilewriteresultimpl implements FileWriterUtils.writefileResult{
@@ -1619,7 +1523,7 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
         getfilewriteresultimpl(String url)
         {
             mUrl = url;
-            Hex2BinConvertFragment.this.url = url;
+            CameraTestFragment.this.url = url;
         }
         @Override
         public void OnFilewritesuccess() {

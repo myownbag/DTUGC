@@ -120,6 +120,7 @@
             android:layout_height="1dp"
             android:background="#CFCFCF" />
         <LinearLayout
+            android:id="@+id/ptz_container_press"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -159,6 +160,7 @@
                 android:weightSum="10"
                 >
                 <TextView
+                    android:id="@+id/ptz_pressure_limit_l_lab"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
                     android:gravity="center_vertical"
@@ -174,6 +176,7 @@
                     />
             </LinearLayout>
             <LinearLayout
+                android:id="@+id/ptz_pressure_limit_h_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -204,6 +207,7 @@
             android:layout_height="1dp"
             android:background="#CFCFCF" />
         <LinearLayout
+            android:id="@+id/ptz_temperature_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -289,6 +293,7 @@
             android:background="#CFCFCF" />
 
         <LinearLayout
+            android:id="@+id/ptz_press_factor_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -372,6 +377,7 @@
             android:layout_height="1dp"
             android:background="#CFCFCF" />
         <LinearLayout
+            android:id="@+id/ptz_container_scan_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -397,6 +403,7 @@
             android:layout_height="1dp"
             android:background="#CFCFCF" />
         <LinearLayout
+            android:id="@+id/ptz_pluse_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"

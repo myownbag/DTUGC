@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#fff"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#1D8FFE" >
+
+        <ImageView
+            android:id="@+id/ptz_settings_imgBackItemset"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/icon_back" />
+
+        <TextView
+            android:id="@+id/ptz_settings_txt_titles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textColor="#FFF"
+            android:textSize="20sp" />
+
+    </RelativeLayout>
+<LinearLayout
+    android:id="@+id/addr201_APN_Container"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:orientation="horizontal"
+    >
+
+    <TextView
+        android:id="@+id/ptz_settings_spiner_lab"
+        android:layout_gravity="center_vertical"
+        android:layout_width="80sp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="APN:"
+        android:textColor="#444"
+        android:textSize="14sp" />
+
+    <Spinner
+        android:id="@+id/ptz_settings_spiner_ctrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:textColor="#444"
+        android:textSize="14sp" />
+</LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+    <LinearLayout
+        android:id="@+id/ptz_settings_edit1_container"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:id="@+id/ptz_settings_edit_lab1"
+            android:layout_gravity="center_vertical"
+            android:layout_width="80sp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="USERS:"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/ptz_settings_edit_ctrl1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:textColor="#444"
+            android:textSize="14sp" />
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+    <LinearLayout
+        android:id="@+id/ptz_settings_edit2_containers"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:id="@+id/ptz_settings_edit_lab2"
+            android:layout_gravity="center_vertical"
+            android:layout_width="80sp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="PASSWORD:"
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/ptz_settings_edit_ctrl2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:textColor="#444"
+            android:textSize="14sp" />
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#CFCFCF" />
+
+    <RelativeLayout
+        android:id="@+id/ptz_buttons_container"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        >
+    <Button
+
+        android:id="@+id/ptz_settings_ok_button"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
+        android:layout_centerVertical="true"
+      android:layout_centerHorizontal="true"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/round_button"
+        android:text="确 定"
+        android:textColor="@drawable/white"
+
+        />
+    </RelativeLayout>>
+</LinearLayout>
