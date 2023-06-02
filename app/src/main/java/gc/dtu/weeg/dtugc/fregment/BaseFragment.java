@@ -9,6 +9,7 @@ import java.text.ParseException;
 
 import gc.dtu.weeg.dtugc.MainActivity;
 import gc.dtu.weeg.dtugc.bluetooth.BluetoothService;
+import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
 public abstract class BaseFragment extends Fragment {
     public Boolean mIsatart=false;
@@ -67,4 +68,6 @@ public abstract class BaseFragment extends Fragment {
     {
         mIsatart=false;
     }
+
+
 }

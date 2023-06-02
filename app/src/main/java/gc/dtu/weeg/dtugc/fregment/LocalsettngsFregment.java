@@ -33,6 +33,7 @@ import gc.dtu.weeg.dtugc.R;
 import gc.dtu.weeg.dtugc.myview.LocalSetaddr219ExtraInfoView;
 import gc.dtu.weeg.dtugc.myview.LocalSetaddr221ExtrainfoView;
 import gc.dtu.weeg.dtugc.myview.LocalSetaddr222ExtraInfoView;
+import gc.dtu.weeg.dtugc.myview.LocalSetaddr229ExtraInfoView;
 import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
@@ -79,6 +80,7 @@ public class LocalsettngsFregment extends BaseFragment {
             {"219","时间段传输设置","14","E"},
             {"221","月高峰采集传输","23","E"},
             {"222","拍照功能","3","E"},
+            {"229","报警延时","2","E"},
     };
     public String[][] registerinfosel=
             {
@@ -476,6 +478,16 @@ public class LocalsettngsFregment extends BaseFragment {
                 buf.rewind();
                 buf.get(reg222datacontent);
                 settingscontent[mIndexcmd]= LocalSetaddr222ExtraInfoView.dacodetoStr(reg222datacontent);
+            }
+            else if(tempint2 == 229)
+            {
+                byte[] reg229datacontent = new byte[2];
+                ByteBuffer buf = ByteBuffer.allocate(2);
+                buf=buf.order(ByteOrder.LITTLE_ENDIAN);
+                buf.put(readOutBuf1,16,2)  ;
+                buf.rewind();
+                buf.get(reg229datacontent);
+                settingscontent[mIndexcmd]= LocalSetaddr229ExtraInfoView.dacodetoStr(reg229datacontent);
             }
             else
             {

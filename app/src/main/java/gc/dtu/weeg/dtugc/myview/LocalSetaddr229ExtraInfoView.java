@@ -14,15 +14,17 @@ import gc.dtu.weeg.dtugc.myview.slidingbutton.BaseSlidingToggleButton;
 import gc.dtu.weeg.dtugc.myview.slidingbutton.SlidingToggleButton;
 import gc.dtu.weeg.dtugc.utils.ToastUtils;
 
-public class LocalSetaddr222ExtraInfoView extends LinearLayout {
+public class LocalSetaddr229ExtraInfoView extends LinearLayout {
     static  Context ttt;
     String mCursetstr;
     Context mActivity;
     SlidingToggleButton mCameraEn;
     EditText mCameraScan;
     TextView mStatus;
+    TextView mLableShowInfo1;
+    TextView mLableShowInfo2;
     View mView;
-    public LocalSetaddr222ExtraInfoView(Context context, String setingstr) {
+    public LocalSetaddr229ExtraInfoView(Context context, String setingstr) {
         super(context);
         mActivity = context;
         ttt = context;
@@ -36,6 +38,8 @@ public class LocalSetaddr222ExtraInfoView extends LinearLayout {
         mCameraEn = mView.findViewById(R.id.reg222funenable);
         mCameraScan = mView.findViewById(R.id.reg222_scan_time);
         mStatus = mView.findViewById(R.id.reg222isenableinfo);
+        mLableShowInfo1 = mView.findViewById(R.id.lable_show_info1);
+        mLableShowInfo2 = mView.findViewById(R.id.lable_show_info2);
 
         mCameraEn.setOnCheckedChanageListener(new BaseSlidingToggleButton.OnCheckedChanageListener() {
             @Override
@@ -51,6 +55,9 @@ public class LocalSetaddr222ExtraInfoView extends LinearLayout {
             }
         });
 
+        mLableShowInfo1.setText("报警延时");
+        mLableShowInfo2.setText("延时时间(分)");
+
         byte[] test = strinfo2bytes(mCursetstr);
 
         if(test[0] == 1)
@@ -61,10 +68,12 @@ public class LocalSetaddr222ExtraInfoView extends LinearLayout {
         {
             mCameraEn.setChecked(false);
         }
-
+        byte[] testbyt = new byte[2];
+        testbyt[0] = test[1];
+        testbyt[1] = 0;
         ByteBuffer buf = ByteBuffer.allocate(2);
         buf=buf.order(ByteOrder.LITTLE_ENDIAN);
-        buf.put(test,1,2) ;
+        buf.put(testbyt,0,2) ;
         buf.rewind();
         String info = ""+buf.getShort();
         mCameraScan.setText(info);
@@ -81,10 +90,12 @@ public class LocalSetaddr222ExtraInfoView extends LinearLayout {
         {
             ttt = "禁止,";
         }
-
+        byte[] ttst = new byte[2];
+        ttst[0] = bytedecode[1];
+        ttst[1] = 0;
         ByteBuffer buf = ByteBuffer.allocate(2);
         buf=buf.order(ByteOrder.LITTLE_ENDIAN);
-        buf.put(bytedecode,1,2)  ;
+        buf.put(ttst,0,2)  ;
         buf.rewind();
         short test = buf.getShort();
 //        if(test>10000 || test<-10000)
@@ -96,7 +107,7 @@ public class LocalSetaddr222ExtraInfoView extends LinearLayout {
     }
     public byte[] dacodeshowinfo()
     {
-        byte[] buts = new byte[3];
+        byte[] buts = new byte[2];
         if(mCameraEn.isChecked() == true)
         {
             buts[0] = 1;
@@ -109,12 +120,12 @@ public class LocalSetaddr222ExtraInfoView extends LinearLayout {
         buf=buf.order(ByteOrder.LITTLE_ENDIAN);
         buf.putShort(Short.parseShort(mCameraScan.getText().toString()));
         buf.rewind();
-        buf.get(buts,1,2);
+        buf.get(buts,1,1);
         return  buts;
     }
     static public byte[] strinfo2bytes(String setinfo)
     {
-        byte[] but = new byte[3];
+        byte[] but = new byte[2];
         if(setinfo !=null)
         {
             int index=-1;
@@ -142,7 +153,7 @@ public class LocalSetaddr222ExtraInfoView extends LinearLayout {
                     buf=buf.order(ByteOrder.LITTLE_ENDIAN);
                     buf.putShort(ts) ;
                     buf.rewind();
-                    buf.get(but,1,2);
+                    buf.get(but,1,1);
                 }
                 else
                 {

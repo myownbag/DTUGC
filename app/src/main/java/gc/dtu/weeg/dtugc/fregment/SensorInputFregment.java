@@ -77,7 +77,9 @@ public class SensorInputFregment extends BaseFragment {
                     {"1","RS485_ExSAF","65533"},
                     {"1","RS485_ANCN","65531"},
                     {"1","转换模块","65532"},
+                    {"1","PCM9890B","65530"},
                     {"1","模拟量量程","65535"},
+
 
                     {"2","无","0"},
                     {"2","PT100","1"},

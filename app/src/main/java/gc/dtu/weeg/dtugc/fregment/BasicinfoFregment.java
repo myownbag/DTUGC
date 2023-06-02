@@ -39,6 +39,7 @@ public class BasicinfoFregment extends BaseFragment {
     IndicatorSeekBar indicatorSeekBar;
     public Button butsend;
     public int currentposition=0;
+    public Button testbut;
     //public int timersec=30;
     //停止标记
     Boolean timerstop=false;
@@ -140,6 +141,32 @@ public class BasicinfoFregment extends BaseFragment {
 
             }
         });
+
+
+        testbut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mIsatart=true;
+                byte testbuf[] = new byte[18];
+                int index=0;
+                testbuf[index++]= (byte) 0xfd;
+                testbuf[index++]= (byte) 0x00;
+                testbuf[index++]= (byte) 0x00;
+                testbuf[index++]= 13;
+                testbuf[index++]= (byte) 0x00;
+                testbuf[index++]= (byte) 0x19;
+                for(int i=0;i<8;i++)
+                {
+                    testbuf[index++]= (byte) 0x00;
+                }
+                testbuf[index++]= 2;
+                testbuf[index++]= (byte) 0x00;
+                CodeFormat.crcencode(testbuf);
+                Log.d("zl",CodeFormat.byteToHex(testbuf,testbuf.length).toUpperCase());
+                String readOutMsg = DigitalTrans.byte2hex(testbuf);
+                verycutstatus(readOutMsg);
+            }
+        });
     }
 
     private void verycutstatus(String readOutMsg) {
@@ -162,7 +189,7 @@ public class BasicinfoFregment extends BaseFragment {
     @Override
     public void OndataCometoParse(String readOutMsg1, byte[] readOutBuf1) {
         String temp;
-//        Log.d("zl",CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
+       Log.d("zl",CodeFormat.byteToHex(readOutBuf1,readOutBuf1.length));
         if(mIsatart==false)
         {
             return;
@@ -346,5 +373,7 @@ public class BasicinfoFregment extends BaseFragment {
         Timeinfo=mView.findViewById(R.id.tv_basic_time);
         Signalinfo=mView.findViewById(R.id.tv_basic_signal);
         butsend = mView.findViewById(R.id.tv_basic_btn_write);
+        testbut = mView.findViewById(R.id.tv_basic_btn_test);
+
     }
 }
