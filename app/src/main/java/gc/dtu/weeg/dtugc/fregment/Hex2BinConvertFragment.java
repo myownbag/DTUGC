@@ -465,9 +465,10 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
                 FIRMBASEUPDATESERVICER = Constants.FIRM_BASEUPDATESERVICER_FMMCU_SGULCA;
                 FIRMUPDATESERVERINFO = Constants.FIRM_UPDATESERVER_FMMCU_SGULCA;
                 break;
-//            case 4:
-//                //预留新设备
-//                break;
+            case 5:
+                FIRMBASEUPDATESERVICER = Constants.FIRM_BASEUPDATESERVICER_FMMCU_EMVSV;
+                FIRMUPDATESERVERINFO = Constants.FIRM_UPDATESERVER_FMMCU_EMVSV;
+                break;
         }
 
 
@@ -1150,6 +1151,9 @@ public class Hex2BinConvertFragment extends BaseFragment implements  EasyPermiss
                         break;
                     case 3:
                         Httpurl= Constants.FIRM_BASEUPDATESERVICER_FMMCU_SGULCA;
+                        break;
+                    case 5:
+                        Httpurl = Constants.FIRM_BASEUPDATESERVICER_FMMCU_EMVSV;
                         break;
                 }
 

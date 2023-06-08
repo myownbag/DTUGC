@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -67,7 +68,10 @@ import gc.dtu.weeg.dtugc.fregment.PTZSettingsFragment;
 import gc.dtu.weeg.dtugc.fregment.PressSensoraddSetframent;
 import gc.dtu.weeg.dtugc.fregment.RealtimedataFregment;
 import gc.dtu.weeg.dtugc.fregment.SensorInputFregment;
+import gc.dtu.weeg.dtugc.fregment.SvEventShowFragment;
+import gc.dtu.weeg.dtugc.fregment.SvGasPressShowFragment;
 import gc.dtu.weeg.dtugc.myview.CustomDialog;
+import gc.dtu.weeg.dtugc.utils.CodeFormat;
 import gc.dtu.weeg.dtugc.utils.Constants;
 import gc.dtu.weeg.dtugc.utils.DigitalTrans;
 import gc.dtu.weeg.dtugc.utils.FileWriterUtils;
@@ -115,7 +119,7 @@ public class MainActivity extends FragmentActivity {
     private ViewGroup mClassContainer;
     int mScrollX = 0;
     private List<BaseFragment> fragments;
-    public String[] titles=new String[]{"基本信息","实时数据", "历史数据","本机设置","PTZ设置"
+    public String[] titles=new String[]{"基本信息","实时数据","智能阀事件读取","智能阀状态读取", "历史数据","本机设置","PTZ设置"
             , "温压传感器接入","气体传感器接入", "仪表接入","传感器调试","NB业务注册","阀门控制","版本信息","固件升级","IC卡设置","外接报警设置","拍照测试","压力高级设置"};
     //蓝牙状态保存
     public Boolean mIsconnect = false;
@@ -152,6 +156,41 @@ public class MainActivity extends FragmentActivity {
     public ExternedGasAlarmSettingFragment fragment15;
     public CameraTestFragment fragment16;
     public GasAdvanceSettingFragment fragment17;
+    public SvEventShowFragment fragment18;
+    public SvGasPressShowFragment fragment19;
+
+    int mAck;
+    BlueToothACK mAckThread;
+//    CountDownTimer countDownTimer = new CountDownTimer(30000,10000) {
+//        @Override
+//        public void onTick(long millisUntilFinished) {
+//
+//        }
+//
+//        @Override
+//        public void onFinish() {
+//                if(mIsconnect == true)
+//                {
+//                    mAck = 1;
+//
+//                    byte[] senddatabuf = new byte[18];
+//                    int index =0;
+//                    senddatabuf[index++]= (byte) 0xfd;
+//                    senddatabuf[index++]= (byte) 0x00;
+//                    senddatabuf[index++]= (byte) 0x00;
+//                    senddatabuf[index++]= 13;
+//                    senddatabuf[index++]= (byte) 0x00;
+//                    senddatabuf[index++]= (byte) 0x19;
+//                    for(int i=0;i<8;i++)
+//                    {
+//                        senddatabuf[index++]= (byte) 0x00;
+//                    }
+//                    senddatabuf[index++]= (byte) 0xC7;
+//                    senddatabuf[index++]= (byte) 0x00;
+//                    CodeFormat.crcencode(senddatabuf);
+//                }
+//        }
+//    };
 
     //接口
     Ondataparse mydataparse=null;
@@ -184,6 +223,7 @@ public class MainActivity extends FragmentActivity {
         // x.Ext.setDebug(BuildConfig.DEBUG); // 是否输出debug日志, 开启debug会影响性能.
         instanceMainActivity = this;
         mydataparse=null;
+        mAck = 0;
         InitView();
         InitFrgment();
         InitBlueTooth();
@@ -288,6 +328,44 @@ public class MainActivity extends FragmentActivity {
 
                             // mConversationArrayAdapter.clear();
                             mIsconnect = true;
+//                            countDownTimer.start();
+                            mAck = 1;
+
+                            byte[] senddatabuf = new byte[18];
+                            int index =0;
+                            senddatabuf[index++]= (byte) 0xfd;
+                            senddatabuf[index++]= (byte) 0x00;
+                            senddatabuf[index++]= (byte) 0x00;
+                            senddatabuf[index++]= 13;
+                            senddatabuf[index++]= (byte) 0x00;
+                            senddatabuf[index++]= (byte) 0x19;
+                            for(int i=0;i<8;i++)
+                            {
+                                senddatabuf[index++]= (byte) 0x00;
+                            }
+                            senddatabuf[index++]= (byte) 0xC7;
+                            senddatabuf[index++]= (byte) 0x00;
+                            CodeFormat.crcencode(senddatabuf);
+                            String readOutMsg = DigitalTrans.byte2hex(senddatabuf);
+                            sendData(readOutMsg, "String strOwner");
+
+                            if(mAckThread == null)
+                            {
+                                mAckThread = new BlueToothACK();
+                                mAckThread.start();
+                                Log.d("zl","ACK start");
+                            }
+                            else
+                            {
+                                if(mAckThread.isAlive())
+                                {
+                                    mAckThread.interrupt();
+                                }
+                                mAckThread = null;
+                                mAckThread = new BlueToothACK();
+                                mAckThread.start();
+                                Log.d("zl","ACK Init");
+                            }
                             break;
                         case BluetoothState.STATE_CONNECTING:
                             //setStatus(R.string.title_connecting);
@@ -304,10 +382,17 @@ public class MainActivity extends FragmentActivity {
                     }
                     break;
                 case BluetoothState.MESSAGE_WRITE:
+                    mAckThread.interrupt();
+                    mAckThread = null;
+                    mAckThread = new BlueToothACK();
+                    mAckThread.start();
+                    Log.d("zl","ACK restart");
                     // byte[] writeBuf = (byte[]) msg.obj;
                     // construct a string from the buffer
                     // String writeMessage = new String(writeBuf);
                     // mConversationArrayAdapter.add("Me:  " + writeMessage);
+//                    countDownTimer.cancel();
+//                    countDownTimer.start();
                     break;
                 case BluetoothState.MESSAGE_READ:
                     if (mThreedTimeout != null)
@@ -333,7 +418,12 @@ public class MainActivity extends FragmentActivity {
                     //获取接收的返回数据
 //                    Log.d("zl","MainActivity Read:"+readOutMsg);
                     Log.v("ttt", "recv:" + readOutMsg);
-
+                    if(mAck == 1)
+                    {
+                        mAck = 0;
+                        Log.d("zl","send ack reset");
+                        return;
+                    }
                     if (mydataparse != null) {
                         mydataparse.datacometoparse(readOutMsg, readOutBuf);
                     } else {
@@ -419,6 +509,20 @@ public class MainActivity extends FragmentActivity {
         bundle1.putString("extra",titles[index++]);
         fregment2.setArguments(bundle1);
         fragments.add(fregment2);
+
+        fragment18 = new SvEventShowFragment();
+        Bundle bundle18 = new Bundle();
+        bundle18.putInt("position",index);
+        bundle18.putString("extra",titles[index++]);
+        fragment18.setArguments(bundle18);
+        fragments.add(fragment18);
+
+        fragment19 =new SvGasPressShowFragment();
+        Bundle bundle19 = new Bundle();
+        bundle19.putInt("position",index);
+        bundle19.putString("extra",titles[index++]);
+        fragment19.setArguments(bundle19);
+        fragments.add(fragment19);
 
         fregment3 = new FrozendataFregment();
         Bundle bundle2 = new Bundle();
@@ -913,6 +1017,56 @@ public class MainActivity extends FragmentActivity {
                 MainActivity.this.mHandler.obtainMessage(BluetoothState.MESSAGE_STATE_TIMEOUT)
                         .sendToTarget(); //       mHandler.obtainMessage(BluetoothState.MESSAGE_READ, bytes, -1, buffer)
                       //  .sendToTarget();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public class BlueToothACK extends Thread
+    {
+        public int mtimeout;
+        BlueToothACK()
+        {
+            mtimeout=30000;
+        }
+        BlueToothACK(int timeout)
+        {
+            mtimeout=timeout;
+        }
+        @Override
+        public void run() {
+            try {
+                sleep(mtimeout);
+
+                ((MainActivity)MainActivity.getInstance()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(mIsconnect == true)
+                        {
+                            mAck = 1;
+
+                            byte[] senddatabuf = new byte[18];
+                            int index =0;
+                            senddatabuf[index++]= (byte) 0xfd;
+                            senddatabuf[index++]= (byte) 0x00;
+                            senddatabuf[index++]= (byte) 0x00;
+                            senddatabuf[index++]= 13;
+                            senddatabuf[index++]= (byte) 0x00;
+                            senddatabuf[index++]= (byte) 0x19;
+                            for(int i=0;i<8;i++)
+                            {
+                                senddatabuf[index++]= (byte) 0x00;
+                            }
+                            senddatabuf[index++]= (byte) 0xC7;
+                            senddatabuf[index++]= (byte) 0x00;
+                            CodeFormat.crcencode(senddatabuf);
+                            String readOutMsg = DigitalTrans.byte2hex(senddatabuf);
+                            sendData(readOutMsg, "String strOwner");
+                        }
+                    }
+                });
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

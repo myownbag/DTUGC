@@ -81,6 +81,8 @@ public class LocalsettngsFregment extends BaseFragment {
             {"221","月高峰采集传输","23","E"},
             {"222","拍照功能","3","E"},
             {"229","报警延时","2","E"},
+            {"111","低电压阀门动作","1","L"},
+            {"112","掉电阀门动作","1","L"},
     };
     public String[][] registerinfosel=
             {
@@ -105,6 +107,8 @@ public class LocalsettngsFregment extends BaseFragment {
                     {"110","EMV BV","4"},
                     {"110","IC卡 控制阀","5"},
                     {"110","MYDJF","6"},
+                    {"110","WeegEMV SV","7"},
+                    {"110","Smart SV","8"},
                     //无线模块
 //                    {"198","","-1"},
                     {"197","维格TCP","0"},
@@ -137,6 +141,12 @@ public class LocalsettngsFregment extends BaseFragment {
 //                    {"208","","-1"},
                     {"208","频率","0"},
                     {"208","每天固定时间","2"},
+
+                    {"111","不关闭","0"},
+                    {"111","关闭","1"},
+
+                    {"112","不关闭","0"},
+                    {"112","关闭","1"},
             };
     public String[] settingscontent=new String[baseinfo.length];
     byte [][] senddatabuf=new byte[baseinfo.length][18];
@@ -384,7 +394,7 @@ public class LocalsettngsFregment extends BaseFragment {
             }
             else
             {
-                gatetype=-1;
+                gatetype=tempint;
             }
             for(i=0;i<registerinfosel.length;i++)
             {
@@ -396,6 +406,10 @@ public class LocalsettngsFregment extends BaseFragment {
                         settingscontent[mIndexcmd]=registerinfosel[i][1];
                         // myadpater.notifyDataSetChanged();
                         break;
+                    }
+                    else
+                    {
+                        settingscontent[mIndexcmd]=""+gatetype;
                     }
                 }
             }

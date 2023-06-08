@@ -368,6 +368,21 @@ public class ItemSetingActivity extends Activity {
                              sendbuf[24]=(byte)(Constants.MYDJF_CLOSEDELY%0x100);;
                              sendbuf[25]=(byte)(Constants.MYDJF_CLOSEDELY/0x100);;
                              break;
+                         case 7:
+                             sendbuf[16]=0x07;
+                             break;
+                         case 8:
+                             sendbuf[16]=0x02;
+                             sendbuf[17]=0x01; //球阀
+                             sendbuf[18]= (byte) 0x20;
+                             sendbuf[19]= (byte) 0x4E;
+                             sendbuf[20]= (byte) 0x0C;
+                             sendbuf[21]= (byte) 0x12;
+                             sendbuf[22]= (byte) 0x96;
+                             sendbuf[23]=0x00;
+                             sendbuf[24]= (byte) 0x96;
+                             sendbuf[25]=0x00;
+                             break;
                      }
 
                  }

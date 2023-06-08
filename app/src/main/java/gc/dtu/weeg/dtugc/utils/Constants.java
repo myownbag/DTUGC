@@ -101,6 +101,9 @@ public class Constants {
     public static final String FIRM_BASEUPDATESERVICER_FMMCU_SGULCA = "http://58.216.223.222:8000/download/FMMCU/SGULCA/";
     public static final String FIRM_UPDATESERVER_FMMCU_SGULCA = "SGULCA.txt";
 
+    public static final String FIRM_BASEUPDATESERVICER_FMMCU_EMVSV = "http://58.216.223.222:8000/download/FMMCU/EMVSV/";
+    public static final String FIRM_UPDATESERVER_FMMCU_EMVSV = "EMVSV.txt";
+
     public static final int FIRMWARE_DATAWRITE_TIMEOUT=6;
     public static final int FIRMWARE_DATAERROR_TIMEOUT=7;
     public static final int FIRMWARE_DATAFINISH_TIMEOUT=8;
